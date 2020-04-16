@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'file',
     'problem',
     'submission',
+    'judge',
 ]
 
 REST_FRAMEWORK = {
