@@ -1,0 +1,15 @@
+# read design
+#read_verilog ./immediate_standard.v
+read_verilog ./immediate_test.v
+
+hierarchy -check
+
+# high-level synthesis
+proc; opt; fsm; opt; memory; opt
+
+show
+
+sim 
+-a
+-vcd counter.vcd
+

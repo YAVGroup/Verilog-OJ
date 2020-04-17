@@ -1,0 +1,83 @@
+$scope module ImmExtend $end
+$var wire 32 n1 \$0\imm[31:0] $end
+$var wire 1 n2 \$auto$rtlil.cc:1667:Not$10 $end
+$var wire 1 n3 \$auto$rtlil.cc:1667:Not$12 $end
+$var wire 1 n4 \$auto$rtlil.cc:1667:Not$14 $end
+$var wire 1 n5 \$auto$rtlil.cc:1667:Not$16 $end
+$var wire 1 n6 \$auto$rtlil.cc:1667:Not$18 $end
+$var wire 1 n7 \$auto$rtlil.cc:1667:Not$42 $end
+$var wire 1 n8 \$auto$rtlil.cc:1671:ReduceOr$28 $end
+$var wire 1 n9 \$auto$rtlil.cc:1671:ReduceOr$32 $end
+$var wire 1 n10 \$auto$rtlil.cc:1671:ReduceOr$36 $end
+$var wire 1 n11 \$auto$rtlil.cc:1671:ReduceOr$40 $end
+$var wire 1 n12 \$procmux$4_CMP $end
+$var wire 1 n13 \$procmux$5_CMP $end
+$var wire 1 n14 \$procmux$6_CMP $end
+$var wire 1 n15 \$procmux$7_CMP $end
+$var wire 1 n16 \$procmux$8_CMP $end
+$var wire 32 n17 imm $end
+$var wire 3 n18 imm_type $end
+$var wire 25 n19 inst $end
+$upscope $end
+$enddefinitions $end
+#0
+bxxxxxxxxxxxxxxxxxxxxxxxxx n19
+bxxx n18
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n17
+bx n16
+bx n15
+bx n14
+bx n13
+bx n12
+bx n11
+bx n10
+bx n9
+bx n8
+bx n7
+bx n6
+bx n5
+bx n4
+bx n3
+bx n2
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx n1
+#5
+#10
+#15
+#20
+#25
+#30
+#35
+#40
+#45
+#50
+#55
+#60
+#65
+#70
+#75
+#80
+#85
+#90
+#95
+#100
+#105
+#110
+#115
+#120
+#125
+#130
+#135
+#140
+#145
+#150
+#155
+#160
+#165
+#170
+#175
+#180
+#185
+#190
+#195
+#200
+#202
