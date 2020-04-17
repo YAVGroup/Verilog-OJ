@@ -13,7 +13,7 @@ def generate_submit_zone():
     generated_name += time.asctime().replace(' ', '-').replace(':', '')
     generated_name += ''.join(random.sample(string.ascii_letters +
                                             string.digits, 8))
-    subprocess.run("mkdir " + generated_name, shell=False)
+    subprocess.run("mkdir " + generated_name, shell=True)
     return generated_name
 
 
@@ -52,21 +52,21 @@ def perform_judge(task_struct):
     else:
         try:
             subprocess.run("cp" + " {source_file} {target_path}".format(
-                source_file=task_file_path, target_path=submit_zone_path), shell=False)
+                source_file=task_file_path, target_path=submit_zone_path), shell=True)
         except OSError as e:
             print("Failed to copy submission files: ", e, file=sys.stderr)
 
     # Copy standard output file to target directory
     try:
         subprocess.run("cp" + " {source_file} {target_path}".format(
-            source_file=task_standard_output_path, target_path=submit_zone_path), shell=False)
+            source_file=task_standard_output_path, target_path=submit_zone_path), shell=True)
     except OSError as e:
         print("Failed to copy standard output: ", e, file=sys.stderr)
 
     # Copy submit script to target directory
     try:
         subprocess.run("cp" + " {source_file} {target_path}".format(
-            source_file=task_submit_script_path, target_path=submit_zone_path), shell=False)
+            source_file=task_submit_script_path, target_path=submit_zone_path), shell=True)
     except OSError as e:
         print("Failed to copy submit script: ", e, file=sys.stderr)
 
@@ -75,7 +75,7 @@ def perform_judge(task_struct):
     # Yosys to generate our output
     try:
         subprocess.run("bash " + " {script_name}".format(
-            script_name=task_submit_script_name), shell=False)
+            script_name=task_submit_script_name), shell=True)
     except OSError as e:
         print("Yosys Failed: ", e, file=sys.stderr)
 
@@ -96,30 +96,26 @@ def perform_judge_iverilog_version(submission):
     submit_zone_path = generate_submit_zone()
     # submit_file = submission.submit_files
     submit_file = get_submit_file_test()
+    submit_problem = submission.problem
 
-    # submit_problem = submission.problem
-
-    # iverilog_output = get_iverilog_output(submit_problem.id)
-    # iverilog_script = get_iverilog_script(submit_problem.id)
-
-    iverilog_output = get_iverilog_output(1)
-    iverilog_script = get_iverilog_script(1)
+    iverilog_output = get_iverilog_output(submit_problem.id)
+    iverilog_script = get_iverilog_script(submit_problem.id)
 
     try:
         subprocess.run("cp" + " {source_file} {target_path}".format(
-            source_file=iverilog_output, target_path=submit_zone_path), shell=False)
+            source_file=iverilog_output, target_path=submit_zone_path), shell=True)
     except OSError as e:
         print("Failed to copy standard output: ", e, file=sys.stderr)
 
     try:
         subprocess.run("cp" + " {source_file} {target_path}".format(
-            source_file=iverilog_script, target_path=submit_zone_path), shell=False)
+            source_file=iverilog_script, target_path=submit_zone_path), shell=True)
     except OSError as e:
         print("Failed to copy submit script: ", e, file=sys.stderr)
 
     try:
         subprocess.run("bash {script}".format(
-            script=iverilog_script), shell=False)
+            script=iverilog_script), shell=True)
     except OSError as e:
         print("Failed to execute submit script: ", e, file=sys.stderr)
 
