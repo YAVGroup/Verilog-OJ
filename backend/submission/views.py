@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
 from rest_framework.compat import coreapi, coreschema
 from rest_framework.permissions import IsAuthenticated
+from judge.tasks import do_judge_task
+
 
 from .models import Submission
 from .serializers import SubmissionSerializer
@@ -49,4 +51,13 @@ class SubmitView(APIView):
     )
     def post(self, request, *args):
         # TODO: 提交评测功能
-        return Response('TODO', status.HTTP_500_INTERNAL_SERVER_ERROR)
+        serializer = SubmissionSerializer(data=request.data)
+        try:
+            serializer.is_valid(True)
+            serializer.save()
+
+            do_judge_task(serializer.data['id'])
+            return Response('提交评测', status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # return Response('TODO', status.HTTP_500_INTERNAL_SERVER_ERROR)
