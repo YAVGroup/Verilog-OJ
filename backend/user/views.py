@@ -154,6 +154,7 @@ class UserSignupView(GenericAPIView):
     """
     注册
     """
+    permission_classes = (AllowAny,)
     serializer_class = UserSerializer
     def post(self, request, *args):
         # 注册
