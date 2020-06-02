@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
 from rest_framework.compat import coreapi, coreschema
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from judge.tasks import do_judge_task
 
 
@@ -26,6 +27,7 @@ class SubmitView(APIView):
     提交
     """
     permission_classes = (IsAuthenticated,)
+    #permission_classes = (AllowAny,)
     schema = AutoSchema(
         manual_fields=[
             coreapi.Field(
