@@ -52,7 +52,6 @@ class SubmitView(APIView):
         ]
     )
     def post(self, request, *args):
-        # TODO: 提交评测功能
         serializer = SubmissionSerializer(data=request.data)
         try:
             serializer.is_valid(True)

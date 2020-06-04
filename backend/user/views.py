@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth import login, logout
+from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
@@ -154,13 +155,14 @@ class UserSignupView(GenericAPIView):
     """
     注册
     """
-    # FIXME
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
     def post(self, request, *args):
         # 注册
-        serializer = UserSerializer(data=request.data)
         try:
+            data = request.data.copy()
+            data['password'] = make_password(data['password'])
+            serializer = UserSerializer(data=data)
             serializer.is_valid(True)
             serializer.save()
             return Response('注册成功', status.HTTP_201_CREATED)
