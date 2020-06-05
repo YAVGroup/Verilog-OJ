@@ -24,7 +24,6 @@ class UserViewSet(ModelViewSet):
     """
     获取和修改用户信息（create仅限管理员，update/partial_update/delete仅限管理员和本人）
     """
-    # permission_classes = (permissions.OthersGetOnlyPermission,)
     queryset = User.objects.all()
     
     def get_serializer_class(self):
@@ -43,34 +42,12 @@ class UserViewSet(ModelViewSet):
         else:
             return [GetOnlyPermission()]
 
-class UserLoginView(APIView):
+class UserLoginView(GenericAPIView):
     """
     通过用户名和密码进行登录
     """
-    schema = AutoSchema(
-        manual_fields=[
-            coreapi.Field(
-                name='username',
-                required=True,
-                location='form',
-                schema=coreschema.String(
-                    title='username',
-                    description='用户名'
-                )
-            ),
-            coreapi.Field(
-                name='password',
-                required=True,
-                location='form',
-                schema=coreschema.String(
-                    title='password',
-                    description='密码'
-                )
-            ),
-        ]
-    )
-    # {"username":"test", "password":"test1234"}
     permission_classes = (AllowAny,)
+    serializer_class = UserLoginSerializer
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
