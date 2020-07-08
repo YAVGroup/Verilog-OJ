@@ -1,5 +1,3 @@
-from submission.models import Submission, SubmissionResult
-
 import tempfile
 import os
 import subprocess
@@ -12,7 +10,7 @@ judge_config = {
     'url_host': 'http://localhost:8080/'
 }
 
-def get_submission_detail(id):
+def get_submission_detail(submission_id, testcase_id):
     # todo: do get query, with token preconfigured, then fill the form
     return {
         'id': 0,
@@ -21,7 +19,7 @@ def get_submission_detail(id):
             'problem_files': [
                 {'uuid': "abc"}
             ],
-            'testcase_id': 0
+            'testcase_id': testcase_id
         },
         'user': {
             'id': 0,
@@ -40,7 +38,7 @@ def download_file(path, uuid):
     # Download file and store it in path (a dir)
     pass
 
-def push_result(result):
+def push_result(result, submission_id, testcase_id):
     # todo: post to the result, return True on completion
     # result: {}
     return True
@@ -103,19 +101,29 @@ def prepare_and_run(detail):
         log_out = "Suppressed due to submit_logs in judge configurations"
         log_err = "Suppressed due to submit_logs in judge configurations"
 
-    # Post them back
-    
-
     tmpdir.cleanup()
-    
 
-def judge(submission_id):
+    # Post them back
+    result = {
+        'score': score,
+        'log_out': log_out,
+        'log_err': log_err
+    }
+
+    return result
+
+
+def judge(submission_id, testcase_id):
     """
     评测某个提交。生成若干SubmissionResult，之后Submission就会被更新。
     """
     # TODO: 对某个提交进行评测
     # Query submission api for a json
-    detail = get_submission_detail(submission_id)
-
-
-    return "good"
+    try:
+        detail = get_submission_detail(submission_id, testcase_id)
+        result = prepare_and_run(detail)
+        push_result(result, submission_id, testcase_id)
+        return True
+    except:
+        print("Unexpected error while processing {}-{}: {}".format(submission_id, testcase_id, sys.exc_info()[0]))
+        return False
