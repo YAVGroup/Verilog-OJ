@@ -1,0 +1,45 @@
+$date
+	Thu Jul  9 07:55:01 2020
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module testbench $end
+$var reg 3 ! x [2:0] $end
+$upscope $end
+$scope module testbench $end
+$var wire 8 " y [7:0] $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+bx "
+bx !
+$end
+#1
+b1 "
+b0 !
+#2
+b10 "
+b1 !
+#3
+b100 "
+b10 !
+#4
+b1000 "
+b11 !
+#5
+b10000 "
+b100 !
+#6
+b100000 "
+b101 !
+#7
+b1000000 "
+b110 !
+#8
+b10000000 "
+b111 !
