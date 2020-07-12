@@ -93,5 +93,3 @@ class VcdComparator:
         except VcdSignalComparationError as e:
             return (False, "{}".format(e))
 
-if __name__ == "__main__":
-    cmpr = VcdComparator("./out.vcd", "", [''])

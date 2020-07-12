@@ -1,5 +1,5 @@
 import tempfile
-import os
+import os, sys
 import subprocess
 
 judge_config = {
@@ -45,72 +45,71 @@ def push_result(result, submission_id, testcase_id):
 
 def prepare_and_run(detail):
     # make a new folder in /tmp
-    tmpdir =  tempfile.TemporaryDirectory()
-    print('Created temporary directory {}'.format(tmpdir.name))
-    BASE_PATH = tmpdir.name
-    TESTCASE_DIR = os.path.join(BASE_PATH, "./testcase")
-    PROBLEM_DIR = os.path.join(BASE_PATH, "./problem")
-    SUBMIT_DIR = os.path.join(BASE_PATH, "./submit")
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        print('Created temporary directory {}'.format(tmpdirname))
+        BASE_PATH = tmpdirname
+        TESTCASE_DIR = os.path.join(BASE_PATH, "./testcase")
+        PROBLEM_DIR = os.path.join(BASE_PATH, "./problem")
+        SUBMIT_DIR = os.path.join(BASE_PATH, "./submit")
 
-    os.mkdir(TESTCASE_DIR)
-    os.mkdir(PROBLEM_DIR)
-    os.mkdir(SUBMIT_DIR)
+        os.mkdir(TESTCASE_DIR)
+        os.mkdir(PROBLEM_DIR)
+        os.mkdir(SUBMIT_DIR)
 
-    # download all contents in place
-    for f in detail['testcase_files']:
-        download_file(TESTCASE_DIR, f['uuid'])
-    
-    for f in detail['problem']['problem_files']:
-        download_file(PROBLEM_DIR, f['uuid'])
+        # download all contents in place
+        for f in detail['testcase_files']:
+            download_file(TESTCASE_DIR, f['uuid'])
+        
+        for f in detail['problem']['problem_files']:
+            download_file(PROBLEM_DIR, f['uuid'])
 
-    for f in detail['testcase_files']:
-        download_file(SUBMIT_DIR, f['uuid'])
+        for f in detail['submit_files']:
+            download_file(SUBMIT_DIR, f['uuid'])
 
-    os.chdir(BASE_PATH)
+        os.chdir(BASE_PATH)
 
-    # evaluate with time limit
-    process = subprocess.Popen(['/bin/bash', os.path.join(TESTCASE_DIR, judge_config['entry_file'])],
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE
-            )
-    
-    if judge_config['time_limit'] != 0:
-        try:
-            out, err = process.communicate(timeout=judge_config['time_limit'])
-        except subprocess.TimeoutExpired:
-            process.kill()
+        # evaluate with time limit
+        process = subprocess.Popen(['/bin/bash', os.path.join(TESTCASE_DIR, judge_config['entry_file'])],
+                stdout = subprocess.PIPE,
+                stderr = subprocess.PIPE
+                )
+        
+        if judge_config['time_limit'] != 0:
+            try:
+                out, err = process.communicate(timeout=judge_config['time_limit'])
+            except subprocess.TimeoutExpired:
+                process.kill()
+                out, err = process.communicate()
+        else:
             out, err = process.communicate()
-    else:
-        out, err = process.communicate()
-    
+        
 
-    # push stdout & score to the server
-    score_file_path = os.path.join(BASE_PATH, judge_config['final_score'])
-    score = None
-    if os.path.exists(score_file_path):
-        with open(score_file_path, "r") as f:
-            score = int(f.read())
-    print("Final score: {}".format(score))
+        # push stdout & score to the server
+        score_file_path = os.path.join(BASE_PATH, judge_config['final_score'])
+        score = None
+        if os.path.exists(score_file_path):
+            with open(score_file_path, "r") as f:
+                score = int(f.read())
+        print("Final score: {}".format(score))
 
-    # Grab all logs
-    if judge_config['submit_logs']:
-        # out.read is expected to be bytes
-        log_out = out.read().decode("utf8")
-        log_err = err.read().decode("utf8")
-    else:
-        log_out = "Suppressed due to submit_logs in judge configurations"
-        log_err = "Suppressed due to submit_logs in judge configurations"
+        # Grab all logs
+        if judge_config['submit_logs']:
+            # out.read is expected to be bytes
+            log_out = out.decode("utf8")
+            log_err = err.decode("utf8")
+        else:
+            log_out = "Suppressed due to submit_logs in judge configurations"
+            log_err = "Suppressed due to submit_logs in judge configurations"
 
-    tmpdir.cleanup()
+        # Post them back
+        result = {
+            'score': score,
+            'success': True if score is not None else False,
+            'log_out': log_out,
+            'log_err': log_err
+        }
 
-    # Post them back
-    result = {
-        'score': score,
-        'log_out': log_out,
-        'log_err': log_err
-    }
-
-    return result
+        return result
 
 
 def judge(submission_id, testcase_id):
@@ -125,5 +124,6 @@ def judge(submission_id, testcase_id):
         push_result(result, submission_id, testcase_id)
         return True
     except:
-        print("Unexpected error while processing {}-{}: {}".format(submission_id, testcase_id, sys.exc_info()[0]))
+        raise Exception("Comment me on production, but backtraces are useful for debugging")
+        print("Unexpected error while processing {}-{}: {}".format(submission_id, testcase_id, sys.exc_info()))
         return False
