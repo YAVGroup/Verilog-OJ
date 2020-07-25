@@ -22,6 +22,7 @@
       <el-button @click="dialogLoginVisible = false">Cancel</el-button>
       <el-button type="primary" @click="loginClick">OK</el-button>
     </div>
+    <a href="/api/user/ustc-login">统一身份认证登陆</a>
   </el-dialog>
 </template>
 
@@ -44,7 +45,7 @@ export default {
     loginClick() {
       var pas = this.$md5(this.form.password);
       this.$axios
-        .post("/login/", {
+        .post("/user/login", {
           username: this.form.username,
           password: pas
         })
@@ -59,8 +60,8 @@ export default {
           });
 
           sessionStorage.setItem("username", this.form.username);
-          sessionStorage.setItem("name", response.data.name);
-          sessionStorage.setItem("type", response.data.type);
+          sessionStorage.setItem("name", response.data.last_name+response.data.first_name);
+          //sessionStorage.setItem("type", response.data.type);
 
 
 
@@ -76,7 +77,7 @@ export default {
             this.$store.state.loginip = "chrome" // 后台会处理
           }
 
-          this.$axios
+          /*this.$axios
             .post("/setlogindata/", {
               username: this.form.username,
               ip: this.$store.state.loginip,
@@ -95,9 +96,11 @@ export default {
               sessionStorage.setItem("type", "");
               sessionStorage.setItem("acpro", "");
             });
+            */
+          this.$router.go(0);
         })
         .catch(error => {
-          this.$message.error("用户名不存在（" + error + "）");
+          this.$message.error( error );
         });
     }
   }
