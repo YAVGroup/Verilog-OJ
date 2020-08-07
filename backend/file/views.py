@@ -1,14 +1,10 @@
 from django.http import FileResponse
-from rest_framework import status, permissions
-from rest_framework.views import APIView
-from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, ListModelMixin
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework.response import Response
+from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import IsAdminUser
 
 from .models import File
 from .serializers import FileSerializer
-# from ..user.permissions import 
 
 class FileViewSet(GenericViewSet, CreateModelMixin, ListModelMixin):
     """

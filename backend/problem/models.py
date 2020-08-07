@@ -7,11 +7,6 @@ from file.models import File
 class Problem(models.Model):
     id = models.AutoField(primary_key=True, help_text='题目ID')
     name = models.CharField(max_length=20, help_text='题目名字')
-#     creater = models.ForeignKey(
-#         User,
-#         null=True, on_delete=models.SET_NULL,
-#         help_text='题目的创建者'
-#     )
     create_time = models.TimeField(auto_now_add=True, help_text='题目的创建时间')
     deadline_time = models.TimeField(null=True, blank=True, help_text='题目的截止时间')
     problem_files = models.ManyToManyField(File, help_text='题目所用文件（描述等）')

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
@@ -10,15 +10,14 @@ from rest_framework.schemas import AutoSchema
 from rest_framework.compat import coreapi, coreschema
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from cas_client import CASClient
+
 from .models import User
 from .serializers import UserSerializer, UserPublicSerializer, UserLoginSerializer
 from .permissions import GetOnlyPermission, OthersGetOnlyPermission
 
-from django.shortcuts import render, redirect
-import sys
+import sys, random
 sys.path.append('../')
-from cas_client import CASClient
-import random
 
 class UserViewSet(ModelViewSet):
     """
@@ -62,10 +61,7 @@ class UserLogoutView(APIView):
     def get(self, request, *args):
         if request.user.id:
             logout(request)
-            # ticket = request.COOKIES.get('ticket')
             rep = Response('logout succeed')
-            # if ticket:
-            #     rep.delete_cookie('ticket')
             return rep
         else:
             return Response('not login yet')
@@ -123,7 +119,6 @@ class UserUSTCLoginView(APIView):
                                 username += random.choice('abcdefghijklmnopqrstuvwxyz!@#$%^&*()')
 
                 rep = Response('OK', status.HTTP_200_OK)        # 更换为 rep = redirect('home')
-                # rep.set_cookie("ticket", ticket)
                 return rep
         cas_login_url = cas_client.get_login_url(service_url=app_login_url)
         return redirect(cas_login_url)
