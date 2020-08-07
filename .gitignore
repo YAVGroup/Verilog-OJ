@@ -1,0 +1,12 @@
+**/__pycache__
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Database for test
+db.sqlite3
