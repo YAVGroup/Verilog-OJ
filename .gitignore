@@ -10,3 +10,6 @@
 
 # Database for test
 db.sqlite3
+
+# backend migrations
+backend/*/migrations
