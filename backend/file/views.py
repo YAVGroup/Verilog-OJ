@@ -22,7 +22,7 @@ class FileViewSet(GenericViewSet, CreateModelMixin, ListModelMixin):
         response['Content-Disposition'] = 'attachment; filename="%s"' % instance.name
         return response
     
-    def list(self, request, *args, **kwargs):
-        self.permission_classes = (IsAdminUser)
-        self.check_permissions(request)
-        super(FileViewSet, self).list(self, request, args, kwargs)
+    # def list(self, request, *args, **kwargs):
+    #     self.permission_classes = (IsAdminUser,)
+    #     self.check_permissions(request)
+    #     super(FileViewSet, self).list(self, request, args, kwargs)
