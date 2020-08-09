@@ -1,7 +1,9 @@
 from judge.celery import app
 from celery.utils.log import get_task_logger
+import os, sys
 
 from judge.judge import judge
+
 
 # To call:
 # - run celery first (in the same folder with manage.py)
@@ -15,8 +17,9 @@ from judge.judge import judge
 logger = get_task_logger(__name__)
 
 @app.task
-def do_judge_task(submission_id):
+def do_judge_task(submission_id, testcase_id):
     ''' Do judgement on submission with id given '''
     # todo: save result by calling POST on the model
-    logger.info("do_judge_task() called!")
-    return judge(submission_id)
+    logger.info("do_judge_task() called with submission_id={}, testcase_id={}".format(submission_id, testcase_id))
+
+    judge(submission_id, testcase_id)
