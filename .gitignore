@@ -12,5 +12,8 @@ venv/
 # Database for test
 db.sqlite3
 
+# backend file storage
+backend/storage
+
 # backend migrations
 backend/*/migrations
