@@ -2,6 +2,7 @@ from django.http import FileResponse
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import IsAdminUser
+from judge.judger_auth import IsJudger
 
 from .models import File
 from .serializers import FileSerializer
@@ -22,7 +23,11 @@ class FileViewSet(GenericViewSet, CreateModelMixin, ListModelMixin):
         response['Content-Disposition'] = 'attachment; filename="%s"' % instance.name
         return response
     
-    # def list(self, request, *args, **kwargs):
-    #     self.permission_classes = (IsAdminUser,)
-    #     self.check_permissions(request)
-    #     super(FileViewSet, self).list(self, request, args, kwargs)
+    def list(self, request, *args, **kwargs):
+        # Standard bitwise operator have been overloaded in permission classes
+        # ref: https://www.django-rest-framework.org/api-guide/permissions/#setting-the-permission-policy
+        self.permission_classes = (IsAdminUser | IsJudger,)
+        #print("{} {}".format(request.user, request.auth))
+        self.check_permissions(request)
+        
+        return super(FileViewSet, self).list(self, request, args, kwargs)

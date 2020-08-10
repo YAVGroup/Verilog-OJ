@@ -55,8 +55,19 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         #'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'judge.judger_auth.JudgerAuthentication',
     ],
 }
+
+# Used by JudgerAuthentication, which sets auth to "Judger" and user to 
+# django.contrib.auth.models.AnonymousUser.
+# -- THIS SHOULD BE A SECRET! --
+JUDGER_SECRET = 'c8fc82f3d6b6150692baaad61ae77abd29ab2d0379700443394cd41eca7ad5e2'
+
+# Only IP in this range is allowed to be a valid judger in authentication
+JUDGER_IP_WHITELIST = [
+    '127.0.0.1'
+]
 
 # CORS白名单设置
 CORS_ORIGIN_ALLOW_ALL = False
