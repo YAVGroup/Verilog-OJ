@@ -11,7 +11,7 @@
         <i class="el-icon-star-off"></i>Home</el-menu-item>
       <el-menu-item index="/problem">
         <i class="el-icon-menu"></i>Problem</el-menu-item>
-      <!--   
+      <!--
       <el-menu-item index="/statue">
         <i class="el-icon-tickets"></i>Status</el-menu-item>
       <el-menu-item index="/contest">
@@ -21,7 +21,7 @@
       -->
       <el-menu-item index="/wiki">
         <i class="el-icon-star-off"></i>Wiki</el-menu-item>
-    <!--  
+    <!--
       <el-menu-item index="/todolist">
         <i class="el-icon-s-promotion"></i>TodoList</el-menu-item>
     -->
@@ -145,7 +145,7 @@ export default {
     handleCommand (command) {
       if (command == "logout") {
         this.$axios
-          .get("/user/logout/")
+          .get("/api/user/logout/")
           .then(response => {
             this.$message({
               message: "登出成功！",
@@ -153,8 +153,6 @@ export default {
             });
             sessionStorage.setItem("username", "");
             sessionStorage.setItem("name", "");
-            //sessionStorage.setItem("rating", "");
-            //sessionStorage.setItem("type", "");
             this.loginshow = 0;
             this.username = "";
             this.$router.go(0);

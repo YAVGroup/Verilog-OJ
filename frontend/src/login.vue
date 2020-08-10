@@ -43,64 +43,26 @@ export default {
       this.dialogLoginVisible = true;
     },
     loginClick() {
-      var pas = this.$md5(this.form.password);
       this.$axios
-        .post("/user/login", {
+        .post("/api/user/login/", {
           username: this.form.username,
-          password: pas
+          password: this.form.password
         })
         .then(response => {
-          if (response.data == "passworderror") {
-            this.$message.error("密码错误");
-            return;
-          }
           this.$message({
             message: "登录成功！",
             type: "success"
           });
-
           sessionStorage.setItem("username", this.form.username);
-          sessionStorage.setItem("name", response.data.last_name+response.data.first_name);
-          //sessionStorage.setItem("type", response.data.type);
-
-
-
-          this.dialogLoginVisible = false;
-          if(this.$store.state.loginip==""){
-            this.$store.state.loginip = "chrome" // 后台会处理
-          }
-
-          if(this.$store.state.loginip==""){
-            this.$store.state.loginip = "chrome" // 后台会处理
-          }
-          if(this.$store.state.loginip==undefined){
-            this.$store.state.loginip = "chrome" // 后台会处理
-          }
-
-          /*this.$axios
-            .post("/setlogindata/", {
-              username: this.form.username,
-              ip: this.$store.state.loginip,
-              msg: this.$store.state.logininfo
-            })
-            .then(response => {
-              this.$router.go(0);
-            })
-            .catch(error => {
-              this.$message.error(
-                "服务器错误！" + "(" + JSON.stringify(error.response.data) + ")"
-              );
-              sessionStorage.setItem("username", "");
-              sessionStorage.setItem("name", "");
-              sessionStorage.setItem("rating", "");
-              sessionStorage.setItem("type", "");
-              sessionStorage.setItem("acpro", "");
-            });
-            */
+          if (response.data.last_name == "" && response.data.first_name == "")
+            sessionStorage.setItem("name", this.form.username);
+          else
+            sessionStorage.setItem("name", response.data.last_name+response.data.first_name);
+          sessionStorage.setItem("userid", response.data.id);
           this.$router.go(0);
         })
         .catch(error => {
-          this.$message.error( error );
+          this.$message.error("登录失败：" + JSON.stringify(error.response.data));
         });
     }
   }
