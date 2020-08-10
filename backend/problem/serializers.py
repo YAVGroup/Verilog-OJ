@@ -6,7 +6,8 @@ from .models import Problem, TestCase
 class TestCaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestCase
-        exclude = ['id', 'problem']
+        #exclude = ['id', 'problem']
+        fields = '__all__'
 
 class ProblemSerializer(serializers.ModelSerializer):
     testcases = TestCaseSerializer(source='get_testcases', read_only=True, many=True)

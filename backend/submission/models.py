@@ -38,6 +38,8 @@ class SubmissionResult(models.Model):
         help_text='某个测试点结果所属的测试点'
     )
     grade = models.IntegerField(help_text='本测试点所得的分数')
+    log = models.TextField(help_text='The log generated along the process')
+    app_data = models.TextField(help_text='Data associated with this result (waveform, etc)')
     
     class Meta:
         unique_together = (('submission', 'testcase'),)

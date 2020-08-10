@@ -5,7 +5,7 @@ class SubmissionResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubmissionResult
         fields = '__all__'
-        exclude = ['id', 'submission']
+        #exclude = ['id', 'submission']
 
 class SubmissionSerializer(serializers.ModelSerializer):
     results = SubmissionResultSerializer(source='get_results', read_only=True, many=True)

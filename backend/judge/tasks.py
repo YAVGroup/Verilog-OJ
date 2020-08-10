@@ -18,7 +18,10 @@ logger = get_task_logger(__name__)
 
 @app.task
 def do_judge_task(submission_id, testcase_id):
-    ''' Do judgement on submission with id given '''
+    """
+    Do judgement on submission with id given
+    TODO: pass judger config struct
+    """
     # todo: save result by calling POST on the model
     logger.info("do_judge_task() called with submission_id={}, testcase_id={}".format(submission_id, testcase_id))
 

@@ -17,6 +17,7 @@ class Problem(models.Model):
         return sum([testcase.grade for testcase in self.get_testcases()])
 
 class TestCase(models.Model):
+    id = models.AutoField(primary_key=True, help_text='Testcase ID')
     problem = models.ForeignKey(
         Problem,
         on_delete=models.CASCADE,
