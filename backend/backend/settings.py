@@ -53,7 +53,12 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        #'rest_framework.authentication.BasicAuthentication',
+
+        # temporarily enable this to test api in django built-in coreapi docs
+        # since SessionAuthentication checks for scrf_token, which the docs fail to 
+        # give
+        # TODO: comment on production
+        'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'judge.judger_auth.JudgerAuthentication',
     ],
