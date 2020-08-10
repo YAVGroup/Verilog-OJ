@@ -245,7 +245,16 @@ def main():
 
     args = parser.parse_args()
     # https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser.add_subparsers
-    args.func(args)
+    
+    # Fix "AttributeError" bug when no arguments are given
+    # ref: https://stackoverflow.com/questions/48648036/python-argparse-args-has-no-attribute-func
+    #args.func(args)
+
+    try:
+        func = args.func
+    except AttributeError:
+        parser.error("too few arguments")
+    func(args)
 
 if __name__ == '__main__':
     main()
