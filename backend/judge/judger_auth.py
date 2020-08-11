@@ -4,6 +4,8 @@ from rest_framework import authentication
 from rest_framework import exceptions
 from rest_framework.permissions import BasePermission
 
+import django.contrib.auth.models
+
 class JudgerAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         # A header named X-JudgerSecret
@@ -20,7 +22,8 @@ class JudgerAuthentication(authentication.BaseAuthentication):
             print("Disallowed due to IP Whitelist policy.")
             return None
 
-        return (None, 'Judger')
+        # Fix user, since most scenario requires non-null user
+        return (django.contrib.auth.models.AnonymousUser(), 'Judger')
 
 class IsJudger(BasePermission):
     """
@@ -28,4 +31,4 @@ class IsJudger(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return bool(request.user is None and request.auth == 'Judger')
+        return bool(request.auth == 'Judger')

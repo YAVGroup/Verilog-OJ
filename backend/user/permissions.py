@@ -8,7 +8,6 @@ class GetOnlyPermission(BasePermission):
         if(request.method == 'GET'):
             return True
         else:
-            # Fix bug: request.user could be None in JudgerAuthentication
             return request.user and request.user.is_superuser
 
 class OthersGetOnlyPermission(BasePermission):
