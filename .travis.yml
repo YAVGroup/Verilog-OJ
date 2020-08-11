@@ -10,7 +10,7 @@ script:
   - python manage.py makemigrations file judge problem submission user
   - python manage.py migrate
   - python manage.py test
-  - pip install coverage python-coveralls
+  - pip install coverage coveralls
   - coverage run --source='.' manage.py test
   - coverage report
 
