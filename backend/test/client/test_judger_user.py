@@ -4,14 +4,14 @@
 All things that an anonymous user could do shell be tested here
 """
 
-import django.test
+import django.test, django.core.files
 from rest_framework.test import APIClient
 from submission.models import Submission, SubmissionResult
 from problem.models import Problem, TestCase
 from user.models import User
 from file.models import File
 from django.utils import timezone
-import pytz
+import pytz, io, os
 
 from django.conf import settings
 
@@ -65,16 +65,34 @@ class JudgerAPITester(django.test.TestCase):
             app_data="SOME_APPDATA"
         )
 
+        # Modify MEDIA_ROOT to change the place we store
+        BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+        self.old_root = settings.MEDIA_ROOT
+        settings.MEDIA_ROOT = os.path.join(BASE_PATH, "./tmp_storage/")
+
+        fake_file_object = io.StringIO(initial_value='EXAMPLE_TEXT')
+        file = File.objects.create(
+            id=1,
+            file=django.core.files.File(fake_file_object, name="example_file.txt"),
+            name="example_file.txt"
+        )
+
+    def tearDown(self):
+        settings.MEDIA_ROOT = self.old_root
+        super().tearDown()
+
+
     def test_submit(self):
         """
         Judger should not have the permission to submit
         """
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        resp = c.post('/api/submit', {'problem': '1', 'submit_files': '[]'})
+        resp = c.post('/api/submit', {'problem': 1, 'submit_files': [1]})
         # The TestCase in Django automatically disables csrf
         # ref: https://stackoverflow.com/questions/25003527/how-do-you-include-a-csrf-token-when-testing-a-post-endpoint-in-django
-        self.assertTrue(resp.status_code == 401 or resp.status_code == 403)
+        # print(resp.content.decode("utf-8"))
+        self.assertEqual(resp.status_code, 403)
 
     def test_submission_result_uniqueness(self):
         """
@@ -99,7 +117,7 @@ class JudgerAPITester(django.test.TestCase):
         resp = c.post('/api/submission-results/',
             {"grade": "1", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1"})
         #print(resp.content.decode("utf-8"))
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 201)  # 201 Created
 
     def test_submission_result_get_detail(self):
         c = APIClient()
