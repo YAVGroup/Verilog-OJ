@@ -145,7 +145,7 @@ export default {
     handleCommand (command) {
       if (command == "logout") {
         this.$axios
-          .get("/api/user/logout/")
+          .get("/user/logout/")
           .then(response => {
             this.$message({
               message: "登出成功！",
@@ -153,6 +153,7 @@ export default {
             });
             sessionStorage.setItem("username", "");
             sessionStorage.setItem("name", "");
+            sessionStorage.setItem("userid", "");
             this.loginshow = 0;
             this.username = "";
             this.$router.go(0);

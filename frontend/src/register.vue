@@ -96,13 +96,13 @@ export default {
       this.dialogRegisterVisible = true;
     },
     registerClick () {
-      if (
-        !this.form.last_name ||
-        !this.form.first_name
-      ) {
-        this.$message.error("字段不能为空！");
-        return;
-      }
+      // if (
+      //   !this.form.last_name ||
+      //   !this.form.first_name
+      // ) {
+      //   this.$message.error("字段不能为空！");
+      //   return;
+      // }
       if (this.form.password != this.form.comfirm) {
         this.$message.error("两次密码不一致！");
         return;
@@ -136,38 +136,34 @@ export default {
         return;
       }
 
-      this.form.password = this.$md5(this.form.password);
-      // this.$axios
-      //   .post("/userdata/", this.form)
-      //   .then(response => {
       this.$axios
-        .post("/user/signup", this.form)
+        .post("/user/signup/", this.form)
         .then(response => {
-          if (response.data == "usererror") {
-            this.$message.error("用户名已存在！");
-            return;
-          }
           this.$message({
             message: "注册成功！",
             type: "success"
           });
           this.dialogRegisterVisible = false;
-          this.form.password = "";
+
+          // 注册成功后顺便给他登录一下
+          this.$axios.post("/user/login/", {
+            username: this.form.username,
+            password: this.form.password
+          }).then(response => {
+            sessionStorage.setItem("username", response.data.username);
+            if (response.data.last_name == "" && response.data.first_name == "")
+              sessionStorage.setItem("name", response.data.username);
+            else
+              sessionStorage.setItem("name", response.data.last_name+response.data.first_name);
+            sessionStorage.setItem("userid", response.data.id);
+            this.$router.go(0);
+          })
         })
         .catch(error => {
           this.$message.error(
-            "服务器错误！" + "(" + JSON.stringify(error.response.data) + ")"
+            "注册失败：" + JSON.stringify(error.response.data)
           );
         });
-      //})
-      // .catch(error => {
-      //   if (JSON.stringify(error.response.data).indexOf("user") >= 0)
-      //     this.$message.error("用户名已存在！");
-      //   else
-      //     this.$message.error(
-      //       "服务器错误！" + "(" + JSON.stringify(error.response.data) + ")"
-      //     );
-      // });
     }
   }
 };

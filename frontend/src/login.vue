@@ -44,7 +44,7 @@ export default {
     },
     loginClick() {
       this.$axios
-        .post("/api/user/login/", {
+        .post("/user/login/", {
           username: this.form.username,
           password: this.form.password
         })
