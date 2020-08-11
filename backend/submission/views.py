@@ -67,7 +67,10 @@ class SubmitView(APIView):
             prob_id = serializer.data['problem']
             subm_id = subm.id
             print("{} {}".format(prob_id, subm_id))
-            prob = Problem.objects.filter(id=prob_id)[0]
+            prob = Problem.objects.filter(id=prob_id).first()
+            if prob == None:
+                return Response('No such problem', status.HTTP_404_NOT_FOUND)
+
             for case in prob.get_testcases():
                 do_judge_task.delay(subm_id, case.id)
 
