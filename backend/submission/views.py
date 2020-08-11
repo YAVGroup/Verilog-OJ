@@ -11,6 +11,7 @@ from judge.tasks import do_judge_task
 
 from .models import Submission, SubmissionResult
 from .serializers import SubmissionSerializer, SubmissionResultSerializer
+from .serializers import SubmissionPublicSerializer, SubmissionResultPublicSerializer
 from user.permissions import GetOnlyPermission
 from judge.judger_auth import IsJudger
 from problem.models import Problem
@@ -20,9 +21,36 @@ class SubmissionViewSet(ReadOnlyModelViewSet):
     获取提交信息
     """
     queryset = Submission.objects.all()
-    serializer_class = SubmissionSerializer
+    #serializer_class = SubmissionSerializer
     # TODO: 提交信息的查看权限问题
     permission_classes = (GetOnlyPermission,)
+
+    def get_serializer_class(self):
+        """
+        Override parent code from rest_framework.generics.GenericAPIView
+        to dynamically adjust the item to be used
+        """
+        if not hasattr(self.request, 'user'): # 生成文档用
+            return SubmissionSerializer
+        elif self.request.auth == "Judger" or self.request.user.is_superuser:
+            return SubmissionSerializer
+        elif self.request.method == 'GET' and (not 'pk' in self.kwargs):
+            # Check if we're querying a specific one
+            # In list mode, the log and app_data is always hidden
+            return SubmissionPublicSerializer
+        elif self.request.method == 'GET' and 'pk' in self.kwargs:
+            # In retrive mode
+            user_id = self.request.user.id
+            if user_id is None:
+                return SubmissionPublicSerializer
+            else:
+                subm = Submission.objects.filter(id=self.request.data['submission'])[0]
+                if str(subm.user.id) != user_id:
+                    return SubmissionPublicSerializer
+                else:
+                    return SubmissionSerializer
+        else:
+            return SubmissionSerializer
 
 # Read-only for users, allow to create for other users
 class SubmissionResultViewSet(ModelViewSet):
@@ -30,10 +58,36 @@ class SubmissionResultViewSet(ModelViewSet):
     Get submission result information
     """
     queryset = SubmissionResult.objects.all()
-    serializer_class = SubmissionResultSerializer
+    #serializer_class = SubmissionResultSerializer
     # TODO: 提交信息的查看权限问题
     permission_classes = (GetOnlyPermission | IsJudger,)
 
+    def get_serializer_class(self):
+        """
+        Override parent code from rest_framework.generics.GenericAPIView
+        to dynamically adjust the item to be used
+        """
+        if not hasattr(self.request, 'user'): # 生成文档用
+            return SubmissionResultSerializer
+        elif self.request.auth == "Judger" or self.request.user.is_superuser:
+            return SubmissionResultSerializer
+        elif self.request.method == 'GET' and (not 'pk' in self.kwargs):
+            # Check if we're querying a specific one
+            # In list mode, the log and app_data is always hidden
+            return SubmissionResultPublicSerializer
+        elif self.request.method == 'GET' and 'pk' in self.kwargs:
+            # In retrive mode
+            user_id = self.request.user.id
+            if user_id is None:
+                return SubmissionResultPublicSerializer
+            else:
+                subm = Submission.objects.filter(id=self.request.data['submission'])[0]
+                if str(subm.user.id) != user_id:
+                    return SubmissionResultPublicSerializer
+                else:
+                    return SubmissionResultSerializer
+        else:
+            return SubmissionResultSerializer
 
 class SubmitView(APIView):
     """
@@ -55,9 +109,18 @@ class SubmitView(APIView):
     ])
 
     def post(self, request, *args):
-        serializer = SubmissionSerializer(data=request.data)
+        # Fix bug: must check permission first
+        self.check_permissions(request)
+
         # put the user segment in, ref: BaseSerializer docstring
-        serializer.initial_data['user'] = request.user.id
+        # Fix bug: AttributeError: This QueryDict instance is immutable
+        # ref: https://stackoverflow.com/questions/44717442/this-querydict-instance-is-immutable
+        data = request.data.copy()
+        data['user'] = request.user.id
+        serializer = SubmissionSerializer(data=data)
+
+        # print(request.data)
+        # print(serializer.initial_data)
         try:
             serializer.is_valid(True)
             subm = serializer.save()
@@ -66,7 +129,7 @@ class SubmitView(APIView):
             # Get all test cases related to this problem
             prob_id = serializer.data['problem']
             subm_id = subm.id
-            print("{} {}".format(prob_id, subm_id))
+            # print("{} {}".format(prob_id, subm_id))
             prob = Problem.objects.filter(id=prob_id).first()
             if prob == None:
                 return Response('No such problem', status.HTTP_404_NOT_FOUND)
