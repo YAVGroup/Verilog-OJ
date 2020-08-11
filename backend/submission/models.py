@@ -16,7 +16,7 @@ class Submission(models.Model):
         on_delete=models.CASCADE,
         help_text='提交的用户'
     )
-    submit_time = models.TimeField(auto_now_add=True, help_text='提交时间')
+    submit_time = models.DateTimeField(auto_now_add=True, help_text='提交时间')
     submit_files = models.ManyToManyField(File, help_text='提交的文件（代码等）')
     
     def get_results(self):
@@ -27,6 +27,8 @@ class Submission(models.Model):
         return self.get_results().exists()
 
 class SubmissionResult(models.Model):
+    id = models.AutoField(primary_key=True, help_text='提交结果ID')
+    submit_time = models.DateTimeField(auto_now_add=True, help_text='结果提交时间')
     submission = models.ForeignKey(
         Submission,
         on_delete=models.CASCADE,
