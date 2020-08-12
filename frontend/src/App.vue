@@ -11,40 +11,31 @@
         <i class="el-icon-star-off"></i>Home</el-menu-item>
       <el-menu-item index="/problem">
         <i class="el-icon-menu"></i>Problem</el-menu-item>
-      <!--
       <el-menu-item index="/statue">
         <i class="el-icon-tickets"></i>Status</el-menu-item>
-      <el-menu-item index="/contest">
-        <i class="el-icon-bell"></i>Contest</el-menu-item>
-      <el-menu-item index="/rank">
-        <i class="el-icon-star-on"></i>Rank</el-menu-item>
-      -->
-      <el-menu-item index="/wiki">
-        <i class="el-icon-star-off"></i>Wiki</el-menu-item>
-    <!--
-      <el-menu-item index="/todolist">
-        <i class="el-icon-s-promotion"></i>TodoList</el-menu-item>
-    -->
+      <!-- <el-menu-item index="/contest">
+        <i class="el-icon-bell"></i>Contest</el-menu-item> -->
+
       <el-button round
                  id="button"
                  @click="registeropen"
-                 v-show="!loginshow">Register</el-button>
+                 v-show="loginshow">Register</el-button>
       <el-button round
                  id="button"
                  @click="loginopen"
-                 v-show="!loginshow">Login</el-button>
+                 v-show="loginshow">Login</el-button>
 
       <el-dropdown id="user"
-                   v-show="loginshow"
+                   v-show="!loginshow"
                    @command="handleCommand"
                    :show-timeout="100"
                    :split-button="true">
         <span class="el-dropdown-link">Welcome {{name}}</span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="home">Home</el-dropdown-item>
-          <el-dropdown-item command="submittion">Submittion</el-dropdown-item>
+          <!-- <el-dropdown-item command="submittion">Submittion</el-dropdown-item> -->
           <el-dropdown-item command="setting">Setting</el-dropdown-item>
-          <el-dropdown-item command="classes" divided>Class</el-dropdown-item>
+          <!-- <el-dropdown-item command="classes" divided>Class</el-dropdown-item> -->
           <el-dropdown-item command="admin" divided v-show="isadmin">Admin</el-dropdown-item>
           <el-dropdown-item command="logout" divided>Logout</el-dropdown-item>
         </el-dropdown-menu>
@@ -107,32 +98,14 @@ export default {
     return {
       activeIndex: "1",
       school: "USTC",
-      loginshow: sessionStorage.username,
+      loginshow: sessionStorage.userid == "",
       username: sessionStorage.username,
       name: sessionStorage.name,
       isadmin: false
     };
   },
   mounted () {
-/*
-    this.isadmin = sessionStorage.type == 2 || sessionStorage.type == 3;
-
-    var sb = this.$store.state.sb
-    if (sb == undefined) {
-      this.$axios
-        .get("/settingboard/")
-        .then(res => {
-          if (res.data.length > 0) this.school = res.data[0].ojname;
-          else this.school = "USTC";
-          this.$store.state.sb = res.data
-        });
-    }
-    else {
-      if (sb.length > 0) this.school = sb[0].ojname;
-      else this.school = "USTC";
-    }
-
-*/
+    this.isadmin = sessionStorage.isadmin == "true";
   },
   methods: {
     loginopen () {
@@ -154,8 +127,7 @@ export default {
             sessionStorage.setItem("username", "");
             sessionStorage.setItem("name", "");
             sessionStorage.setItem("userid", "");
-            this.loginshow = 0;
-            this.username = "";
+            sessionStorage.setItem("isadmin", "");
             this.$router.go(0);
           })
           .catch(error => {
@@ -167,7 +139,6 @@ export default {
       if (command == "home") {
         this.$router.push({
           name: "user",
-          // query: { username: sessionStorage.username }
           params: { userid: sessionStorage.userid }
         });
       }
@@ -177,22 +148,22 @@ export default {
           params: { username: sessionStorage.username }
         });
       }
-      if (command == "submittion") {
-        this.$router.push({
-          name: "statue",
-          query: { username: sessionStorage.username }
-        });
-      }
+      // if (command == "submittion") {
+      //   this.$router.push({
+      //     name: "statue",
+      //     query: { username: sessionStorage.username }
+      //   });
+      // }
       if (command == "admin") {
         this.$router.push({
           name: "admin"
         });
       }
-      if (command == "classes") {
-        this.$router.push({
-          name: "classes"
-        });
-      }
+      // if (command == "classes") {
+      //   this.$router.push({
+      //     name: "classes"
+      //   });
+      // }
     }
   }
 };

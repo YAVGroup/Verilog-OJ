@@ -59,10 +59,16 @@ export default {
           else
             sessionStorage.setItem("name", response.data.last_name+response.data.first_name);
           sessionStorage.setItem("userid", response.data.id);
+
+          sessionStorage.setItem("isadmin", response.data.is_superuser);
           this.$router.go(0);
         })
         .catch(error => {
-          this.$message.error("登录失败：" + JSON.stringify(error.response.data));
+          if (error.response != undefined)
+            this.$message.error("登录失败：" + JSON.stringify(error.response.data));
+          else
+            this.$message.error("抱歉，似乎出了点问题");
+          console.log(error);
         });
     }
   }
