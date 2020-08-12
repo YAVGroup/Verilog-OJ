@@ -20,11 +20,23 @@ class Submission(models.Model):
     submit_files = models.ManyToManyField(File, help_text='提交的文件（代码等）')
     
     def get_results(self):
+        "获得该次提交对应的所有测试点结果"
         return SubmissionResult.objects.filter(submission=self)
+    
     def get_total_grade(self):
+        "获得该次提交的总分数"
         return sum([result.grade for result in self.get_results()])
+    
     def have_judged(self):
-        return self.get_results().exists()
+        "判断是否已经评测完毕"
+        return len(self.get_results()) == len(self.problem.get_testcases())
+    
+    def is_ac(self):
+        "判断该次提交是否AC"
+        for result in self.get_results():
+            if not result.is_ac():
+                return False
+        return True
 
 class SubmissionResult(models.Model):
     id = models.AutoField(primary_key=True, help_text='提交结果ID')
@@ -45,3 +57,7 @@ class SubmissionResult(models.Model):
     
     class Meta:
         unique_together = (('submission', 'testcase'),)
+    
+    def is_ac(self):
+        "判断该测试点是否AC"
+        return self.grade == self.testcase.grade

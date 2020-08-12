@@ -167,7 +167,8 @@ export default {
       if (command == "home") {
         this.$router.push({
           name: "user",
-          query: { username: sessionStorage.username }
+          // query: { username: sessionStorage.username }
+          params: { userid: sessionStorage.userid }
         });
       }
       if (command == "setting") {

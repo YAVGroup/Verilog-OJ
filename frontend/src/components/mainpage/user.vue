@@ -1,22 +1,17 @@
 <template>
   <el-card shadow="always" id="card">
     <center>
-      <h1 :style="color">{{username}}</h1>
-      <h4 :style="color">{{ des }}</h4>
-      <h4 :style="color">Rating: {{ rating }}</h4>
-    </center>
-
-    <ratingchart></ratingchart>
-
-    <center>
       <h1 :style="color">{{ name }}</h1>
+      <!-- <h1 :style="color">{{ username }}</h1> -->
+      <!-- <h4 :style="color">{{ email }}</h4> -->
+      <h4 :style="color">{{ student_id }}</h4>
     </center>
 
     <el-row>
       <el-col :span="8">
         <center>
-          <h2 :style="color">Submittion</h2>
-          <h3 :style="color">{{ submittion }}</h3>
+          <h2 :style="color">Submitted</h2>
+          <h3 :style="color">{{ submitted }}</h3>
         </center>
       </el-col>
       <el-col :span="8">
@@ -39,94 +34,64 @@
     </center>
     <el-button
       id="tag"
-      v-for="(name,index) in acpro"
-      :key="index"
+      v-for="problem in ac_problems"
+      :key="problem.id"
       size="small"
-      @click="problemclick(name)"
+      @click="problemclick(problem.id)"
       type="success"
       style="width:70px;"
-    >{{ name }}</el-button>
+    >{{ problem.id }}</el-button>
   </el-card>
 </template>
 
 <script>
-import ratingchart from "@/components/chart/ratingchart";
 export default {
   name: "user",
-  components: {
-    ratingchart
-  },
   data() {
     return {
+      userid: "",
       username: "",
       name: "",
-      des: "",
-      ac: "",
-      submittion: "",
-      score: "",
-      rating: "",
-      acpro: [],
+      student_id: "",
+      ac: "", // AC的题目数
+      submitted: "", // 提交的题目数
+      score: "", // 提交的题目分数总和
+      ac_problems: [], // AC的题目列表
       color: ""
     };
   },
   methods: {
-    ratingcolor({ row, rowIndex }) {
-      if (row.rating >= 3000) return "color:red;";
-      if (row.rating >= 2600) return "color:#BB5E00;";
-      if (row.rating >= 2200) return "color:#E6A23C;";
-      if (row.rating >= 2050) return "color:#930093;";
-      if (row.rating >= 1900) return "color:#0000AA;";
-      if (row.rating >= 1700) return "color:#007799;";
-      if (row.rating >= 1500) return "color:#227700;";
-      if (row.rating >= 1350) return "color:#67C23A;";
-      if (row.rating >= 1200) return "color:#909399;";
-      return "color:#303133;font-weight: bold;";
-    },
-
-    problemclick(name) {
+    problemclick(id) {
       this.$router.push({
         name: "problemdetail",
-        query: { problemID: name }
+        query: { problemID: id }
       });
     }
   },
   created() {
-    this.username = this.$route.query.username;
-    if (this.username) {
-      this.$axios.get("/user/?username=" + this.username).then(response => {
-        this.name = response.data[0].name;
-      });
+    this.userid = this.$route.params.userid;
+    if (this.userid) {
+      this.$axios.get("/users/" + this.userid + "/").then(response => {
+        this.username = response.data.username;
+        if (response.data.last_name == "" && response.data.first_name == "")
+          this.name = this.username;
+        else
+          this.name = response.data.last_name + response.data.first_name;
+        this.email = response.data.email;
+        if(response.data.student_id == null)
+          this.student_id = "";
+        else
+          this.student_id = response.data.student_id;
 
-      this.$axios.get("/userdata/?username=" + this.username).then(response => {
-        this.ac = response.data[0].ac;
-        this.submittion = response.data[0].submit;
-        this.des = response.data[0].des;
-        this.score = response.data[0].score;
-        this.rating = response.data[0].rating;
+        this.ac_problems = response.data.ac_problems;
+        this.ac = this.ac_problems.length;
+        this.submitted = response.data.submitted_problems.length;
+        this.score = response.data.total_score;
 
-        this.acpro = response.data[0].acpro.split("|");
-        this.acpro.shift();
-
-        var style = "";
-        if (this.rating >= 3000) style = "color:red;font-weight: bold;";
-        else if (this.rating >= 2600)
-          style = "color:#BB5E00;font-weight: bold;";
-        else if (this.rating >= 2200)
-          style = "color:#E6A23C;font-weight: bold;";
-        else if (this.rating >= 2050)
-          style = "color:#930093;font-weight: bold;";
-        else if (this.rating >= 1900)
-          style = "color:#0000AA;font-weight: bold;";
-        else if (this.rating >= 1700)
-          style = "color:#007799;font-weight: bold;";
-        else if (this.rating >= 1500)
-          style = "color:#227700;font-weight: bold;";
-        else if (this.rating >= 1350)
-          style = "color:#67C23A;font-weight: bold;";
-        else if (this.rating >= 1200)
-          style = "color:#909399;font-weight: bold;";
-        else style = "color:#303133;font-weight: bold;";
-        this.color = style;
+        if (response.data.is_superuser)
+          this.color = "color: red; font-weight: bold;"
+        else
+          this.color = "color: black; font-weight: bold";
       });
     }
   }
