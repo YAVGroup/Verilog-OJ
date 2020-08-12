@@ -6,6 +6,12 @@ from rest_framework.permissions import BasePermission
 
 import django.contrib.auth.models
 
+# import the logging library
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
 class JudgerAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         # A header named X-JudgerSecret
@@ -19,7 +25,11 @@ class JudgerAuthentication(authentication.BaseAuthentication):
 
         # TODO: Test if IP in whitelist
         if request.META.get('REMOTE_ADDR') not in settings.JUDGER_IP_WHITELIST:
-            print("Disallowed due to IP Whitelist policy.")
+            #print("Disallowed due to IP Whitelist policy.")
+            logger.warning(
+                "Access attempt from {} as judger have been blocked due to Judger IP Whitelist policy.".format(
+                    request.META.get('REMOTE_ADDR')
+                ))
             return None
 
         # Fix user, since most scenario requires non-null user
