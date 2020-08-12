@@ -117,6 +117,17 @@ class JudgerAPITester(django.test.TestCase):
         # print(resp.content.decode("utf-8"))
         self.assertEqual(resp.status_code, 200)
 
+    def test_submission_result_patch_done(self):
+        """
+        Should be able to patch
+        """
+        c = APIClient()
+        c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
+        resp = c.patch('/api/submission-results/1/',
+            {"status": "DONE"})
+        # print(resp.content.decode("utf-8"))
+        self.assertEqual(resp.status_code, 200)
+
     def test_submission_result_put_deleted(self):
         # Delete the subm in advance
         SubmissionResult.objects.filter(id=1).delete()

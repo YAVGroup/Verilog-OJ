@@ -23,13 +23,8 @@ def get_submission_detail(submission_id, testcase_id, submission_result_id):
         sess.headers.update({'X-JudgerSecret': judge_config['judger_secret']})
 
         # Move status to JUDGING
-        r = sess.put("{}/api/submission-results/{}/".format(judge_config['url_host'], submission_result_id), data={
-            'grade': 0,
-            'status': 'JUDGING',
-            'log': 'Working',
-            'app_data': 'N/A',
-            'submission': str(submission_id),
-            'testcase': str(testcase_id)
+        r = sess.patch("{}/api/submission-results/{}/".format(judge_config['url_host'], submission_result_id), data={
+            'status': 'JUDGING'
         })
         print(r.content.decode("utf-8"))
         r.raise_for_status()
@@ -161,14 +156,12 @@ def push_result(result, submission_id, testcase_id, submission_result_id):
 
         # NOTE: when app_data == '', the requests library will probably
         # ignore sending it (?)
-        r = sess.put("{}/api/submission-results/{}/".format(judge_config['url_host'], submission_result_id), data={
+        r = sess.patch("{}/api/submission-results/{}/".format(judge_config['url_host'], submission_result_id), data={
             'grade': str(result['score']),
             'log': "stderr:\n{}\n\nstdout:\n{}".format(
                 result['log_err'], result['log_out']),
             'status': 'DONE',
-            'app_data': result['appdata'] if judge_config['submit_appdata'] else 'N/A',
-            'submission': str(submission_id),
-            'testcase': str(testcase_id)
+            'app_data': result['appdata'] if judge_config['submit_appdata'] else 'N/A'
         })
         r.raise_for_status()
     return True
