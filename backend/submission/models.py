@@ -40,6 +40,19 @@ class Submission(models.Model):
 
 class SubmissionResult(models.Model):
     id = models.AutoField(primary_key=True, help_text='提交结果ID')
+
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('JUDGING', 'Judging'),
+        ('DONE', 'Done'),
+        ('ERROR', 'Error')
+    ]
+
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES,
+        help_text='The current status of this submission result'
+    )
+
     submit_time = models.DateTimeField(auto_now_add=True, help_text='结果提交时间')
     submission = models.ForeignKey(
         Submission,

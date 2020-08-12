@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 from judge.tasks import do_judge_task
 
+from rest_framework.viewsets import GenericViewSet
+from rest_framework import mixins
 
 from .models import Submission, SubmissionResult
 from .serializers import SubmissionSerializer, SubmissionResultSerializer
@@ -53,7 +55,10 @@ class SubmissionViewSet(ReadOnlyModelViewSet):
             return SubmissionSerializer
 
 # Read-only for users, allow to create for other users
-class SubmissionResultViewSet(ModelViewSet):
+class SubmissionResultViewSet(mixins.RetrieveModelMixin,
+                              mixins.UpdateModelMixin,
+                              mixins.ListModelMixin,
+                              GenericViewSet):
     """
     Get submission result information
     """
@@ -135,7 +140,17 @@ class SubmitView(APIView):
                 return Response('No such problem', status.HTTP_404_NOT_FOUND)
 
             for case in prob.get_testcases():
-                do_judge_task.delay(subm_id, case.id)
+                # Create a new SubmissionResult structure
+                subm_res = SubmissionResult.objects.create(
+                    status='PENDING',
+                    submission=subm,
+                    testcase=case,
+                    grade=0,
+                    log="",
+                    app_data=""
+                )
+
+                do_judge_task.delay(subm_id, case.id, subm_res.id)
 
             #do_judge_task(serializer.data['id'], serializer.data[''])
             return Response('提交评测', status.HTTP_201_CREATED)

@@ -17,12 +17,17 @@ from judge.judge import judge
 logger = get_task_logger(__name__)
 
 @app.task
-def do_judge_task(submission_id, testcase_id):
+def do_judge_task(submission_id, testcase_id, submission_result_id):
     """
     Do judgement on submission with id given
     TODO: pass judger config struct
     """
     # todo: save result by calling POST on the model
-    logger.info("do_judge_task() called with submission_id={}, testcase_id={}".format(submission_id, testcase_id))
+    logger.info(
+        "Called with submission_id={}, testcase_id={}, submission_result_id={}".format(
+            submission_id, 
+            testcase_id,
+            submission_result_id
+        ))
 
-    judge(submission_id, testcase_id)
+    judge(submission_id, testcase_id, submission_result_id)

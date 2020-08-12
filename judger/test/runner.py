@@ -182,10 +182,10 @@ class JudgerTester:
             
             print("Written {}/".format(real_fp))
             
-        def mock_get_submission_detail(submission_id, testcase_id):
+        def mock_get_submission_detail(submission_id, testcase_id, submission_result_id):
             return cfg_inst.config['submission_detail'].copy()
         
-        def mock_push_result(result, submission_id, testcase_id):
+        def mock_push_result(result, submission_id, testcase_id, submission_result_id):
             print("Result: {}".format(result))
         
         # inject in, this assumes judge.py is in ../
@@ -197,7 +197,8 @@ class JudgerTester:
         judge.get_submission_detail = mock_get_submission_detail
         judge.download_file = mock_download_file
 
-        judge.judge(cfg_inst.config['submission_id'], cfg_inst.config['testcase_id'])
+        # 1 stands for the submission result id, useless here
+        judge.judge(cfg_inst.config['submission_id'], cfg_inst.config['testcase_id'], 1)
 
 def run(args):
     print("Running subcommand run with name={}".format(args.name))

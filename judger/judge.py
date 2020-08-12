@@ -16,11 +16,23 @@ judge_config = {
     'judger_secret': 'c8fc82f3d6b6150692baaad61ae77abd29ab2d0379700443394cd41eca7ad5e2'
 }
 
-def get_submission_detail(submission_id, testcase_id):
+def get_submission_detail(submission_id, testcase_id, submission_result_id):
 
     with requests.Session() as sess:
         # Setup default options for auth
         sess.headers.update({'X-JudgerSecret': judge_config['judger_secret']})
+
+        # Move status to JUDGING
+        r = sess.put("{}/api/submission-results/{}/".format(judge_config['url_host'], submission_result_id), data={
+            'grade': 0,
+            'status': 'JUDGING',
+            'log': 'Working',
+            'app_data': 'N/A',
+            'submission': str(submission_id),
+            'testcase': str(testcase_id)
+        })
+        print(r.content.decode("utf-8"))
+        r.raise_for_status()
 
         # Example response for /api/submissions/2/:
         # {
@@ -141,17 +153,20 @@ def download_file(path, uuid):
     with open(os.path.join(path, filename), "wb") as f:
         f.write(r_file.content)
 
-def push_result(result, submission_id, testcase_id):
+def push_result(result, submission_id, testcase_id, submission_result_id):
     # todo: post to the result
     # result: {}
     with requests.Session() as sess:
         sess.headers.update({'X-JudgerSecret': judge_config['judger_secret']})
 
-        r = sess.post("{}/api/submission-results/".format(judge_config['url_host']), data={
+        # NOTE: when app_data == '', the requests library will probably
+        # ignore sending it (?)
+        r = sess.put("{}/api/submission-results/{}/".format(judge_config['url_host'], submission_result_id), data={
             'grade': str(result['score']),
             'log': "stderr:\n{}\n\nstdout:\n{}".format(
                 result['log_err'], result['log_out']),
-            'app_data': result['appdata'] if judge_config['submit_appdata'] else '',
+            'status': 'DONE',
+            'app_data': result['appdata'] if judge_config['submit_appdata'] else 'N/A',
             'submission': str(submission_id),
             'testcase': str(testcase_id)
         })
@@ -237,18 +252,18 @@ def prepare_and_run(detail):
         return result
 
 
-def judge(submission_id, testcase_id):
+def judge(submission_id, testcase_id, submission_result_id):
     """
     评测某个提交。生成若干SubmissionResult，之后Submission就会被更新。
     """
     # TODO: 对某个提交进行评测
     # Query submission api for a json
     try:
-        detail = get_submission_detail(submission_id, testcase_id)
+        detail = get_submission_detail(submission_id, testcase_id, submission_result_id)
         result = prepare_and_run(detail)
-        push_result(result, submission_id, testcase_id)
+        push_result(result, submission_id, testcase_id, submission_result_id)
         return True
     except:
-        print("Unexpected error while processing {}-{}, traceback below:\n{}".format(
-            submission_id, testcase_id, traceback.format_exc()))
+        print("Unexpected error while processing {}-{} (result_id={}), traceback below:\n{}".format(
+            submission_id, testcase_id, submission_result_id, traceback.format_exc()))
         return False
