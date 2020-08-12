@@ -59,6 +59,7 @@ class JudgerAPITester(django.test.TestCase):
         subr = SubmissionResult.objects.create(
             id=1,
             submission=subm,
+            status="PENDING",
             testcase=tesc,
             grade=10,
             log="SOME_LOG",
@@ -94,30 +95,38 @@ class JudgerAPITester(django.test.TestCase):
         # print(resp.content.decode("utf-8"))
         self.assertEqual(resp.status_code, 403)
 
-    def test_submission_result_uniqueness(self):
+    def test_submission_result_post(self):
         """
-        Because of the unique_together imposed by submission result
+        Should no longer be able to post
         """
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
         resp = c.post('/api/submission-results/',
-            {"grade": "1", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1"})
+            {"grade": "1",  "status": "DONE", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1"})
         #print(resp.content.decode("utf-8"))
-        self.assertEqual(resp.status_code, 400)   # Bad request
+        self.assertEqual(resp.status_code, 405)   # Method not allowed
 
-    def test_submission_result_post(self):
+    def test_submission_result_put_done(self):
         """
-        Because of the unique_together imposed by submission result
+        Should be able to put
         """
+        c = APIClient()
+        c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
+        resp = c.put('/api/submission-results/1/',
+            {"grade": "1", "status": "DONE", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1"})
+        # print(resp.content.decode("utf-8"))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_submission_result_put_deleted(self):
         # Delete the subm in advance
         SubmissionResult.objects.filter(id=1).delete()
 
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        resp = c.post('/api/submission-results/',
-            {"grade": "1", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1"})
-        #print(resp.content.decode("utf-8"))
-        self.assertEqual(resp.status_code, 201)  # 201 Created
+        resp = c.put('/api/submission-results/1/',
+            {"grade": "1", "status": "DONE", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1"})
+        # print(resp.content.decode("utf-8"))
+        self.assertEqual(resp.status_code, 404)  # No longer there
 
     def test_submission_result_get_detail(self):
         c = APIClient()
