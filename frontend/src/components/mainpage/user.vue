@@ -34,13 +34,13 @@
     </center>
     <el-button
       id="tag"
-      v-for="problem in ac_problems"
-      :key="problem.id"
+      v-for="ac_problem_id in ac_problems"
+      :key="ac_problem_id"
       size="small"
-      @click="problemclick(problem.id)"
+      @click="problemclick(ac_problem_id)"
       type="success"
       style="width:70px;"
-    >{{ problem.id }}</el-button>
+    >{{ ac_problem_id }}</el-button>
   </el-card>
 </template>
 
@@ -92,6 +92,8 @@ export default {
           this.color = "color: red; font-weight: bold;"
         else
           this.color = "color: black; font-weight: bold";
+      }).catch(error => {
+        this.$message.error("服务器错误：" + JSON.stringify(error.response.data));
       });
     }
   }

@@ -2,14 +2,17 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 
 from .models import User
-from submission.serializers import SubmissionSerializer, SubmissionPublicSerializer
-from problem.serializers import ProblemSerializer
+# from submission.serializers import SubmissionSerializer, SubmissionPublicSerializer
+# from problem.serializers import ProblemSerializer
 
 # 给出全部用户信息
 class UserSerializer(serializers.ModelSerializer):
-    submissions = SubmissionSerializer(source='get_submissions', read_only=True, many=True)
-    submitted_problems = ProblemSerializer(source='get_submitted_problems', read_only=True, many=True)
-    ac_problems = ProblemSerializer(source='get_ac_problems', read_only=True, many=True)
+    # submissions = SubmissionSerializer(source='get_submissions', read_only=True, many=True)
+    # submitted_problems = ProblemSerializer(source='get_submitted_problems', read_only=True, many=True)
+    # ac_problems = ProblemSerializer(source='get_ac_problems', read_only=True, many=True)
+    # total_score = serializers.IntegerField(source='get_total_score', read_only=True)
+    submitted_problems = serializers.ListField(source='get_submitted_problems', read_only=True)
+    ac_problems = serializers.ListField(source='get_ac_problems', read_only=True)
     total_score = serializers.IntegerField(source='get_total_score', read_only=True)
     
     class Meta:
@@ -18,9 +21,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 # 仅给出用户对外界公开的信息
 class UserPublicSerializer(serializers.ModelSerializer):
-    submissions = SubmissionPublicSerializer(source='get_submissions', read_only=True, many=True)
-    submitted_problems = ProblemSerializer(source='get_submitted_problems', read_only=True, many=True)
-    ac_problems = ProblemSerializer(source='get_ac_problems', read_only=True, many=True)
+    # submissions = SubmissionPublicSerializer(source='get_submissions', read_only=True, many=True)
+    # submitted_problems = ProblemSerializer(source='get_submitted_problems', read_only=True, many=True)
+    # ac_problems = ProblemSerializer(source='get_ac_problems', read_only=True, many=True)
+    # total_score = serializers.IntegerField(source='get_total_score', read_only=True)
+    submitted_problems = serializers.ListField(source='get_submitted_problems', read_only=True)
+    ac_problems = serializers.ListField(source='get_ac_problems', read_only=True)
     total_score = serializers.IntegerField(source='get_total_score', read_only=True)
     
     class Meta:

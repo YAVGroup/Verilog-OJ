@@ -4,8 +4,12 @@
       <el-row>
         <el-card shadow="always">
           <!--problem id-->
-          <el-row :gutter="18"
-                  id="title">{{(this.oj=="LPOJ"?"YAVG":"")+(this.oj=="LPOJ"?" - ":"")+(this.oj=="LPOJ"?this.proid:"")+' '}}{{title}}</el-row>
+          <el-row :gutter="18" id="title">
+            {{title}}
+          </el-row>
+          <el-row :gutter="18" id="ddl" v-show="have_ddl">
+            {{ddl}}
+          </el-row>
           <br>
           <!--description-->
           <el-row :gutter="18"
@@ -17,8 +21,8 @@
                  :key="des"></div>
           </el-row>
           <!--img-->
-          <img :src="'data:image/jpeg;base64,'+imgcode"
-               class="img-responsive" v-if="imgcode!=''">
+          <!-- <img :src="'data:image/jpeg;base64,'+imgcode"
+               class="img-responsive" v-if="imgcode!=''"> -->
 
           <!--input description-->
           <el-row :gutter="18"
@@ -37,7 +41,7 @@
                  v-html="output"></div>
           </el-row>
           <!--sample-->
-          <el-row :gutter="18"
+          <!-- <el-row :gutter="18"
                   style="left:10px">
             <el-row :gutter="18"
                     v-for="(item,index) in sinput.length"
@@ -66,7 +70,7 @@
                         style="margin-bottom: 0px;">{{soutput[index]}}</el-row>
               </el-col>
             </el-row>
-          </el-row>
+          </el-row> -->
 
           <!--
           <el-row :gutter="18"
@@ -77,13 +81,13 @@
           </el-row>
           -->
           <!--hint-->
-          <el-row :gutter="18"
+          <!-- <el-row :gutter="18"
                   id="des">Hint</el-row>
           <el-row :gutter="18"
                   id="detail">
             <div style="margin-right:50px;word-break:break-all;white-space:pre-line;"
                  v-html="hint"></div>
-          </el-row>
+          </el-row> -->
         </el-card>
       </el-row>
       <el-row>
@@ -136,14 +140,14 @@
         <el-card shadow="always">
           <el-collapse v-model="activeNames">
             <!---->
-            <el-collapse-item name="1"
+            <!-- <el-collapse-item name="1"
                               id="des">
               <template slot="title">
                 <font color="deepskyblue"
                       size="4">Creator:</font>
               </template>
               <div>{{author}}</div>
-            </el-collapse-item>
+            </el-collapse-item> -->
             <!---->
             <el-collapse-item name="2"
                               id="des">
@@ -152,33 +156,6 @@
                       size="4">Date:</font>
               </template>
               <div>{{addtime}}</div>
-            </el-collapse-item>
-            <!---->
-            <el-collapse-item name="3"
-                              id="des">
-              <template slot="title">
-                <font color="deepskyblue"
-                      size="4">OJ:</font>
-              </template>
-              <div>{{oj}}</div>
-            </el-collapse-item>
-            <!---->
-            <el-collapse-item name="4"
-                              id="des">
-              <template slot="title">
-                <font color="deepskyblue"
-                      size="4">Time:</font>
-              </template>
-              <div>{{time}}</div>
-            </el-collapse-item>
-            <!---->
-            <el-collapse-item name="5"
-                              id="des">
-              <template slot="title">
-                <font color="deepskyblue"
-                      size="4">Memory:</font>
-              </template>
-              <div>{{memory}}</div>
             </el-collapse-item>
             <!---->
             <el-collapse-item name="7"
@@ -250,7 +227,7 @@ export default {
   },
   data () {
     return {
-      imgcode: "",
+      // imgcode: "",
       ip: "",
       userip: "",
       cmOptions: {
@@ -263,36 +240,32 @@ export default {
       des: "",
       input: "",
       output: "",
-      sinput: ["", ""],
-      soutput: ["", ""],
-      author: "",
+      // author: "",
       addtime: "",
-      oj: "",
-      proid: "",
-      source: "",
-      time: "",
-      memory: "",
-      hint: "",
+      ddl: "",
+      have_ddl: false,
+      // proid: "",
+      // source: "",
       tagnames: [],
       activeNames: ["1", "2", "3", "4", "5", "6"],
       level: "Easy",
       code: "",
       language: "Verilog",
 
-      codetemplate: {},
+      // codetemplate: {},
 
-      ac: 100,
-      mle: 100,
-      tle: 100,
-      rte: 100,
-      pe: 100,
-      ce: 100,
-      wa: 100,
-      se: 100,
+      // ac: 100,
+      // mle: 100,
+      // tle: 100,
+      // rte: 100,
+      // pe: 100,
+      // ce: 100,
+      // wa: 100,
+      // se: 100,
       submitbuttontext: "提交后请勿重复刷新/支持将文件拖入代码框",
       judgetype: "primary",
       loadingshow: false,
-      submitid: -1
+      // submitid: -1
     };
   },
   watch: {
@@ -307,136 +280,136 @@ export default {
 
     var myip = require('ip');
     this.userip = myip.address();
-    this.ID = this.$route.query.problemID;
-    if (!this.ID) {
+    this.id = this.$route.params.problemid;
+    if (!this.id) {
       this.$message.error("参数错误" + "(" + this.ID + ")");
       return;
     }
-    var auth = 1;
 
-
-    this.$axios
-      .get("/showpic/", {
-        params: {
-          ProblemId: this.$route.query.problemID
-        }
-      })
-      .then(res => {
-        this.imgcode = res.data;
-      });
-
-
+    // var auth = 1;
+    // this.$axios
+    //   .get("/showpic/", {
+    //     params: {
+    //       ProblemId: this.$route.query.problemID
+    //     }
+    //   })
+    //   .then(res => {
+    //     this.imgcode = res.data;
+    //   });
 
     this.$axios
-      .get("/problem/" + this.ID + "/")
+      .get("/problems/" + this.id + "/")
       .then(response => {
-        auth = response.data.auth;
-        if ((auth == 2 || auth == 3) && (sessionStorage.type == 1 || sessionStorage.type == "")) {
-          this.title = "非法访问！请在比赛中访问题目！";
-          this.$message.error("服务器错误！" + "(" + "无权限" + ")");
-          return;
+        // auth = response.data.auth;
+        // if ((auth == 2 || auth == 3) && (sessionStorage.type == 1 || sessionStorage.type == "")) {
+        //   this.title = "非法访问！请在比赛中访问题目！";
+        //   this.$message.error("服务器错误！" + "(" + "无权限" + ")");
+        //   return;
+        // }
+        // this.proid = this.ID
+        this.des = response.data.description;
+        this.input = response.data.description_input;
+        this.output = response.data.description_output;
+        // this.author = response.data.author;
+        this.addtime = response.data.create_time =
+          moment(response.data.create_time).format("YYYY-MM-DD HH:mm:ss");
+
+        // var li = response.data.template.split("*****")
+        // for (var i = 1; i < li.length; i += 2) {
+        //   this.codetemplate[li[i]] = li[i + 1]
+        // }
+        // this.code = this.codetemplate[this.language]
+
+        // if (this.oj != "LPOJ") {
+        //   this.proid = this.source
+        // }
+
+
+        // this.$axios
+        //   .get("/problemdata/" + this.ID + "/")
+        //   .then(response => {
+        // if (response.data["level"] == "1") response.data["level"] = "Easy";
+        // if (response.data["level"] == "2")
+        //   response.data["level"] = "Medium";
+        // if (response.data["level"] == "3") response.data["level"] = "Hard";
+        // if (response.data["level"] == "4")
+        //   response.data["level"] = "VeryHard";
+        // if (response.data["level"] == "5")
+        //   response.data["level"] = "ExtremelyHard";
+        response.data.level = "Easy";
+
+        // if (response.data["tag"] == null) response.data["tag"] = ["无"];
+        // else response.data["tag"] = response.data["tag"].split("|");
+        response.data.tag = ["无"];
+
+        // if (response.data.submission == 0) {
+        //   this.ac = 0;
+        //   this.mle = 0;
+        //   this.tle = 0;
+        //   this.rte = 0;
+        //   this.pe = 0;
+        //   this.ce = 0;
+        //   this.wa = 0;
+        //   this.se = 0;
+        // } else {
+        //   this.ac = parseFloat(
+        //     ((response.data.ac * 100) / response.data.submission).toFixed(2)
+        //   );
+        //   this.mle = parseFloat(
+        //     ((response.data.mle * 100) / response.data.submission).toFixed(
+        //       2
+        //     )
+        //   );
+        //   this.tle = parseFloat(
+        //     ((response.data.tle * 100) / response.data.submission).toFixed(
+        //       2
+        //     )
+        //   );
+        //   this.rte = parseFloat(
+        //     ((response.data.rte * 100) / response.data.submission).toFixed(
+        //       2
+        //     )
+        //   );
+        //   this.pe = parseFloat(
+        //     ((response.data.pe * 100) / response.data.submission).toFixed(2)
+        //   );
+        //   this.ce = parseFloat(
+        //     ((response.data.ce * 100) / response.data.submission).toFixed(2)
+        //   );
+        //   this.wa = parseFloat(
+        //     ((response.data.wa * 100) / response.data.submission).toFixed(2)
+        //   );
+        //   this.se = parseFloat(
+        //     ((response.data.se * 100) / response.data.submission).toFixed(2)
+        //   );
+        // }
+
+        if (response.data.deadline_time == null) {
+          this.ddl = "";
+          this.have_ddl = false;
+        } else {
+          this.ddl = response.data.deadline_time;
+          this.have_ddl = true;
         }
-        this.proid = this.ID
-        this.des = response.data.des;
-        this.input = response.data.input;
-        this.output = response.data.output;
-        this.sinput = response.data.sinput.split("|#)"); //分隔符
-        this.soutput = response.data.soutput.split("|#)");
-        this.author = response.data.author;
-        this.addtime = response.data["addtime"] = moment(
-          response.data["addtime"]
-        ).format("YYYY-MM-DD HH:mm:ss");
 
-        this.oj = response.data.oj;
-        this.source = response.data.source;
-        this.time = response.data.time + "MS";
-        this.memory = response.data.memory + "MB";
-        this.hint = response.data.hint;
+        console.log(response.data);
 
-        var li = response.data.template.split("*****")
-        for (var i = 1; i < li.length; i += 2) {
-          this.codetemplate[li[i]] = li[i + 1]
-        }
-        this.code = this.codetemplate[this.language]
+        this.title = response.data.name;
+        this.level = response.data.level;
+        this.tagnames = response.data.tag;
+        this.$refs.prosta.setdata(this.$data)
+        console.log(this.$refs["Statusmini"])
+        this.$refs["Statusmini"].setstatus(this.ID, sessionStorage.username, "");
 
-        if (this.oj != "LPOJ") {
-          this.proid = this.source
-        }
-
-
-        this.$axios
-          .get("/problemdata/" + this.ID + "/")
-          .then(response => {
-            if (response.data["level"] == "1") response.data["level"] = "Easy";
-            if (response.data["level"] == "2")
-              response.data["level"] = "Medium";
-            if (response.data["level"] == "3") response.data["level"] = "Hard";
-            if (response.data["level"] == "4")
-              response.data["level"] = "VeryHard";
-            if (response.data["level"] == "5")
-              response.data["level"] = "ExtremelyHard";
-
-            if (response.data["tag"] == null) response.data["tag"] = ["无"];
-            else response.data["tag"] = response.data["tag"].split("|");
-
-            if (response.data.submission == 0) {
-              this.ac = 0;
-              this.mle = 0;
-              this.tle = 0;
-              this.rte = 0;
-              this.pe = 0;
-              this.ce = 0;
-              this.wa = 0;
-              this.se = 0;
-            } else {
-              this.ac = parseFloat(
-                ((response.data.ac * 100) / response.data.submission).toFixed(2)
-              );
-              this.mle = parseFloat(
-                ((response.data.mle * 100) / response.data.submission).toFixed(
-                  2
-                )
-              );
-              this.tle = parseFloat(
-                ((response.data.tle * 100) / response.data.submission).toFixed(
-                  2
-                )
-              );
-              this.rte = parseFloat(
-                ((response.data.rte * 100) / response.data.submission).toFixed(
-                  2
-                )
-              );
-              this.pe = parseFloat(
-                ((response.data.pe * 100) / response.data.submission).toFixed(2)
-              );
-              this.ce = parseFloat(
-                ((response.data.ce * 100) / response.data.submission).toFixed(2)
-              );
-              this.wa = parseFloat(
-                ((response.data.wa * 100) / response.data.submission).toFixed(2)
-              );
-              this.se = parseFloat(
-                ((response.data.se * 100) / response.data.submission).toFixed(2)
-              );
-            }
-
-            this.title = response.data.title;
-            this.level = response.data.level;
-            this.tagnames = response.data.tag;
-            this.$refs.prosta.setdata(this.$data)
-            console.log(this.$refs["Statusmini"])
-            this.$refs["Statusmini"].setstatus(this.ID, sessionStorage.username, "");
-
-          })
-          .catch(error => {
-            this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          });
       })
       .catch(error => {
-        this.title = "非法访问！请在比赛中访问题目！";
         this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
       });
+      // })
+      // .catch(error => {
+      //   this.title = "非法访问！请在比赛中访问题目！";
+      //   this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
+      // });
   },
   methods: {
     showdialog () {
