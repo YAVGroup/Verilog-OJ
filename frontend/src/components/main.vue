@@ -1,33 +1,32 @@
 <template>
-  <el-row :gutter="12">
-    <el-col :span="6">
-      <el-row :gutter="10"><welcomemessage></welcomemessage></el-row>
+  <div>
+    <el-row>
 
-      <el-row :gutter="10">
-      <!-- <el-card style="height:150px;" :body-style="{ padding: '0px' }"> -->
-        <el-carousel height="150px" direction="horizontal" arrow="never" :interval="6000">
-          <el-carousel-item v-for="item in tables" :key="item.msg">
-              <div style="margin:20px;" v-html="item.msg"></div>
-          </el-carousel-item>
-        </el-carousel>
-      <!-- </el-card> -->
+    </el-row>
+    <el-row :gutter="12">
 
-      <!-- <el-row :gutter="10"><topuser></topuser></el-row> -->
-      </el-row>
-    </el-col>
+      <el-col :span="8" :offset="4">
+        <el-row>
+          <div class="home-frame">
+            <newsboard></newsboard>
+          </div>
+        </el-row>
+      </el-col>
+      <el-col :span="8">
+        <el-row>
+          <div class="home-frame">
+            <probsearch></probsearch>
+          </div>
+        </el-row>
+      </el-col>
+    </el-row>
+    <el-row>
+      <el-col :span=16 :offset="4">
+        <welcomemessage></welcomemessage>
+      </el-col>
+    </el-row>
+  </div>
 
-    <el-col :span="18">
-      <el-row>
-        <el-tabs type="border-card">
-          <el-tab-pane :label="'Description'"><description></description></el-tab-pane>
-          <el-tab-pane :label="'Rule'" :lazy="true"><ratingrule></ratingrule></el-tab-pane>
-        </el-tabs>
-      </el-row>
-      <el-row>
-        <!--<contestmini></contestmini>-->
-      </el-row>
-    </el-col>
-  </el-row>
 </template>
 
 <script>
@@ -36,14 +35,17 @@ import welcomemessage from "@/components/utils/welcomemessage";
 //import topuser from "@/components/utils/topuser";
 import ratingrule from "@/components/utils/ratingrule";
 //import contestmini from "@/components/utils/contestmini";
-import description from "@/components/utils/description";
+import newsboard from "@/components/utils/newsboard";
+import probsearch from "@/components/utils/probsearch";
+
 export default {
   components: {
     welcomemessage,
     //topuser,
     ratingrule,
     //contestmini,
-    description,
+    newsboard,
+    probsearch,
   },
   name: "homepage",
   data() {
@@ -63,15 +65,10 @@ export default {
 </script>
 
 <style scoped>
-.el-row {
-  margin-bottom: 12px;
-}
 
-.el-carousel__item:nth-child(2n) {
-  background-color: #ffffff;
-}
+.home-frame {
+  /* box-shadow: 0 1px 2px rgba(0, 0, 0, .12), 0 0 8px rgba(0, 0, 0, .04); */
+  padding: 12px 10px 10px 12px;
 
-.el-carousel__item:nth-child(2n + 1) {
-  background-color: #ffffff;
 }
 </style>
