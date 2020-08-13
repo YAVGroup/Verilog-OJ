@@ -64,25 +64,7 @@
     </transition>
 <!-- >  主体<-->
     <div class="footer">
-      <p>
-        Powered by
-        <a href="https://github.com/lluckydog/Verilog-OJ"
-           target="_blank"
-           style="text-decoration: none;color:#409EFF;">YAVG</a>
-        <span>
-          &nbsp; Version: 1.1&nbsp;&nbsp; Docs:&nbsp;&nbsp;
-          <a href="https://github.com/lluckydog/Verilog-OJ"
-             target="_blank"
-             style="text-decoration: none;color:#409EFF;">USTC Docs</a>&nbsp;&nbsp;欢迎加入USTC讨论群: 767423557&nbsp;&nbsp;
-          <a target="_blank"
-             href="//shang.qq.com/wpa/qunwpa?idkey=dcc9d5c63a744d5c09eda5dd7f4b208451e66b42ba633ea23ec6fa4d49135825">
-            <img border="0"
-                 src="//pub.idqqimg.com/wpa/images/group.png"
-                 alt="USTC讨论群"
-                 title="USTC讨论群">
-          </a>
-        </span>
-      </p>
+      Verilog OJ 测试版, 本项目得到了中国科学技术大学 VLab 实验平台的帮助和支持
     </div>
   </div>
 </template>
@@ -210,5 +192,6 @@ export default {
   margin-bottom: 10px;
   text-align: center;
   font-size: small;
+  color: #777;
 }
 </style>
