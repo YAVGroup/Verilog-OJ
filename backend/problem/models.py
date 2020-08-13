@@ -9,12 +9,41 @@ class Problem(models.Model):
     name = models.CharField(max_length=20, help_text='题目名字')
     create_time = models.DateTimeField(auto_now_add=True, help_text='题目的创建时间')
     deadline_time = models.DateTimeField(null=True, blank=True, help_text='题目的截止时间')
-    problem_files = models.ManyToManyField(File, help_text='题目所用文件（描述等）')
+    
+    description = models.TextField(help_text='题目描述（文字）')
+    description_input = models.TextField(help_text='输入描述（文字）')
+    description_output = models.TextField(help_text='输出描述（文字）')
+    description_files = models.ManyToManyField(File, help_text='描述文件', related_name='description', blank=True)
+    
+    app_data = models.TextField(help_text='样例用到的波形图', blank=True)
+    judge_files = models.ManyToManyField(File, help_text='评测所用文件', related_name='judge', blank=True)
     
     def get_testcases(self):
+        "获得该题目所有测试点"
         return TestCase.objects.filter(problem=self)
+    
     def get_total_grade(self):
+        "获得该题目测试点分值之和"
         return sum([testcase.grade for testcase in self.get_testcases()])
+    
+    def get_submitted_users(self):
+        "获得提交了该题目的用户（仅id）"
+        from submission.models import Submission
+        submissions = Submission.objects.filter(problem=self)
+        users = set()
+        for submission in submissions:
+            users.add(submission.user.id)
+        return list(users)
+    
+    def get_ac_users(self):
+        "获得AC了该题目的用户（仅id）"
+        from submission.models import Submission
+        submissions = Submission.objects.filter(problem=self)
+        users = set()
+        for submission in submissions:
+            if submission.is_ac():
+                users.add(submission.user.id)
+        return list(users)
 
 class TestCase(models.Model):
     id = models.AutoField(primary_key=True, help_text='Testcase ID')

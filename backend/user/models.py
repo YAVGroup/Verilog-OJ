@@ -19,22 +19,22 @@ class User(AbstractUser):
         return Submission.objects.filter(user=self)
     
     def get_submitted_problems(self):
-        "获得该用户提交的所有题目"
+        "获得该用户提交的所有题目（仅id）"
         from submission.models import Submission, SubmissionResult
         
         submitted_problems = set()
         for submission in self.get_submissions():
-            submitted_problems.add(submission.problem)
+            submitted_problems.add(submission.problem.id)
         return list(submitted_problems)
     
     def get_ac_problems(self):
-        "获得该用户AC的所有题目"
+        "获得该用户AC的所有题目（仅id）"
         from submission.models import Submission, SubmissionResult
         
         ac_problems = set()
         for submission in self.get_submissions():
             if submission.is_ac():
-                ac_problems.add(submission.problem)
+                ac_problems.add(submission.problem.id)
         return list(ac_problems)
     
     def get_total_score(self):

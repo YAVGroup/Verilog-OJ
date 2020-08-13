@@ -2,11 +2,6 @@
   <el-row :gutter="15">
     <el-col :span="18">
       <el-card shadow="always">
-        <el-switch style="float: right;"
-                   v-model="islpoj"
-                   active-text="YAVG"
-                   inactive-text="All"
-                   @change="statuechange"></el-switch>
         <!--上方选页-->
         <el-pagination @size-change="handleSizeChange"
                        @current-change="handleCurrentChange"
@@ -22,10 +17,10 @@
                   @cell-mouse-enter="changestatistices"
                   @cell-click="problemclick"
                   size="small">
-          <el-table-column prop="problem"
+          <el-table-column prop="id"
                            label="ID"
                            :width="70"></el-table-column>
-          <el-table-column prop="title"
+          <el-table-column prop="name"
                            label="Title"
                            :width="250"></el-table-column>
           <el-table-column prop="level"
@@ -53,7 +48,7 @@
                       hit>{{ name }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="score"
+          <el-table-column prop="total_grade"
                            label="Score"
                            :width="70"></el-table-column>
         </el-table>
@@ -131,60 +126,60 @@ export default {
       se: 100,
       title: "Statistics",
       currenttag: "",
-      islpoj: true,
-      searchtext: "",
-      searchoj: "LPOJ"
+      searchtext: ""
     };
   },
   methods: {
-    statuechange (val) {
-      if (val == true) {
-        this.searchoj = "LPOJ"
-      } else {
-        this.searchoj = ""
-      }
-      this.searchtitle()
+    // 重新获取题目列表信息
+    refresh() {
+      this.$axios.get(
+        "/problems/?limit=" + this.pagesize + "&offset=" + (this.currentpage-1)*this.pagesize + "&search=" + this.searchtext
+      ).then(response => {
+          for (var i = 0; i < response.data.length; i++) {
+            // mapping = {
+            //   1: "Easy",
+            //   2: "Medium",
+            //   3: "Hard",
+            //   4: "VeryHard",
+            //   5: "ExtremelyHard"
+            // };
+            // response.data[i].level = mapping[response.data[i].level];
+
+            // if (response.data.results[i]["level"] == "1")
+            //   response.data.results[i]["level"] = "Easy";
+            // if (response.data.results[i]["level"] == "2")
+            //   response.data.results[i]["level"] = "Medium";
+            // if (response.data.results[i]["level"] == "3")
+            //   response.data.results[i]["level"] = "Hard";
+            // if (response.data.results[i]["level"] == "4")
+            //   response.data.results[i]["level"] = "VeryHard";
+            // if (response.data.results[i]["level"] == "5")
+            //   response.data.results[i]["level"] = "ExtremelyHard";
+            response.data[i].level = "Easy";
+
+            response.data[i].ac = response.data[i].ac_users.length;
+            response.data[i].submitted = response.data[i].submitted_users.length;
+            response.data[i].rate = response.data[i].ac + "/" + response.data[i].submitted;
+
+            // if (response.data.results[i]["tag"] == null)
+            //   response.data.results[i]["tag"] = ["无"];
+            // else
+            //   response.data.results[i]["tag"] = response.data.results[i][
+            //     "tag"
+            //   ].split("|");
+            response.data[i].tag = ["无"];
+          }
+
+          this.tableData = response.data;
+          this.totalproblem = response.data.length;
+      }).catch(error => {
+        this.$message.error("服务器错误：" + JSON.stringify(error.response.data));
+      });
     },
+
     searchtitle () {
       this.currentpage = 1;
-      this.$axios
-        .get(
-          "/problemdata/?limit=" +
-          this.pagesize +
-          "&offset=" +
-          (this.currentpage - 1) * this.pagesize +
-          "&auth=1&search=" +
-          this.searchtext +
-          "&oj=" + this.searchoj
-        )
-        .then(response => {
-          for (var i = 0; i < response.data.results.length; i++) {
-            if (response.data.results[i]["level"] == "1")
-              response.data.results[i]["level"] = "Easy";
-            if (response.data.results[i]["level"] == "2")
-              response.data.results[i]["level"] = "Medium";
-            if (response.data.results[i]["level"] == "3")
-              response.data.results[i]["level"] = "Hard";
-            if (response.data.results[i]["level"] == "4")
-              response.data.results[i]["level"] = "VeryHard";
-            if (response.data.results[i]["level"] == "5")
-              response.data.results[i]["level"] = "ExtremelyHard";
-
-            response.data.results[i]["rate"] =
-              response.data.results[i]["ac"] +
-              "/" +
-              response.data.results[i]["submission"];
-
-            if (response.data.results[i]["tag"] == null)
-              response.data.results[i]["tag"] = ["无"];
-            else
-              response.data.results[i]["tag"] = response.data.results[i][
-                "tag"
-              ].split("|");
-          }
-          this.tableData = response.data.results;
-          this.totalproblem = response.data.count;
-        });
+      this.refresh();
     },
     tagclick (name) {
       if (this.currenttag.indexOf(name) >= 0) {
@@ -205,127 +200,15 @@ export default {
       }
       this.searchtext = this.currenttag;
       this.currentpage = 1;
-      this.$axios
-        .get(
-          "/problemdata/?limit=" +
-          this.pagesize +
-          "&offset=" +
-          (this.currentpage - 1) * this.pagesize +
-          "&auth=1&search=" +
-          this.searchtext +
-          "&oj=" + this.searchoj
-        )
-        .then(response => {
-          for (var i = 0; i < response.data.results.length; i++) {
-            if (response.data.results[i]["level"] == "1")
-              response.data.results[i]["level"] = "Easy";
-            if (response.data.results[i]["level"] == "2")
-              response.data.results[i]["level"] = "Medium";
-            if (response.data.results[i]["level"] == "3")
-              response.data.results[i]["level"] = "Hard";
-            if (response.data.results[i]["level"] == "4")
-              response.data.results[i]["level"] = "VeryHard";
-            if (response.data.results[i]["level"] == "5")
-              response.data.results[i]["level"] = "ExtremelyHard";
-
-            response.data.results[i]["rate"] =
-              response.data.results[i]["ac"] +
-              "/" +
-              response.data.results[i]["submission"];
-
-            if (response.data.results[i]["tag"] == null)
-              response.data.results[i]["tag"] = ["无"];
-            else
-              response.data.results[i]["tag"] = response.data.results[i][
-                "tag"
-              ].split("|");
-          }
-          this.tableData = response.data.results;
-          this.totalproblem = response.data.count;
-        });
+      this.refresh();
     },
     handleSizeChange (val) {
       this.pagesize = val;
-
-      this.$axios
-        .get(
-          "/problemdata/?limit=" +
-          this.pagesize +
-          "&offset=" +
-          (this.currentpage - 1) * this.pagesize +
-          "&auth=1&search=" +
-          this.searchtext +
-          "&oj=" + this.searchoj
-        )
-        .then(response => {
-          for (var i = 0; i < response.data.results.length; i++) {
-            if (response.data.results[i]["level"] == "1")
-              response.data.results[i]["level"] = "Easy";
-            if (response.data.results[i]["level"] == "2")
-              response.data.results[i]["level"] = "Medium";
-            if (response.data.results[i]["level"] == "3")
-              response.data.results[i]["level"] = "Hard";
-            if (response.data.results[i]["level"] == "4")
-              response.data.results[i]["level"] = "VeryHard";
-            if (response.data.results[i]["level"] == "5")
-              response.data.results[i]["level"] = "ExtremelyHard";
-
-            response.data.results[i]["rate"] =
-              response.data.results[i]["ac"] +
-              "/" +
-              response.data.results[i]["submission"];
-
-            if (response.data.results[i]["tag"] == null)
-              response.data.results[i]["tag"] = ["无"];
-            else
-              response.data.results[i]["tag"] = response.data.results[i][
-                "tag"
-              ].split("|");
-          }
-          this.tableData = response.data.results;
-          this.totalproblem = response.data.count;
-        });
+      this.refresh();
     },
     handleCurrentChange (val) {
       this.currentpage = val;
-      this.$axios
-        .get(
-          "/problemdata/?limit=" +
-          this.pagesize +
-          "&offset=" +
-          (this.currentpage - 1) * this.pagesize +
-          "&auth=1&search=" +
-          this.searchtext +
-          "&oj=" + this.searchoj
-        )
-        .then(response => {
-          for (var i = 0; i < response.data.results.length; i++) {
-            if (response.data.results[i]["level"] == "1")
-              response.data.results[i]["level"] = "Easy";
-            if (response.data.results[i]["level"] == "2")
-              response.data.results[i]["level"] = "Medium";
-            if (response.data.results[i]["level"] == "3")
-              response.data.results[i]["level"] = "Hard";
-            if (response.data.results[i]["level"] == "4")
-              response.data.results[i]["level"] = "VeryHard";
-            if (response.data.results[i]["level"] == "5")
-              response.data.results[i]["level"] = "ExtremelyHard";
-
-            response.data.results[i]["rate"] =
-              response.data.results[i]["ac"] +
-              "/" +
-              response.data.results[i]["submission"];
-
-            if (response.data.results[i]["tag"] == null)
-              response.data.results[i]["tag"] = ["无"];
-            else
-              response.data.results[i]["tag"] = response.data.results[i][
-                "tag"
-              ].split("|");
-          }
-          this.tableData = response.data.results;
-          this.totalproblem = response.data.count;
-        });
+      this.refresh();
     },
     tableRowClassName ({ row, rowIndex }) {
       var acpro = this.$store.state.acpro;
@@ -368,49 +251,18 @@ export default {
     problemclick: function (row, column, cell, event) {
       this.$router.push({
         name: "problemdetail",
-        query: { problemID: row.problem }
+        params: { problemid: row.id }
       });
     }
   },
   mounted () {
-    this.$axios
-      .get("/problemdata/?limit=15&offset=0&auth=1&oj=LPOJ")
-      .then(response => {
-
-        console.log(response.data);
-        for (var i = 0; i < response.data.results.length; i++) {
-          if (response.data.results[i]["level"] == "1")
-            response.data.results[i]["level"] = "Easy";
-          if (response.data.results[i]["level"] == "2")
-            response.data.results[i]["level"] = "Medium";
-          if (response.data.results[i]["level"] == "3")
-            response.data.results[i]["level"] = "Hard";
-          if (response.data.results[i]["level"] == "4")
-            response.data.results[i]["level"] = "VeryHard";
-          if (response.data.results[i]["level"] == "5")
-            response.data.results[i]["level"] = "ExtremelyHard";
-
-          response.data.results[i]["rate"] =
-            response.data.results[i]["ac"] +
-            "/" +
-            response.data.results[i]["submission"];
-
-          if (response.data.results[i]["tag"] == null)
-            response.data.results[i]["tag"] = ["无"];
-          else
-            response.data.results[i]["tag"] = response.data.results[i][
-              "tag"
-            ].split("|");
-        }
-        this.tableData = response.data.results;
-        this.totalproblem = response.data.count;
-      });
+    this.refresh();
 
     // this.$axios.get("/problemtag/").then(response => {
     //   for (var i = 0; i < response.data.length; i++)
     //     this.tagnames.push(response.data[i]["tagname"]);
     // });
-  }
+  },
 };
 </script>
 
