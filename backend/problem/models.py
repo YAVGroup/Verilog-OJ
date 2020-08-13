@@ -15,6 +15,9 @@ class Problem(models.Model):
         return TestCase.objects.filter(problem=self)
     def get_total_grade(self):
         return sum([testcase.grade for testcase in self.get_testcases()])
+    
+    def __str__(self):
+        return self.name
 
 class TestCase(models.Model):
     id = models.AutoField(primary_key=True, help_text='Testcase ID')
@@ -30,3 +33,8 @@ class TestCase(models.Model):
     )
     testcase_files = models.ManyToManyField(File, help_text='测试点所用文件')
     grade = models.IntegerField(default=10, help_text='测试点分值')
+
+    def __str__(self):
+        return "TestCase #{} (Problem #{}, {})".format(
+            self.id, self.problem.id, self.problem.name
+            )

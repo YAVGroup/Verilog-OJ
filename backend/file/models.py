@@ -26,3 +26,6 @@ class File(models.Model):
         kwargs['force_insert'] = False
         kwargs['force_update'] = True
         super(File, self).save(**kwargs)
+
+    def __str__(self):
+        return self.name
