@@ -4,15 +4,18 @@
 
     </el-row>
     <el-row :gutter="12">
-
-      <el-col :span="8" :offset="4">
+      <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6">
+        <!-- placeholder only -->
+        &nbsp;
+      </el-col>
+      <el-col :xs="12" :sm="10" :md="8" :lg="6" :xl="6">
         <el-row>
           <div class="home-frame">
             <newsboard></newsboard>
           </div>
         </el-row>
       </el-col>
-      <el-col :span="8">
+      <el-col :xs="12" :sm="10" :md="8" :lg="6" :xl="6">
         <el-row>
           <div class="home-frame">
             <probsearch></probsearch>
@@ -21,7 +24,11 @@
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span=16 :offset="4">
+      <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6">
+        <!-- placeholder only -->
+        &nbsp;
+      </el-col>
+      <el-col :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
         <welcomemessage></welcomemessage>
       </el-col>
     </el-row>
