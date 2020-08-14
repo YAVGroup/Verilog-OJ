@@ -1,0 +1,8 @@
+[run]
+omit =
+    backend/*sgi.py
+    # This is used by Django to discovery apps
+    */apps.py
+    # This won't be used in production website
+    utilities/*
+    
