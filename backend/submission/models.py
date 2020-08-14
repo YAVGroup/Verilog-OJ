@@ -53,6 +53,20 @@ class SubmissionResult(models.Model):
         help_text='The current status of this submission result'
     )
 
+    POSSIBLE_FAILURE_CHOICES = [
+        ('CE', 'Compile Error'),
+        ('RES_LIM_EXCEED', 'Resource Limitation Exceeded'),
+        ('NONE', 'No error'),
+        ('TIME_LIM_EXCEED', 'Time Limitation Exceeded'),
+        # When it's in PENDING or JUDGING we use this
+        ('NA', 'Not available')
+    ]
+
+    possible_failure = models.CharField(
+        max_length=20, choices=POSSIBLE_FAILURE_CHOICES,
+        help_text='Possible failure of this submission result'
+    )
+
     submit_time = models.DateTimeField(auto_now_add=True, help_text='结果提交时间')
     submission = models.ForeignKey(
         Submission,

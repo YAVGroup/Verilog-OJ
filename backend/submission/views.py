@@ -147,7 +147,8 @@ class SubmitView(APIView):
                     testcase=case,
                     grade=0,
                     log="",
-                    app_data=""
+                    app_data="",
+                    possible_failure='NA'
                 )
 
                 do_judge_task.delay(subm_id, case.id, subm_res.id)

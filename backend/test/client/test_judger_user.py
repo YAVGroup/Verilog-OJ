@@ -63,7 +63,8 @@ class JudgerAPITester(django.test.TestCase):
             testcase=tesc,
             grade=10,
             log="SOME_LOG",
-            app_data="SOME_APPDATA"
+            app_data="SOME_APPDATA",
+            possible_failure="NA"
         )
 
         # Modify MEDIA_ROOT to change the place we store
@@ -102,7 +103,7 @@ class JudgerAPITester(django.test.TestCase):
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
         resp = c.post('/api/submission-results/',
-            {"grade": "1",  "status": "DONE", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1"})
+            {"grade": "1",  "status": "DONE", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1", "possible_failure": "NONE"})
         #print(resp.content.decode("utf-8"))
         self.assertEqual(resp.status_code, 405)   # Method not allowed
 
@@ -113,7 +114,7 @@ class JudgerAPITester(django.test.TestCase):
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
         resp = c.put('/api/submission-results/1/',
-            {"grade": "1", "status": "DONE", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1"})
+            {"grade": "1", "status": "DONE", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1", "possible_failure": "NONE"})
         # print(resp.content.decode("utf-8"))
         self.assertEqual(resp.status_code, 200)
 
@@ -135,7 +136,7 @@ class JudgerAPITester(django.test.TestCase):
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
         resp = c.put('/api/submission-results/1/',
-            {"grade": "1", "status": "DONE", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1"})
+            {"grade": "1", "status": "DONE", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1", "possible_failure": "NONE"})
         # print(resp.content.decode("utf-8"))
         self.assertEqual(resp.status_code, 404)  # No longer there
 
@@ -147,6 +148,7 @@ class JudgerAPITester(django.test.TestCase):
         # This tests for both 200 and the content
         self.assertContains(resp, 'SOME_APPDATA', status_code=200)
         self.assertContains(resp, 'SOME_LOG', status_code=200)
+        self.assertContains(resp, 'NA', status_code=200)
         self.assertContains(resp, 'grade', status_code=200)
 
     def test_problem_get_detail(self):

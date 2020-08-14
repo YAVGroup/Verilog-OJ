@@ -58,7 +58,8 @@ class AnonUserAPITester(django.test.TestCase):
             testcase=tesc,
             grade=10,
             log="SOME_LOG",
-            app_data="SOME_APPDATA"
+            app_data="SOME_APPDATA",
+            possible_failure="NA"
         )
 
     def test_submission_get(self):
@@ -84,6 +85,7 @@ class AnonUserAPITester(django.test.TestCase):
         self.assertNotContains(resp, 'SOME_APPDATA', status_code=200)
         self.assertNotContains(resp, 'SOME_LOG', status_code=200)
         self.assertContains(resp, 'grade', status_code=200)
+        self.assertContains(resp, 'NA', status_code=200)
     
     def test_submission_result_get_detail(self):
         c = APIClient()
@@ -93,11 +95,12 @@ class AnonUserAPITester(django.test.TestCase):
         self.assertNotContains(resp, 'SOME_APPDATA', status_code=200)
         self.assertNotContains(resp, 'SOME_LOG', status_code=200)
         self.assertContains(resp, 'grade', status_code=200)
+        self.assertContains(resp, 'NA', status_code=200)
 
     def test_submission_result_modify(self):
         c = APIClient()
         resp = c.post('/api/submission-results/',
-            {"grade": 1, "log":"asdf", "app_data":"asdf", "submission": 1, "testcase": 1})
+            {"grade": 1, "log":"asdf", "app_data":"asdf", "submission": 1, "testcase": 1, "possible_failure": "NA"})
 
         self.assertEqual(resp.status_code, 401)
 
