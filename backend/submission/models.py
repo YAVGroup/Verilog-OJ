@@ -29,7 +29,10 @@ class Submission(models.Model):
     
     def have_judged(self):
         "判断是否已经评测完毕"
-        return len(self.get_results()) == len(self.problem.get_testcases())
+        if self.problem is None:
+            return False
+        else:
+            return len(self.get_results()) == len(self.problem.get_testcases())
     
     def is_ac(self):
         "判断该次提交是否AC"
