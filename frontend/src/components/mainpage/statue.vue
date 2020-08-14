@@ -167,15 +167,15 @@
       <el-table-column prop="id"
                        label="ID"
                        :width="70"></el-table-column>
-      <el-table-column prop="user"
+      <el-table-column prop="user.username"
                        label="User"
                        :width="140"></el-table-column>
-      <el-table-column prop="problemtitle"
+      <el-table-column prop="problem.name"
                        label="Problem"
                        :width="320">
         <template slot-scope="scope">
           <font color="#409EFF">
-            <b style="cursor:pointer;">{{ scope.row.problemtitle }}</b>
+            <b style="cursor:pointer;">{{ scope.row.problem.name }}</b>
           </font>
         </template>
       </el-table-column>
@@ -243,7 +243,7 @@ export default {
   methods: {
     deletestatus (id) {
       this.$axios
-        .delete("/judgestatus/" + id + "/").then(response => {
+        .delete("/submissions/" + id + "/").then(response => {
           this.$message.success("成功！")
         })
         .catch(error => {
@@ -266,7 +266,7 @@ export default {
           return
         this.$router.push({
           name: "problemdetail",
-          query: { problemID: row.problem }
+          params: { problemid: row.problem.id }
         });
         return;
       }
@@ -274,7 +274,7 @@ export default {
       if (col.label == "User") {
         this.$router.push({
           name: "user",
-          query: { username: row.user }
+          params: { userid: row.user.id }
         });
         return;
       }
@@ -285,7 +285,7 @@ export default {
       this.code = "";
 
       this.$axios
-        .get("/judgestatuscode/" + row.id + "/")
+        .get("/submissions/" + row.id + "/")
         .then(response => {
           this.code = response.data.code;
           this.curid = row.id;
@@ -297,19 +297,19 @@ export default {
             this.compilemsg = row.result
           if (response.data.message + "" != "0") this.compilemsg = response.data.message
 
-          this.$axios.get("/casestatus/?statusid=" + row.id).then(res => {
-            for (var i = 0; i < res.data.length; i++) {
-              this.dialogdata.push({
-                caseresult: res.data[i]["result"],
-                casedata: res.data[i]["casedata"],
-                casetime: res.data[i]["time"],
-                casememory: res.data[i]["memory"],
-                casetitle: res.data[i]["testcase"],
-                caseuseroutput: res.data[i]["useroutput"],
-                caseoutputdata: res.data[i]["outputdata"]
-              });
-            }
-          });
+          // this.$axios.get("/casestatus/?statusid=" + row.id).then(res => {
+          //   for (var i = 0; i < res.data.length; i++) {
+          //     this.dialogdata.push({
+          //       caseresult: res.data[i]["result"],
+          //       casedata: res.data[i]["casedata"],
+          //       casetime: res.data[i]["time"],
+          //       casememory: res.data[i]["memory"],
+          //       casetitle: res.data[i]["testcase"],
+          //       caseuseroutput: res.data[i]["useroutput"],
+          //       caseoutputdata: res.data[i]["outputdata"]
+          //     });
+          //   }
+          // });
         })
         .catch(error => {
           this.code = "无权限查看！" + error;
@@ -411,118 +411,127 @@ export default {
     getstatusdata () {
       this.loading = true;
       var url = ""
-      if (this.contest != 0)
-        url = "/judgestatus/?user=" +
-          this.username +
-          "&limit=" +
-          this.pagesize +
-          "&offset=" +
-          (this.currentpage - 1) * this.pagesize +
-          "&problemtitle=" +
-          this.searchform.problem +
-          "&language=" +
-          this.searchform.language +
-          "&result=" +
-          this.searchform.result +
-          "&contest=" +
-          this.contest
-      else
-        url = "/judgestatus/?user=" +
-          this.username +
-          "&limit=" +
-          this.pagesize +
-          "&offset=" +
-          (this.currentpage - 1) * this.pagesize +
-          "&problem=" +
-          this.searchform.problem +
-          "&language=" +
-          this.searchform.language +
-          "&result=" +
-          this.searchform.result +
-          "&contest=" +
-          this.contest
+      // if (this.contest != 0)
+      url = "/submissions/?user=" +
+        this.username +
+        "&limit=" +
+        this.pagesize +
+        "&offset=" +
+        (this.currentpage - 1) * this.pagesize +
+        "&problemtitle=" +
+        this.searchform.problem +
+        "&language=" +
+        this.searchform.language +
+        "&result=" +
+        this.searchform.result +
+        "&contest=" +
+        this.contest;
+      // else
+      //   url = "/judgestatus/?user=" +
+      //     this.username +
+      //     "&limit=" +
+      //     this.pagesize +
+      //     "&offset=" +
+      //     (this.currentpage - 1) * this.pagesize +
+      //     "&problem=" +
+      //     this.searchform.problem +
+      //     "&language=" +
+      //     this.searchform.language +
+      //     "&result=" +
+      //     this.searchform.result +
+      //     "&contest=" +
+      //     this.contest
 
       this.$axios
         .get(url)
         .then(response => {
-          for (var i = 0; i < response.data.results.length; i++) {
-            var testcase = response.data.results[i]["testcase"];
-            response.data.results[i]["time"] += "MS";
-            response.data.results[i]["memory"] += "MB";
-            response.data.results[i]["length"] += "B";
-            response.data.results[i]["submittime"] = moment(
-              response.data.results[i]["submittime"]
-            ).format("YYYY-MM-DD HH:mm:ss");
+          console.log(response);
+          for (var i = 0; i < response.data.length; i++) {
+            response.data[i].submittime = moment(response.data[i].submitt_time).format("YYYY-MM-DD HH:mm:ss");
+            if (response.data[i].ac == true)
+              response.data[i].result = "Accepted";
+            else if(response.data[i].judged == true)
+              response.data[i].result = "Runtime Error";
+            else
+              response.data[i].result = "Judging";
+            response.data[i].language = "Verilog";
+          //   var testcase = response.data.results[i]["testcase"];
+          //   response.data.results[i]["time"] += "MS";
+          //   response.data.results[i]["memory"] += "MB";
+          //   response.data.results[i]["length"] += "B";
+          //   response.data.results[i]["submittime"] = moment(
+          //     response.data.results[i]["submittime"]
+          //   ).format("YYYY-MM-DD HH:mm:ss");
 
-            if (response.data.results[i]["result"] == "-1") {
-              response.data.results[i]["result"] = "Pending";
-            }
+          //   if (response.data.results[i]["result"] == "-1") {
+          //     response.data.results[i]["result"] = "Pending";
+          //   }
 
-            if (response.data.results[i]["result"] == "-2") {
-              response.data.results[i]["result"] = "Judging";
-            }
+          //   if (response.data.results[i]["result"] == "-2") {
+          //     response.data.results[i]["result"] = "Judging";
+          //   }
 
-            if (response.data.results[i]["result"] == "-3") {
-              response.data.results[i]["result"] =
-                "Wrong Answer on test " + testcase;
-              if (testcase == "?")
-                response.data.results[i]["result"] = "Wrong Answer";
-            }
+          //   if (response.data.results[i]["result"] == "-3") {
+          //     response.data.results[i]["result"] =
+          //       "Wrong Answer on test " + testcase;
+          //     if (testcase == "?")
+          //       response.data.results[i]["result"] = "Wrong Answer";
+          //   }
 
-            if (response.data.results[i]["result"] == "-4")
-              response.data.results[i]["result"] = "Compile Error";
+          //   if (response.data.results[i]["result"] == "-4")
+          //     response.data.results[i]["result"] = "Compile Error";
 
-            if (response.data.results[i]["result"] == "-5") {
-              response.data.results[i]["result"] =
-                "Presentation Error on test " + testcase;
-              if (testcase == "?")
-                response.data.results[i]["result"] = "Presentation Error";
-            }
+          //   if (response.data.results[i]["result"] == "-5") {
+          //     response.data.results[i]["result"] =
+          //       "Presentation Error on test " + testcase;
+          //     if (testcase == "?")
+          //       response.data.results[i]["result"] = "Presentation Error";
+          //   }
 
-            if (response.data.results[i]["result"] == "-6") {
-              response.data.results[i]["result"] = "Waiting";
-            }
+          //   if (response.data.results[i]["result"] == "-6") {
+          //     response.data.results[i]["result"] = "Waiting";
+          //   }
 
-            if (response.data.results[i]["result"] == "0")
-              response.data.results[i]["result"] = "Accepted";
+          //   if (response.data.results[i]["result"] == "0")
+          //     response.data.results[i]["result"] = "Accepted";
 
-            if (response.data.results[i]["result"] == "1") {
-              response.data.results[i]["result"] =
-                "Time Limit Exceeded on test " + testcase;
-              if (testcase == "?")
-                response.data.results[i]["result"] = "Time Limit Exceeded";
-            }
+          //   if (response.data.results[i]["result"] == "1") {
+          //     response.data.results[i]["result"] =
+          //       "Time Limit Exceeded on test " + testcase;
+          //     if (testcase == "?")
+          //       response.data.results[i]["result"] = "Time Limit Exceeded";
+          //   }
 
-            if (response.data.results[i]["result"] == "2") {
-              response.data.results[i]["result"] =
-                "Time Limit Exceeded on test " + testcase;
-              if (testcase == "?")
-                response.data.results[i]["result"] = "Time Limit Exceeded";
-            }
+          //   if (response.data.results[i]["result"] == "2") {
+          //     response.data.results[i]["result"] =
+          //       "Time Limit Exceeded on test " + testcase;
+          //     if (testcase == "?")
+          //       response.data.results[i]["result"] = "Time Limit Exceeded";
+          //   }
 
-            if (response.data.results[i]["result"] == "3") {
-              response.data.results[i]["result"] =
-                "Memory Limit Exceeded on test " + testcase;
-              if (testcase == "?")
-                response.data.results[i]["result"] = "Memory Limit Exceeded";
-            }
+          //   if (response.data.results[i]["result"] == "3") {
+          //     response.data.results[i]["result"] =
+          //       "Memory Limit Exceeded on test " + testcase;
+          //     if (testcase == "?")
+          //       response.data.results[i]["result"] = "Memory Limit Exceeded";
+          //   }
 
-            if (response.data.results[i]["result"] == "4") {
-              response.data.results[i]["result"] =
-                "Runtime Error on test " + testcase;
-              if (testcase == "?")
-                response.data.results[i]["result"] = "Runtime Error";
-            }
+          //   if (response.data.results[i]["result"] == "4") {
+          //     response.data.results[i]["result"] =
+          //       "Runtime Error on test " + testcase;
+          //     if (testcase == "?")
+          //       response.data.results[i]["result"] = "Runtime Error";
+          //   }
 
-            if (response.data.results[i]["result"] == "5")
-              response.data.results[i]["result"] = "System Error";
+          //   if (response.data.results[i]["result"] == "5")
+          //     response.data.results[i]["result"] = "System Error";
 
-            if (response.data.results[i]["problemtitle"] == "")
-              response.data.results[i]["problemtitle"] =
-                response.data.results[i]["problem"];
+          //   if (response.data.results[i]["problemtitle"] == "")
+          //     response.data.results[i]["problemtitle"] =
+          //       response.data.results[i]["problem"];
           }
-          this.tableData = response.data.results;
-          this.totalstatus = response.data.count;
+          this.tableData = response.data;
+          this.totalstatus = response.data.length;
           this.loading = false;
         });
     },
@@ -599,7 +608,7 @@ export default {
   },
   created () {
     //创建一个全局定时器，定时刷新状态
-    this.isadmin = sessionStorage.type == 2 || sessionStorage.type == 3;
+    this.isadmin = sessionStorage.isadmin;
     this.timer();
     //this.$store.state.timer = setInterval(this.timer, 60000);取消自动刷新
   }

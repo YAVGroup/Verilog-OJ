@@ -12,10 +12,10 @@
             <a href="#">YAVG 是否还能如期上线？拭目以待</a>
           </li>
           <li>
-            <a href="#">zdx 是永远滴神！</a>
+            <a href="#"><del>zdx</del> lzt 是永远滴神！</a>
           </li>
         </ul>
-        
+
       </el-col>
     </el-row>
 
@@ -31,7 +31,7 @@ export default {
     };
   },
   methods:{
-    
+
   }
 };
 </script>
