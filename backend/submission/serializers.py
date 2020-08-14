@@ -16,8 +16,8 @@ class SubmissionResultPublicSerializer(serializers.ModelSerializer):
         exclude = ['app_data', 'log']
 
 class SubmissionSerializer(serializers.ModelSerializer):
-    problem = ProblemSerializer()
-    user = UserSerializer()
+    problem_belong = ProblemSerializer(read_only=True)
+    user_belong = UserSerializer(read_only=True)
     
     results = SubmissionResultSerializer(source='get_results', read_only=True, many=True)
     total_grade = serializers.IntegerField(source='get_total_grade', read_only=True)
@@ -29,8 +29,8 @@ class SubmissionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class SubmissionPublicSerializer(serializers.ModelSerializer):
-    problem = ProblemSerializer()
-    user = UserPublicSerializer()
+    problem_belong = ProblemSerializer(read_only=True)
+    user_belong = UserPublicSerializer(read_only=True)
     
     results = SubmissionResultPublicSerializer(source='get_results', read_only=True, many=True)
     total_grade = serializers.IntegerField(source='get_total_grade', read_only=True)

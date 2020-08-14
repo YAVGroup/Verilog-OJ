@@ -95,7 +95,7 @@ def get_submission_detail(submission_id, testcase_id, submission_result_id):
         #     "name": "A decoder test",
         #     "create_time": "14:37:38.303324",
         #     "deadline_time": "14:31:00",
-        #     "problem_files": [
+        #     "judge_files": [
         #         1
         #     ]
         # }
@@ -113,7 +113,7 @@ def get_submission_detail(submission_id, testcase_id, submission_result_id):
             'problem': {
                 'id': s_json['problem'],
                 'problem_files': [
-                    {'uuid': str(k)} for k in p_json["problem_files"]
+                    {'uuid': str(k)} for k in p_json["judge_files"]
                 ],
                 'testcase_id': testcase_id
             },
