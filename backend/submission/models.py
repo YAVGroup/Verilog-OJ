@@ -104,7 +104,7 @@ class SubmissionResult(models.Model):
     def get_result(self):
         "获得该评测的结果类型"
         if self.status == 'DONE':
-            if self.failure == 'NONE':
+            if self.possible_failure == 'NONE':
                 return 'Accepted'
             else:
                 return self.get_possible_failure_display()
