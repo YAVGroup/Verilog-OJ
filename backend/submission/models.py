@@ -67,9 +67,9 @@ class SubmissionResult(models.Model):
     POSSIBLE_FAILURE_CHOICES = [
         ('CE', 'Compile Error'),
         ('RLE', 'Resource Limitation Exceeded'),
-        ('AC', 'Accepted'),
         ('TLE', 'Time Limitation Exceeded'),
         ('WA', 'Wrong Answer'),
+        ('NONE', 'No Error'),
         # When it's in PENDING or JUDGING we use this
         ('NA', 'Not available')
     ]
@@ -99,12 +99,15 @@ class SubmissionResult(models.Model):
     
     def is_ac(self):
         "判断该测试点是否AC"
-        return self.possible_failure == 'AC'
+        return self.possible_failure == 'NONE'
     
     def get_result(self):
         "获得该评测的结果类型"
         if self.status == 'DONE':
-            return self.get_possible_failure_display()
+            if self.possible_failure == 'NONE':
+                return 'Accepted'
+            else:
+                return self.get_possible_failure_display()
         elif self.status == 'ERROR':
             return 'System Error'
         else:
