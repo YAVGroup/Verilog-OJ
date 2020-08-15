@@ -1,71 +1,6 @@
 <template>
   <el-card shadow="always"
            id="card">
-    <el-dialog :visible.sync="dialogVisible"
-               width="80%">
-      <el-alert title="Program Message:"
-                :type="compilemsg=='编译成功！'?'success':'warning'"
-                :description="compilemsg"
-                :closable="false"
-                show-icon
-                :show-close="false"></el-alert>
-      <el-alert title="Code："
-                type="info"
-                :closable="false">
-        <el-button size="mini"
-                   v-clipboard:copy="code"
-                   v-clipboard:success="onCopy"
-                   v-clipboard:error="onError">Copy</el-button>
-        <el-button size="mini"
-                   @click="downloadFile(curid,code)">Download</el-button>
-        <el-button v-if="isadmin"
-                   type="danger"
-                   size="mini"
-                   @click="deletestatus(curid)">Delete</el-button>
-      </el-alert>
-
-      <codemirror id="mycode"
-                  v-model="code"
-                  :options="cmOptions"></codemirror>
-      <el-collapse>
-        <el-collapse-item :key="index"
-                          v-for="(data,index) in dialogdata"
-                          v-if="data.casedata!=''">
-
-          <template slot="title">
-            <el-alert :show-icon="true"
-                      :type="data.caseresult=='Accepted'?'success':(data.caseresult=='Wrong Answer'?'error':'warning')"
-                      :closable="false"
-                      v-show="data.casedata!=''">
-              <template slot="title">
-                <b>{{' '+data.caseresult + ' on test ' + data.casetitle}}</b>
-              </template>
-            </el-alert>
-          </template>
-          <el-alert :title="''"
-                    :type="data.caseresult=='Accepted'?'success':(data.caseresult=='Wrong Answer'?'error':'warning')"
-                    :closable="false"
-                    v-show="data.casedata!=''">
-            <h5 style="white-space:pre;margin-left:15px;"
-                v-if="data.casedata!=''">{{'Time: '+ data.casetime + 'MS'+' Memory: '+data.casememory+'MB'}}</h5>
-            <h5 style="white-space:pre;margin-left:15px;"
-                v-if="data.casedata!=''">Test Input:</h5>
-            <div style="white-space:pre;margin-left:15px;word-wrap:break-word;word-break: normal;"
-                 v-if="data.casedata!=''">{{data.casedata+'\n'}}</div>
-
-            <h5 style="white-space:pre;margin-left:15px;"
-                v-if="data.casedata!=''">Your Output:</h5>
-            <div style="white-space:pre;margin-left:15px;word-wrap:break-word;word-break: normal;"
-                 v-if="data.casedata!=''">{{data.caseuseroutput+'\n'}}</div>
-
-            <h5 style="white-space:pre;margin-left:15px;"
-                v-if="data.casedata!=''">Expected Output:</h5>
-            <div style="white-space:pre;margin-left:15px;word-wrap:break-word;word-break: normal;"
-                 v-if="data.casedata!=''">{{data.caseoutputdata+'\n'}}</div>
-          </el-alert>
-        </el-collapse-item>
-      </el-collapse>
-    </el-dialog>
 
     <el-dialog :visible.sync="searchdialogVisible">
       <el-form :model="searchform"
@@ -167,15 +102,15 @@
       <el-table-column prop="id"
                        label="ID"
                        :width="70"></el-table-column>
-      <el-table-column prop="user.username"
+      <el-table-column prop="user_belong.username"
                        label="User"
                        :width="140"></el-table-column>
-      <el-table-column prop="problem.name"
+      <el-table-column prop="problem_belong.name"
                        label="Problem"
                        :width="320">
         <template slot-scope="scope">
           <font color="#409EFF">
-            <b style="cursor:pointer;">{{ scope.row.problem.name }}</b>
+            <b style="cursor:pointer;">{{ scope.row.problem_belong.name }}</b>
           </font>
         </template>
       </el-table-column>
@@ -229,15 +164,10 @@
 
 <script>
 import moment from "moment";
-import { codemirror } from "vue-codemirror";
-require("codemirror/lib/codemirror.css");
-require("codemirror/theme/base16-light.css");
-require("codemirror/mode/clike/clike");
 import languageselect from "@/components/utils/languageselect";
 export default {
   name: "statue",
   components: {
-    codemirror,
     languageselect
   },
   methods: {
@@ -259,14 +189,12 @@ export default {
     },
 
     rowClick (row, col, e) {
-      console.log(col);
-
       if (col.label == "Problem") {
         if (this.contest != "0")
           return
         this.$router.push({
           name: "problemdetail",
-          params: { problemid: row.problem.id }
+          params: { problemid: row.problem_belong.id }
         });
         return;
       }
@@ -274,48 +202,15 @@ export default {
       if (col.label == "User") {
         this.$router.push({
           name: "user",
-          params: { userid: row.user.id }
+          params: { userid: row.user_belong.id }
         });
         return;
       }
 
-
-
-      this.dialogdata = [];
-      this.code = "";
-
-      this.$axios
-        .get("/submissions/" + row.id + "/")
-        .then(response => {
-          this.code = response.data.code;
-          this.curid = row.id;
-          if (response.data.language == "Verilog") this.curlang = 'v'
-          // if (response.data.language == "C") this.curlang = 'c'
-
-          this.compilemsg = "编译成功！"
-          if (row.result != "Accepted")
-            this.compilemsg = row.result
-          if (response.data.message + "" != "0") this.compilemsg = response.data.message
-
-          // this.$axios.get("/casestatus/?statusid=" + row.id).then(res => {
-          //   for (var i = 0; i < res.data.length; i++) {
-          //     this.dialogdata.push({
-          //       caseresult: res.data[i]["result"],
-          //       casedata: res.data[i]["casedata"],
-          //       casetime: res.data[i]["time"],
-          //       casememory: res.data[i]["memory"],
-          //       casetitle: res.data[i]["testcase"],
-          //       caseuseroutput: res.data[i]["useroutput"],
-          //       caseoutputdata: res.data[i]["outputdata"]
-          //     });
-          //   }
-          // });
-        })
-        .catch(error => {
-          this.code = "无权限查看！" + error;
-        });
-
-      this.dialogVisible = true;
+      this.$router.push({
+        name: 'submission',
+        params: {submissionid: row.id}
+      })
     },
     searchstatus () {
       this.currentpage = 1;
@@ -410,9 +305,7 @@ export default {
 
     getstatusdata () {
       this.loading = true;
-      var url = ""
-      // if (this.contest != 0)
-      url = "/submissions/?user=" +
+      var url = "/submissions/?user=" +
         this.username +
         "&limit=" +
         this.pagesize +
@@ -426,109 +319,14 @@ export default {
         this.searchform.result +
         "&contest=" +
         this.contest;
-      // else
-      //   url = "/judgestatus/?user=" +
-      //     this.username +
-      //     "&limit=" +
-      //     this.pagesize +
-      //     "&offset=" +
-      //     (this.currentpage - 1) * this.pagesize +
-      //     "&problem=" +
-      //     this.searchform.problem +
-      //     "&language=" +
-      //     this.searchform.language +
-      //     "&result=" +
-      //     this.searchform.result +
-      //     "&contest=" +
-      //     this.contest
 
       this.$axios
         .get(url)
         .then(response => {
-          console.log(response);
+          // console.log(response);
           for (var i = 0; i < response.data.length; i++) {
             response.data[i].submittime = moment(response.data[i].submitt_time).format("YYYY-MM-DD HH:mm:ss");
-            if (response.data[i].ac == true)
-              response.data[i].result = "Accepted";
-            else if(response.data[i].judged == true)
-              response.data[i].result = "Runtime Error";
-            else
-              response.data[i].result = "Judging";
             response.data[i].language = "Verilog";
-          //   var testcase = response.data.results[i]["testcase"];
-          //   response.data.results[i]["time"] += "MS";
-          //   response.data.results[i]["memory"] += "MB";
-          //   response.data.results[i]["length"] += "B";
-          //   response.data.results[i]["submittime"] = moment(
-          //     response.data.results[i]["submittime"]
-          //   ).format("YYYY-MM-DD HH:mm:ss");
-
-          //   if (response.data.results[i]["result"] == "-1") {
-          //     response.data.results[i]["result"] = "Pending";
-          //   }
-
-          //   if (response.data.results[i]["result"] == "-2") {
-          //     response.data.results[i]["result"] = "Judging";
-          //   }
-
-          //   if (response.data.results[i]["result"] == "-3") {
-          //     response.data.results[i]["result"] =
-          //       "Wrong Answer on test " + testcase;
-          //     if (testcase == "?")
-          //       response.data.results[i]["result"] = "Wrong Answer";
-          //   }
-
-          //   if (response.data.results[i]["result"] == "-4")
-          //     response.data.results[i]["result"] = "Compile Error";
-
-          //   if (response.data.results[i]["result"] == "-5") {
-          //     response.data.results[i]["result"] =
-          //       "Presentation Error on test " + testcase;
-          //     if (testcase == "?")
-          //       response.data.results[i]["result"] = "Presentation Error";
-          //   }
-
-          //   if (response.data.results[i]["result"] == "-6") {
-          //     response.data.results[i]["result"] = "Waiting";
-          //   }
-
-          //   if (response.data.results[i]["result"] == "0")
-          //     response.data.results[i]["result"] = "Accepted";
-
-          //   if (response.data.results[i]["result"] == "1") {
-          //     response.data.results[i]["result"] =
-          //       "Time Limit Exceeded on test " + testcase;
-          //     if (testcase == "?")
-          //       response.data.results[i]["result"] = "Time Limit Exceeded";
-          //   }
-
-          //   if (response.data.results[i]["result"] == "2") {
-          //     response.data.results[i]["result"] =
-          //       "Time Limit Exceeded on test " + testcase;
-          //     if (testcase == "?")
-          //       response.data.results[i]["result"] = "Time Limit Exceeded";
-          //   }
-
-          //   if (response.data.results[i]["result"] == "3") {
-          //     response.data.results[i]["result"] =
-          //       "Memory Limit Exceeded on test " + testcase;
-          //     if (testcase == "?")
-          //       response.data.results[i]["result"] = "Memory Limit Exceeded";
-          //   }
-
-          //   if (response.data.results[i]["result"] == "4") {
-          //     response.data.results[i]["result"] =
-          //       "Runtime Error on test " + testcase;
-          //     if (testcase == "?")
-          //       response.data.results[i]["result"] = "Runtime Error";
-          //   }
-
-          //   if (response.data.results[i]["result"] == "5")
-          //     response.data.results[i]["result"] = "System Error";
-
-          //   if (response.data.results[i]["problemtitle"] == "")
-          //     response.data.results[i]["problemtitle"] =
-          //       response.data.results[i]["problem"];
           }
           this.tableData = response.data;
           this.totalstatus = response.data.length;
@@ -555,18 +353,6 @@ export default {
       this.timer();
       //this.$store.state.timer = setInterval(this.timer, 60000); 取消自动刷新
     },
-    downloadFile (codeid, content) {
-      var aLink = document.createElement("a");
-      var blob = new Blob([content], { type: "data:text/plain" });
-      var downloadElement = document.createElement("a");
-      var href = window.URL.createObjectURL(blob); //创建下载的链接
-      downloadElement.href = href;
-      downloadElement.download = codeid + '.' + this.curlang; //下载后文件名
-      document.body.appendChild(downloadElement);
-      downloadElement.click(); //点击下载
-      document.body.removeChild(downloadElement); //下载完成移除元素
-      window.URL.revokeObjectURL(href); //释放掉blob对象
-    }
   },
   data () {
     return {
@@ -580,8 +366,6 @@ export default {
         lineWrapping: true
       },
       isadmin: false,
-      curid: 0,
-      curlang: 'v',
       tableData: [],
       currentpage: 1,
       pagesize: 30,
@@ -589,11 +373,7 @@ export default {
       username: "",
       contest: "0",
       showall: false,
-      dialogVisible: false,
       searchdialogVisible: false,
-      code: "",
-      compilemsg: "无权限查看！",
-      dialogdata: [],
       loading: false,
       searchform: {
         user: "",

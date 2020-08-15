@@ -14,6 +14,7 @@ const admin = r => require.ensure([], () => r(require("@/components/mainpage/adm
 const homework = r => require.ensure([], () => r(require("@/components/mainpage/homework")), 'mainpage');
 const classes = r => require.ensure([], () => r(require("@/components/mainpage/classes")), 'mainpage');
 const classdetail = r => require.ensure([], () => r(require("@/components/mainpage/classdetail")), 'mainpage');
+const submission = r => require.ensure([], () => r(require("@/components/mainpage/submission")), 'mainpage');
 
 
 Vue.use(Router)
@@ -57,6 +58,11 @@ export default new Router({
       path: '/statue',
       name: 'statue',
       component: statue
+    },
+    {
+      path: '/submission/:submissionid',
+      name: 'submission',
+      component: submission
     },
 
     // 管理员界面

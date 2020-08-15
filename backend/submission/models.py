@@ -27,12 +27,12 @@ class Submission(models.Model):
         "获得该次提交的总分数"
         return sum([result.grade for result in self.get_results()])
     
-    def have_judged(self):
-        "判断是否已经评测完毕"
-        if self.problem is None:
-            return False
-        else:
-            return len(self.get_results()) == len(self.problem.get_testcases())
+    # def have_judged(self):
+    #     "判断是否已经评测完毕"
+    #     if self.problem is None:
+    #         return False
+    #     else:
+    #         return len(self.get_results()) == len(self.problem.get_testcases())
     
     def is_ac(self):
         "判断该次提交是否AC"
@@ -40,6 +40,14 @@ class Submission(models.Model):
             if not result.is_ac():
                 return False
         return True
+    
+    def get_result(self):
+        "获得该评测的结果类型"
+        results = SubmissionResult.objects.filter(submission=self).order_by('testcase')
+        for (i, result) in enumerate(results):
+            if result.get_result() != 'Accepted':
+                return result.get_result() + ' at testcase #%d' % i
+        return 'Accepted'
 
 class SubmissionResult(models.Model):
     id = models.AutoField(primary_key=True, help_text='提交结果ID')
@@ -58,9 +66,10 @@ class SubmissionResult(models.Model):
 
     POSSIBLE_FAILURE_CHOICES = [
         ('CE', 'Compile Error'),
-        ('RES_LIM_EXCEED', 'Resource Limitation Exceeded'),
-        ('NONE', 'No error'),
-        ('TIME_LIM_EXCEED', 'Time Limitation Exceeded'),
+        ('RLE', 'Resource Limitation Exceeded'),
+        ('AC', 'Accepted'),
+        ('TLE', 'Time Limitation Exceeded'),
+        ('WA', 'Wrong Answer'),
         # When it's in PENDING or JUDGING we use this
         ('NA', 'Not available')
     ]
@@ -82,12 +91,21 @@ class SubmissionResult(models.Model):
         help_text='某个测试点结果所属的测试点'
     )
     grade = models.IntegerField(help_text='本测试点所得的分数')
-    log = models.TextField(help_text='The log generated along the process')
-    app_data = models.TextField(help_text='Data associated with this result (waveform, etc)')
+    log = models.TextField(help_text='The log generated along the process', blank=True)
+    app_data = models.TextField(help_text='Data associated with this result (waveform, etc)', blank=True)
     
     class Meta:
         unique_together = (('submission', 'testcase'),)
     
     def is_ac(self):
         "判断该测试点是否AC"
-        return self.grade == self.testcase.grade
+        return self.possible_failure == 'AC'
+    
+    def get_result(self):
+        "获得该评测的结果类型"
+        if self.status == 'DONE':
+            return self.get_possible_failure_display()
+        elif self.status == 'ERROR':
+            return 'System Error'
+        else:
+            return self.status

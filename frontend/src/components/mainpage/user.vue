@@ -64,7 +64,7 @@ export default {
     problemclick(id) {
       this.$router.push({
         name: "problemdetail",
-        query: { problemID: id }
+        params: { problemID: id }
       });
     }
   },

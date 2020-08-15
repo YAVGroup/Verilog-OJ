@@ -2,8 +2,6 @@ from django.db import models
 from user.models import User
 from file.models import File
 
-# TODO: 区分测试点编号
-
 class Problem(models.Model):
     id = models.AutoField(primary_key=True, help_text='题目ID')
     name = models.CharField(max_length=20, help_text='题目名字')
@@ -60,7 +58,7 @@ class TestCase(models.Model):
         max_length=20, choices=TYPE_CHOICES,
         help_text='测试点类型'
     )
-    testcase_files = models.ManyToManyField(File, help_text='测试点所用文件')
+    testcase_files = models.ManyToManyField(File, help_text='测试点所用文件', blank=True)
     grade = models.IntegerField(default=10, help_text='测试点分值')
 
     def __str__(self):
