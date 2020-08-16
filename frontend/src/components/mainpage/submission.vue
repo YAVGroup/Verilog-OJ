@@ -58,11 +58,11 @@
                   v-clipboard:success="onCopy"
                   v-clipboard:error="onError">Copy</el-button>
       <el-button size="mini"
-                  @click="downloadFile(curid,code)">Download</el-button>
+                  @click="downloadFile(submissionid,code)">Download</el-button>
       <el-button v-if="isadmin"
                   type="danger"
                   size="mini"
-                  @click="deletestatus(curid)">Delete</el-button>
+                  @click="deletestatus(submissionid)">Delete</el-button>
     </el-alert>
 
     <codemirror id="mycode"

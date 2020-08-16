@@ -472,28 +472,20 @@ export default {
         var formData = new FormData();
         var blob = new Blob([this.code], {type: "text/plain"});
         formData.append('file', blob, 'code.v');
-        this.$axios.post("/files/", formData)
-        .then(response => {
-          const fileid = response.data.id;
-          console.log("fileid = " + fileid + " 准备post");
-          var params = new URLSearchParams();
-          params.append('problem', this.id);
-          params.append('submit_files', [fileid]);
-          this.$axios.post("/submit/", /*paramsSON.stringify(*/{
-            'problem': this.id,
-            'submit_files': [fileid],
-          }/*),{
-            headers: {
-              'content-type': 'application/x-www-form-urlencoded'
-            }
-          }*/).then(response => {
-            console.log(response);
-            this.$router.push({
-              name: 'submission',
-              params: {submissionid: response.data.id}
-            });
-          });
+        return this.$axios.post("/files/", formData);
+      }).then(response => {
+        const fileid = response.data.id;
+        return this.$axios.post("/submit", {
+          'problem': this.id,
+          'submit_files': [fileid],
         });
+      }).then(response => {
+        this.$router.push({
+          name: 'submission',
+          params: {submissionid: response.data.id}
+        });
+      }).catch(error => {
+        this.$message.error("提交失败：" + JSON.stringify(error.response.data));
       });
     },
   },

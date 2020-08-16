@@ -46,7 +46,7 @@ class SubmissionViewSet(ReadOnlyModelViewSet):
             if user_id is None:
                 return SubmissionPublicSerializer
             else:
-                subm = Submission.objects.filter(id=self.request.data['submission'])[0]
+                subm = Submission.objects.filter(id=self.kwargs['pk'])[0]
                 if str(subm.user.id) != user_id:
                     return SubmissionPublicSerializer
                 else:

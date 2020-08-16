@@ -8,5 +8,5 @@ router.register('submission-results', SubmissionResultViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('submit/', SubmitView.as_view()),
+    path('submit', SubmitView.as_view()),
 ]
