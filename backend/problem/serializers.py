@@ -14,6 +14,7 @@ class ProblemSerializer(serializers.ModelSerializer):
     total_grade = serializers.IntegerField(source='get_total_grade', read_only=True)
     submitted_users = serializers.ListField(source='get_submitted_users', read_only=True)
     ac_users = serializers.ListField(source='get_ac_users', read_only=True)
+    submissions = serializers.ListField(source='get_submissions', read_only=True)
     
     class Meta:
         model = Problem

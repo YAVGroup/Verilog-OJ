@@ -154,6 +154,6 @@ class SubmitView(APIView):
                 do_judge_task.delay(subm_id, case.id, subm_res.id)
 
             #do_judge_task(serializer.data['id'], serializer.data[''])
-            return Response('提交评测', status.HTTP_201_CREATED)
+            return Response(serializer._data, status.HTTP_201_CREATED)
         except Exception as e:
             return Response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)

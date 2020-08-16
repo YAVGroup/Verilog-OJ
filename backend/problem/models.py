@@ -13,6 +13,10 @@ class Problem(models.Model):
     description_output = models.TextField(help_text='输出描述（文字）')
     description_files = models.ManyToManyField(File, help_text='描述文件', related_name='description', blank=True)
     
+    template_code_file = models.ForeignKey(
+        File, on_delete=models.SET_NULL, null=True, blank=True,
+        help_text='模板代码文件'
+    )
     app_data = models.TextField(help_text='样例用到的波形图', blank=True)
     judge_files = models.ManyToManyField(File, help_text='评测所用文件', related_name='judge', blank=True)
     
@@ -42,6 +46,11 @@ class Problem(models.Model):
             if submission.is_ac():
                 users.add(submission.user.id)
         return list(users)
+    
+    def get_submissions(self):
+        "获得所有提交"
+        from submission.models import Submission
+        return Submission.objects.filter(problem=self).values('id')
     
     def __str__(self):
         return self.name
