@@ -86,7 +86,8 @@ class SubmissionResultViewSet(mixins.RetrieveModelMixin,
             if user_id is None:
                 return SubmissionResultPublicSerializer
             else:
-                subm = Submission.objects.filter(id=self.request.data['submission'])[0]
+                # Query to get the related submission, and user that it belongs to
+                subm = SubmissionResult.objects.filter(id=self.kwargs['pk'])[0].submission
                 if str(subm.user.id) != user_id:
                     return SubmissionResultPublicSerializer
                 else:
