@@ -160,7 +160,6 @@ export default {
     this.submissionid = this.$route.params.submissionid;
     this.$axios.get('/submissions/' + this.submissionid + '/').then(response => {
       this.results = response.data.results;
-      console.log(this.results);
       this.status = response.data.result;
       this.score = response.data.total_grade;
       this.total_score = response.data.problem_belong.total_grade;

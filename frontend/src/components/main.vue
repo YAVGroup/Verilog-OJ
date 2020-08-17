@@ -41,7 +41,6 @@
 import welcomemessage from "@/components/utils/welcomemessage";
 //import topuser from "@/components/utils/topuser";
 import ratingrule from "@/components/utils/ratingrule";
-//import contestmini from "@/components/utils/contestmini";
 import newsboard from "@/components/utils/newsboard";
 import probsearch from "@/components/utils/probsearch";
 
@@ -50,7 +49,6 @@ export default {
     welcomemessage,
     //topuser,
     ratingrule,
-    //contestmini,
     newsboard,
     probsearch,
   },

@@ -68,7 +68,6 @@ export default {
             this.$message.error("登录失败：" + JSON.stringify(error.response.data));
           else
             this.$message.error("抱歉，似乎出了点问题");
-          console.log(error);
         });
     }
   }

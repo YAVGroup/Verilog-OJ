@@ -323,7 +323,6 @@ export default {
       this.$axios
         .get(url)
         .then(response => {
-          // console.log(response);
           for (var i = 0; i < response.data.length; i++) {
             response.data[i].submittime = moment(response.data[i].submitt_time).format("YYYY-MM-DD HH:mm:ss");
             response.data[i].language = "Verilog";

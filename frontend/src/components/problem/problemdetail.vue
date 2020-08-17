@@ -245,7 +245,6 @@ export default {
     this.$axios
       .get("/problems/" + this.id + "/")
       .then(response => {
-        console.log(response.data);
         this.des = response.data.description;
         this.input = response.data.description_input;
         this.output = response.data.description_output;
@@ -341,8 +340,6 @@ export default {
         this.submissions_refresh();
 
         this.$refs.prosta.setdata(this.$data);
-        // console.log(this.$refs["Statusmini"])
-        // this.$refs["Statusmini"].setstatus(this.ID, sessionStorage.username, "");
 
       })
       .catch(error => {
@@ -436,7 +433,6 @@ export default {
             ).format("YYYY-MM-DD");
           }
           this.submissions = response.data;
-          console.log(this.submissions);
         });
     },
 

@@ -45,8 +45,10 @@ const store = new Vuex.Store({
 //   store.state.sb = res.data
 // });
 
+if (sessionStorage.userid == undefined || sessionStorage.userid == null)
+  sessionStorage.setItem("userid", "");
 
-if (sessionStorage.username != "" && sessionStorage.username != undefined) {
+// if (sessionStorage.username != "" && sessionStorage.username != undefined) {
   //获取一下用户的AC题目，全局保存。
   // axios
   //   .get("/userdata/?username=" + sessionStorage.username)
@@ -70,13 +72,13 @@ if (sessionStorage.username != "" && sessionStorage.username != undefined) {
   //       router.go(0)
   //     }
   //   });
-} else {
-  sessionStorage.setItem("username", "");
-  sessionStorage.setItem("name", "");
-  sessionStorage.setItem("rating", "");
-  sessionStorage.setItem("type", "");
-  sessionStorage.setItem("acpro", "");
-}
+// } else {
+//   sessionStorage.setItem("username", "");
+//   sessionStorage.setItem("name", "");
+//   sessionStorage.setItem("rating", "");
+//   sessionStorage.setItem("type", "");
+//   sessionStorage.setItem("acpro", "");
+// }
 
 
 
