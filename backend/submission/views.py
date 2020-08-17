@@ -18,6 +18,8 @@ from user.permissions import GetOnlyPermission
 from judge.judger_auth import IsJudger
 from problem.models import Problem
 
+import django.utils
+
 class SubmissionViewSet(ReadOnlyModelViewSet):
     """
     获取提交信息
@@ -86,7 +88,8 @@ class SubmissionResultViewSet(mixins.RetrieveModelMixin,
             if user_id is None:
                 return SubmissionResultPublicSerializer
             else:
-                subm = Submission.objects.filter(id=self.request.data['submission'])[0]
+                # Query to get the related submission, and user that it belongs to
+                subm = SubmissionResult.objects.filter(id=self.kwargs['pk'])[0].submission
                 if str(subm.user.id) != user_id:
                     return SubmissionResultPublicSerializer
                 else:
@@ -128,6 +131,14 @@ class SubmitView(APIView):
         # print(serializer.initial_data)
         try:
             serializer.is_valid(True)
+
+            # (Optional) Checking for deadline time
+            ddl = Problem.objects.filter(id=data['problem'])[0].deadline_time
+            if ddl is not None and ddl < django.utils.timezone.now():
+                # Whoops, you dare submitting it over ddl!
+                return Response("You've submitted it after deadline! {}".format(str(ddl)),
+                status.HTTP_400_BAD_REQUEST)
+
             subm = serializer.save()
 
             # Instantiate judge task for all testcases

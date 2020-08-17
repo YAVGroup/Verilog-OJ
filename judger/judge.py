@@ -165,6 +165,7 @@ def push_result(result, submission_id, testcase_id, submission_result_id):
             'app_data': result['appdata'] if judge_config['submit_appdata'] else 'N/A',
             'possible_failure': result['possible_failure']
         })
+        #print(r.text)
         r.raise_for_status()
     return True
 
@@ -242,7 +243,7 @@ def prepare_and_run(detail):
         possible_error_file_path = os.path.join(BASE_PATH, judge_config['possible_error_path'])
         try:
             with open(possible_error_file_path, "r") as f:
-                possible_errors.append(f.read())
+                possible_errors.append(f.read().strip())
         except:
             possible_errors.append("NA")
 
