@@ -30,7 +30,7 @@
         </el-col>
         <el-col :span="12">
           <el-input type="password"
-                    v-model="form.comfirm"
+                    v-model="form.confirm"
                     autocomplete="off"
                     placeholder="请重复密码，必填"></el-input>
         </el-col>
@@ -84,7 +84,7 @@ export default {
       form: {
         username: "",
         password: "",
-        comfirm: "",
+        confirm: "",
         last_name: "",
         first_name: "",
         email: ""
@@ -103,7 +103,7 @@ export default {
       //   this.$message.error("字段不能为空！");
       //   return;
       // }
-      if (this.form.password != this.form.comfirm) {
+      if (this.form.password != this.form.confirm) {
         this.$message.error("两次密码不一致！");
         return;
       }

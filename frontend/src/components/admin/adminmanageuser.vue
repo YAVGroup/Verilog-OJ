@@ -127,7 +127,7 @@
         </el-col>
         <el-col :span="12">
           <el-input type="password"
-                    v-model="comfirm"
+                    v-model="confirm"
                     autocomplete="off"
                     placeholder="不修改密码则留空"></el-input>
         </el-col>
@@ -253,7 +253,7 @@ export default {
       },
       userid: -1,
       password: "",
-      comfirm: ""
+      confirm: ""
     };
   },
   methods: {
@@ -386,7 +386,7 @@ export default {
         this.$message.error("字段不能为空！");
         return;
       }
-      if (this.password != this.comfirm) {
+      if (this.password != this.confirm) {
         this.$message.error("两次密码不一致！");
         return;
       }

@@ -173,4 +173,12 @@ class JudgerAPITester(django.test.TestCase):
         # This tests for both 200 and the content
         self.assertEqual(resp.status_code, 200)
 
-    
+    def test_submission_result_get_user_test(self):
+        c = APIClient()
+        # c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
+        signup = c.post('/api/user/signup/', {"username": "testname", "password": "testpassword", "confirm": "testpassword", "last_name": "testlast", "first_name": "testfirst", "email": "test@test.com"})
+        self.assertEqual(signup.status_code, 201)
+        login = c.post('/api/user/login', {"username": "testname", "password": "testpassword"})
+        self.assertEqual(login.status_code, 200)
+        resp = c.get('/api/submission-results/1/')
+        self.assertEqual(resp.status_code, 200)

@@ -30,7 +30,7 @@
           <div style="text-align:center;margin:5px;">确认密码</div>
         </el-col>
         <el-col :span="12">
-          <el-input type="password" v-model="form.comfirm" autocomplete="off"></el-input>
+          <el-input type="password" v-model="form.confirm" autocomplete="off"></el-input>
         </el-col>
       </el-row>
       <el-row :gutter="10">
@@ -105,7 +105,7 @@ export default {
       form: {
         username: "",
         password: "",
-        comfirm: "",
+        confirm: "",
         name: "",
         des:"",
         school: "",
@@ -138,7 +138,7 @@ export default {
         this.$message.error("字段不能为空！");
         return;
       }
-      if (this.form.password != this.form.comfirm) {
+      if (this.form.password != this.form.confirm) {
         this.$message.error("两次密码不一致！");
         return;
       }

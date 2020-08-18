@@ -43,7 +43,7 @@ class SubmissionViewSet(ReadOnlyModelViewSet):
             # In list mode, the log and app_data is always hidden
             return SubmissionPublicSerializer
         elif self.request.method == 'GET' and 'pk' in self.kwargs:
-            # In retrive mode
+            # In retrieve mode
             user_id = self.request.user.id
             if user_id is None:
                 return SubmissionPublicSerializer
