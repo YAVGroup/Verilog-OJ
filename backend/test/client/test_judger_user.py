@@ -218,6 +218,7 @@ class JudgerAPITester(django.test.TestCase):
         )
 
     def test_submission_result_get_user_test(self):
+    # 测试查看提交结果
         # 创建新用户testuser，以及它的题目和提交
         self.createTestUser()
         c = APIClient()
@@ -241,6 +242,35 @@ class JudgerAPITester(django.test.TestCase):
         resp = c.get('/api/submission-results/2/')
         self.assertTrue("log" in resp.content.decode("utf-8"))
 
+        # 测试用于生成文档的接口
         resp = c.get('/docs/')
         self.assertContains(resp, "/api/submission-results/", status_code=200)
-        # print(resp.content.decode("utf-8"))
+
+    def test_submission_get_user_test(self):
+    # 测试查看提交信息
+        # 创建新用户testuser，以及它的题目和提交
+        self.createTestUser()
+        c = APIClient()
+
+        # 首先是super_user，什么都能看到
+        c.login(username='admin', password='123456')
+        # 自己的提交
+        resp = c.get('/api/submissions/1/')
+        self.assertContains(resp, 'log', status_code=200)
+        # 别人的提交
+        resp = c.get('/api/submissions/2/')
+        self.assertContains(resp, 'log', status_code=200)
+
+        # 接下来是testuser，只能看见自己提交的log、app_data等
+        c.login(username='testname', password='testpassword')
+        # 别人的提交只能看到部分信息
+        resp = c.get('/api/submissions/1/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse("log" in resp.content.decode("utf-8"))
+        # 自己的提交能够看到全部信息
+        resp = c.get('/api/submissions/2/')
+        self.assertTrue("log" in resp.content.decode("utf-8"))
+
+        # 测试用于生成文档的接口
+        resp = c.get('/docs/')
+        self.assertContains(resp, "/api/submissions/", status_code=200)
