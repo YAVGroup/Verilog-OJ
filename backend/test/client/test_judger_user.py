@@ -241,3 +241,6 @@ class JudgerAPITester(django.test.TestCase):
         resp = c.get('/api/submission-results/2/')
         self.assertTrue("log" in resp.content.decode("utf-8"))
 
+        resp = c.get('/docs/')
+        self.assertContains(resp, "/api/submission-results/", status_code=200)
+        # print(resp.content.decode("utf-8"))
