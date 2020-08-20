@@ -161,7 +161,7 @@ import languageselect from "@/components/utils/languageselect";
 import moment from "moment";
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
-require("codemirror/mode/clike/clike");
+require("codemirror/mode/verilog/verilog");
 
 export default {
   name: "contestproblem",
@@ -177,7 +177,7 @@ export default {
       userip: "",
       cmOptions: {
         tabSize: 4,
-        mode: "text/x-c++src",
+        mode: "verilog",
         theme: "base16-light",
         lineNumbers: true,
         extraKeys: { Ctrl: "autocomplete" },

@@ -85,7 +85,8 @@ import moment from "moment";
 import { codemirror } from "vue-codemirror";
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
-require("codemirror/mode/clike/clike");
+
+require("codemirror/mode/verilog/verilog");
 import languageselect from "@/components/utils/languageselect";
 export default {
   name: "submission",
@@ -136,7 +137,7 @@ export default {
     return {
       cmOptions: {
         tabSize: 4,
-        mode: "text/x-c++src",
+        mode: "verilog",
         theme: "base16-light",
         lineNumbers: true,
         readOnly: true,

@@ -186,7 +186,10 @@ import languageselect from "@/components/utils/languageselect";
 import prostatistice from "@/components/utils/prostatistice";
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
-require("codemirror/mode/clike/clike");
+require("codemirror/theme/base16-dark.css");
+
+require("codemirror/mode/verilog/verilog");
+
 
 export default {
   name: "problemdetail",
@@ -200,7 +203,7 @@ export default {
     return {
       cmOptions: {
         tabSize: 4,
-        mode: "text/x-c++src",
+        mode:"verilog",
         theme: "base16-light",
         lineNumbers: true
       },
@@ -347,6 +350,7 @@ export default {
       });
   },
   methods: {
+    /*
     changetemplate (lang) {
       var t = this.codetemplate[lang]
       if (t) {
@@ -360,7 +364,7 @@ export default {
         })
       }
     },
-
+  */
     onCopy (e) {
       this.$message.success("复制成功！");
     },
