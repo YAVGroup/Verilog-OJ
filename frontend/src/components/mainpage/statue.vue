@@ -324,7 +324,7 @@ export default {
         .get(url)
         .then(response => {
           for (var i = 0; i < response.data.length; i++) {
-            response.data[i].submittime = moment(response.data[i].submitt_time).format("YYYY-MM-DD HH:mm:ss");
+            response.data[i].submittime = moment(response.data[i].submit_time).format("YYYY-MM-DD HH:mm:ss");
             response.data[i].language = "Verilog";
           }
           this.tableData = response.data;

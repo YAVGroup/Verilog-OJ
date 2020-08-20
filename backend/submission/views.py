@@ -49,7 +49,7 @@ class SubmissionViewSet(ReadOnlyModelViewSet):
                 return SubmissionPublicSerializer
             else:
                 subm = Submission.objects.filter(id=self.kwargs['pk'])[0]
-                if str(subm.user.id) != user_id:
+                if str(subm.user.id) != str(user_id):
                     return SubmissionPublicSerializer
                 else:
                     return SubmissionSerializer
@@ -90,7 +90,7 @@ class SubmissionResultViewSet(mixins.RetrieveModelMixin,
             else:
                 # Query to get the related submission, and user that it belongs to
                 subm = SubmissionResult.objects.filter(id=self.kwargs['pk'])[0].submission
-                if str(subm.user.id) != user_id:
+                if str(subm.user.id) != str(user_id):
                     return SubmissionResultPublicSerializer
                 else:
                     return SubmissionResultSerializer

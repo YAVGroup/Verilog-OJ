@@ -172,13 +172,110 @@ class JudgerAPITester(django.test.TestCase):
 
         # This tests for both 200 and the content
         self.assertEqual(resp.status_code, 200)
+    
+    def createTestUser(self):
+        testuser = User.objects.create_user("testname", password="testpassword")
+
+        prob = Problem.objects.create(
+            id=2, 
+            name="A Test Problem", 
+            deadline_time=timezone.now())
+
+        tesc = TestCase.objects.create(
+            id=2,
+            problem=prob,
+            type='SIM'
+        )
+
+        # TODO: subm.submit_files.add
+        subm = Submission.objects.create(
+            id=2,
+            problem=prob,
+            user=testuser
+        )
+
+        subr = SubmissionResult.objects.create(
+            id=2,
+            submission=subm,
+            status="PENDING",
+            testcase=tesc,
+            grade=10,
+            log="SOME_LOG",
+            app_data="SOME_APPDATA",
+            possible_failure="NA"
+        )
+
+        # Modify MEDIA_ROOT to change the place we store
+        BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+        self.old_root = settings.MEDIA_ROOT
+        settings.MEDIA_ROOT = os.path.join(BASE_PATH, "./tmp_storage/")
+
+        fake_file_object = io.StringIO(initial_value='EXAMPLE_TEXT')
+        file = File.objects.create(
+            id=2,
+            file=django.core.files.File(fake_file_object, name="example_file.txt"),
+            name="example_file.txt"
+        )
 
     def test_submission_result_get_user_test(self):
+    # 测试查看提交结果
+        # 创建新用户testuser，以及它的题目和提交
+        self.createTestUser()
         c = APIClient()
-        # c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        signup = c.post('/api/user/signup/', {"username": "testname", "password": "testpassword", "confirm": "testpassword", "last_name": "testlast", "first_name": "testfirst", "email": "test@test.com"})
-        self.assertEqual(signup.status_code, 201)
-        login = c.post('/api/user/login', {"username": "testname", "password": "testpassword"})
-        self.assertEqual(login.status_code, 200)
+
+        # 首先是super_user，什么都能看到
+        c.login(username='admin', password='123456')
+        # 自己的提交
+        resp = c.get('/api/submission-results/1/')
+        self.assertContains(resp, 'log', status_code=200)
+        # 别人的提交
+        resp = c.get('/api/submission-results/2/')
+        self.assertContains(resp, 'log', status_code=200)
+
+        # 接下来是testuser，只能看见自己提交的log、app_data等
+        c.login(username='testname', password='testpassword')
+        # 别人的提交只能看到部分信息
         resp = c.get('/api/submission-results/1/')
         self.assertEqual(resp.status_code, 200)
+        self.assertFalse("log" in resp.content.decode("utf-8"))
+        # 自己的提交能够看到全部信息
+        resp = c.get('/api/submission-results/2/')
+        self.assertTrue("log" in resp.content.decode("utf-8"))
+
+        # 测试用于生成文档的接口
+        resp = c.get('/docs/')
+        self.assertContains(resp, "/api/submission-results/", status_code=200)
+
+    def test_submission_get_user_test(self):
+    # 测试查看提交信息
+        # 创建新用户testuser，以及它的题目和提交
+        self.createTestUser()
+        c = APIClient()
+
+        # 首先是super_user，什么都能看到
+        c.login(username='admin', password='123456')
+        # 自己的提交
+        resp = c.get('/api/submissions/1/')
+        self.assertContains(resp, 'log', status_code=200)
+        # 别人的提交
+        resp = c.get('/api/submissions/2/')
+        self.assertContains(resp, 'log', status_code=200)
+
+        # 接下来是testuser，只能看见自己提交的log、app_data等
+        c.login(username='testname', password='testpassword')
+        # 别人的提交只能看到部分信息
+        resp = c.get('/api/submissions/1/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse("log" in resp.content.decode("utf-8"))
+        # 自己的提交能够看到全部信息
+        resp = c.get('/api/submissions/2/')
+        self.assertTrue("log" in resp.content.decode("utf-8"))
+
+        # 测试用于生成文档的接口
+        c.logout()
+        resp = c.get('/docs/')
+        self.assertContains(resp, "/api/submissions/", status_code=200)
+
+        c.force_authenticate(user=None)
+        resp = c.get('/api/submissions/1/')
+        self.assertFalse("log" in resp.content.decode("utf-8"))
