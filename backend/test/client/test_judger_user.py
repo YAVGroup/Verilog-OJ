@@ -223,8 +223,21 @@ class JudgerAPITester(django.test.TestCase):
         c.force_authenticate(user=None)
         resp = c.get('/api/submission-results/1/')
         self.assertEqual(resp.status_code, 200)
-        c.force_authenticate(user=User.objects.get(username='testname'))
+
+        c.login(username='admin', password='123456')
         resp = c.get('/api/submission-results/1/')
+        print(resp.content.decode("utf-8"))
         self.assertEqual(resp.status_code, 200)
         resp = c.get('/api/submission-results/2/')
+        print(resp.content.decode("utf-8"))
         self.assertEqual(resp.status_code, 200)
+
+        c.login(username='testname', password='testpassword')
+        resp = c.get('/api/submission-results/1/')
+        print(resp.content.decode("utf-8"))
+        self.assertEqual(resp.status_code, 200)
+        resp = c.get('/api/submission-results/2/')
+        print(resp.content.decode("utf-8"))
+        self.assertEqual(resp.status_code, 200)
+
+        
