@@ -274,3 +274,7 @@ class JudgerAPITester(django.test.TestCase):
         # 测试用于生成文档的接口
         resp = c.get('/docs/')
         self.assertContains(resp, "/api/submissions/", status_code=200)
+
+        c.force_authenticate(user=None)
+        resp = c.get('/api/submissions/1/')
+        self.assertFalse("log" in resp.content.decode("utf-8"))
