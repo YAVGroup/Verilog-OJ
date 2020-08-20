@@ -149,34 +149,8 @@ server{
 └── wikidetail.vue
 ```
 
-### admin（管理员控件）:
 
-```
-./
-├── adminaddchoiceproblem.vue
-├── adminaddcontest.vue
-├── adminaddproblem.vue
-├── adminboard.vue
-├── adminchangechoiceproblem.vue
-├── adminchangecontest.vue
-├── adminchangepro.vue
-├── adminclassmanage.vue
-├── adminmanageuser.vue
-├── adminrejudge.vue
-├── adminsetting.vue
-├── admintrainning.vue
-└── givechoiceproblemscore.vue
-```
 
-### Chart 
-
-```
-./
-├── echarts.js
-├── rankchart.vue			//主页排名图控件（暂不用）
-├── ratingchart.vue
-└── teamchart.vue
-```
 
 ### wiki（暂不用）:
 
@@ -222,9 +196,4 @@ server{
 ```
 
 
-
-## TODO
-
-- soulrow中的新闻部件没有后端对应
-- soulrow中的Search可以改成教学的wiki
 
