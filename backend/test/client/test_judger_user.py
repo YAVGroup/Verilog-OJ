@@ -172,13 +172,58 @@ class JudgerAPITester(django.test.TestCase):
 
         # This tests for both 200 and the content
         self.assertEqual(resp.status_code, 200)
+    
+    def createTestUser(self):
+        testuser = User.objects.create_user("testname", password="testpassword")
+
+        prob = Problem.objects.create(
+            id=2, 
+            name="A Test Problem", 
+            deadline_time=timezone.now())
+
+        tesc = TestCase.objects.create(
+            id=2,
+            problem=prob,
+            type='SIM'
+        )
+
+        # TODO: subm.submit_files.add
+        subm = Submission.objects.create(
+            id=2,
+            problem=prob,
+            user=testuser
+        )
+
+        subr = SubmissionResult.objects.create(
+            id=2,
+            submission=subm,
+            status="PENDING",
+            testcase=tesc,
+            grade=10,
+            log="SOME_LOG",
+            app_data="SOME_APPDATA",
+            possible_failure="NA"
+        )
+
+        # Modify MEDIA_ROOT to change the place we store
+        BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+        self.old_root = settings.MEDIA_ROOT
+        settings.MEDIA_ROOT = os.path.join(BASE_PATH, "./tmp_storage/")
+
+        fake_file_object = io.StringIO(initial_value='EXAMPLE_TEXT')
+        file = File.objects.create(
+            id=2,
+            file=django.core.files.File(fake_file_object, name="example_file.txt"),
+            name="example_file.txt"
+        )
 
     def test_submission_result_get_user_test(self):
+        self.createTestUser()
         c = APIClient()
-        # c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        signup = c.post('/api/user/signup/', {"username": "testname", "password": "testpassword", "confirm": "testpassword", "last_name": "testlast", "first_name": "testfirst", "email": "test@test.com"})
-        self.assertEqual(signup.status_code, 201)
         login = c.post('/api/user/login', {"username": "testname", "password": "testpassword"})
-        self.assertEqual(login.status_code, 200)
         resp = c.get('/api/submission-results/1/')
         self.assertEqual(resp.status_code, 200)
+        print(resp.content.decode("utf-8"))
+        resp = c.get('/api/submission-results/2/')
+        self.assertEqual(resp.status_code, 200)
+        print(resp.content.decode("utf-8"))
