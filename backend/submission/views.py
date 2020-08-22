@@ -20,6 +20,8 @@ from problem.models import Problem
 
 import django.utils
 
+import django.conf
+
 class SubmissionViewSet(ReadOnlyModelViewSet):
     """
     获取提交信息
@@ -35,6 +37,7 @@ class SubmissionViewSet(ReadOnlyModelViewSet):
         to dynamically adjust the item to be used
         """
         if not hasattr(self.request, 'user'): # 生成文档用
+            assert(django.conf.settings.DEBUG == True)
             return SubmissionSerializer
         elif self.request.auth == "Judger" or self.request.user.is_superuser:
             return SubmissionSerializer
@@ -54,6 +57,7 @@ class SubmissionViewSet(ReadOnlyModelViewSet):
                 else:
                     return SubmissionSerializer
         else:
+            assert(django.conf.settings.DEBUG == True)
             return SubmissionSerializer
 
 # Read-only for users, allow to create for other users
@@ -75,6 +79,7 @@ class SubmissionResultViewSet(mixins.RetrieveModelMixin,
         to dynamically adjust the item to be used
         """
         if not hasattr(self.request, 'user'): # 生成文档用
+            assert(django.conf.settings.DEBUG == True)
             return SubmissionResultSerializer
         elif self.request.auth == "Judger" or self.request.user.is_superuser:
             return SubmissionResultSerializer
@@ -95,6 +100,7 @@ class SubmissionResultViewSet(mixins.RetrieveModelMixin,
                 else:
                     return SubmissionResultSerializer
         else:
+            assert(django.conf.settings.DEBUG == True)
             return SubmissionResultSerializer
 
 class SubmitView(APIView):
