@@ -37,7 +37,6 @@ class SubmissionViewSet(ReadOnlyModelViewSet):
         to dynamically adjust the item to be used
         """
         if not hasattr(self.request, 'user'): # 生成文档用
-            assert(django.conf.settings.DEBUG == True)
             return SubmissionSerializer
         elif self.request.auth == "Judger" or self.request.user.is_superuser:
             return SubmissionSerializer
@@ -79,7 +78,6 @@ class SubmissionResultViewSet(mixins.RetrieveModelMixin,
         to dynamically adjust the item to be used
         """
         if not hasattr(self.request, 'user'): # 生成文档用
-            assert(django.conf.settings.DEBUG == True)
             return SubmissionResultSerializer
         elif self.request.auth == "Judger" or self.request.user.is_superuser:
             return SubmissionResultSerializer
