@@ -246,6 +246,9 @@ class JudgerAPITester(django.test.TestCase):
         resp = c.get('/docs/')
         self.assertContains(resp, "/api/submission-results/", status_code=200)
 
+        resp = c.post('/api/submission-results/1/')
+        self.assertContains(resp, "detail", status_code=403)
+
     def test_submission_get_user_test(self):
     # 测试查看提交信息
         # 创建新用户testuser，以及它的题目和提交
@@ -270,6 +273,9 @@ class JudgerAPITester(django.test.TestCase):
         # 自己的提交能够看到全部信息
         resp = c.get('/api/submissions/2/')
         self.assertTrue("log" in resp.content.decode("utf-8"))
+
+        resp = c.post('/api/submissions/1/')
+        self.assertContains(resp, "detail", status_code=403)
 
         # 测试用于生成文档的接口
         c.logout()
