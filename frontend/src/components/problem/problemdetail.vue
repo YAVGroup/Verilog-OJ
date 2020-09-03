@@ -14,29 +14,32 @@
 
           <!--题目描述、输入、输出-->
           <el-row :gutter="18"
-                  id="des">Description</el-row>
-          <el-row :gutter="18"
-                  id="detail">
-            <div style="margin-right:50px;word-break:break-all;white-space:pre-line;"
+                  class="problem-description-title">Description</el-row>
+          <el-row :gutter="18" class="problem-descriptions">
+            <div class="problem-descriptions"
                  v-html="des"
                  :key="des"></div>
           </el-row>
           <el-row :gutter="18"
-                  id="des">Input</el-row>
-          <el-row :gutter="18"
-                  id="detail">
-            <div style="margin-right:50px;word-break:break-all;white-space:pre-line;"
-                 v-html="input"></div>
+                  class="problem-description-title">Input</el-row>
+          <el-row :gutter="18" class="problem-descriptions">
+            <div v-html="input"></div>
           </el-row>
           <el-row :gutter="18"
-                  id="des">Output</el-row>
-          <el-row :gutter="18"
-                  id="detail">
-            <div style="margin-right:50px;word-break:break-all;white-space:pre-line;"
-                 v-html="output"></div>
+                  class="problem-description-title">Output</el-row>
+          <el-row :gutter="18" class="problem-descriptions">
+            <div v-html="output"></div>
           </el-row>
 
           <!--这里放样例波形图-->
+          <el-row :gutter="18"
+                  class="problem-description-title">Sample waveform</el-row>          
+          <el-row :gutter="18"
+                  id="sample_waveform" class="problem-descriptions">
+            <wavedrom waveId="1" 
+                      :parentText="waveform"
+                      errorMessage="Sorry, no sample waveform available"></wavedrom>
+          </el-row>
         </el-card>
       </el-row>
 
@@ -190,6 +193,7 @@ require("codemirror/theme/base16-dark.css");
 
 require("codemirror/mode/verilog/verilog");
 
+import wavedrom from "@/components/utils/wavedrom";
 
 export default {
   name: "problemdetail",
@@ -197,7 +201,8 @@ export default {
     codemirror,
     // statusmini,
     prostatistice,
-    languageselect
+    languageselect,
+    wavedrom
   },
   data () {
     return {
@@ -223,6 +228,8 @@ export default {
       language: "Verilog",
       // template_code: "",
       submissions: [],
+
+      waveform: "",
 
       // codetemplate: {},
 
@@ -251,6 +258,7 @@ export default {
         this.des = response.data.description;
         this.input = response.data.description_input;
         this.output = response.data.description_output;
+        this.waveform = response.data.app_data;
         // this.author = response.data.author;
         this.addtime = response.data.create_time =
           moment(response.data.create_time).format("YYYY-MM-DD HH:mm:ss");
@@ -507,16 +515,6 @@ export default {
   left: 10px;
   font-size: 20px;
 }
-#des {
-  color: deepskyblue;
-  font-weight: bold;
-  left: 20px;
-  font-size: 20px;
-}
-#detail {
-  left: 30px;
-  font-size: 16px;
-}
 #text {
   font-weight: normal;
   font-size: 15px;
@@ -531,6 +529,19 @@ export default {
   border: 1px dashed #e9eaec;
 }
 
+.problem-description-title {
+  color: deepskyblue;
+  font-weight: bold;
+  left: 20px;
+  font-size: 20px;
+}
+.problem-descriptions {
+  left: 30px;
+  font-size: 16px;
+  margin-right: 50px;
+  word-break: break-all;
+  white-space: pre-line;
+}
 .el-row {
   margin-bottom: 20px;
 }
