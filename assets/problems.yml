@@ -25,7 +25,7 @@ problems:
     
   app_data: |-
     {"signal": [
-      {"name": 'out', "wave": '0..'},
+      {"name": "out", "wave": "0.."}
     ]}
 
   judge_files:
@@ -217,10 +217,10 @@ problems:
     您应当输出 a 和 b 进行同或运算的结果。
 
   app_data: |-
-    {'signal': [
-      {'name': 'a', 'wave': '0101'},
-      {'name': 'b', 'wave': '0.1.'},
-      {'name': 'out', 'wave': '10.1'},
+    {"signal": [
+      {"name": "a", "wave": "0101"},
+      {"name": "b", "wave": "0.1."},
+      {"name": "out", "wave": "10.1"}
     ]}
   
   template_code_file:
