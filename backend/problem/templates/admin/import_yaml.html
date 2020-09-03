@@ -38,6 +38,28 @@ problems:
       - name: FileB.txt
         content: |-
           some content
+    app_data: |-
+      { "signal" : [
+        { "name": "clk",  "wave": "p......" },
+        { "name": "bus",  "wave": "x.34.5x", "data": "head body tail" },
+        { "name": "wire", "wave": "0.1..0." }
+      ]}
+    testcases:
+      - type: SIM
+        grade: 10
+        testcase_files:
+          - name: TestFileA.txt
+            content: |-
+              some content
+          - name: TestFileB.txt
+            content: |-
+              some another content
+      - type: SIM
+        grade: 10
+        testcase_files:
+          - name: TestFileC.txt
+            content: |-
+              test file c
     
   - name: The second problem
     description: The second description
