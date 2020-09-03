@@ -1,34 +1,429 @@
 problems:
-  - name: Output Zero
-    description: |-
-      欢迎您，Verilog OJ 的可爱用户！~
-      Verilog 是为数字电路设计和仿真开发的一种「硬件描述语言」。您要设计的逻辑电路对应着一整块「Verilog Module」，而 Module 内部又可以实例化出之前写好的子 Module。Module 实例化的过程，也就是告诉仿真器和模拟器「如何接线」的过程。
-      Verilog 最初是为仿真数字电路所设计，后来才有人将其应用于「综合器」的输入描述中。所谓「仿真 (Simulation)」，就是指用计算机一步一步的模拟数字电路某个时刻的状态，而「综合 (Synthesize)」则是将充满了子 Module，高级硬件描述语言特性的 Module 转化成为一些基本组件的连接的过程。
-      正因为 Verilog 在仿真和综合都有应用，所以学习时请您着重区分那些语法结构是「可仿真、可综合」的，哪些只是「可仿真」的。对此，我们的 Verilog OJ 也会有「仿真测试」（即通过仿真器进行测试，并且比对波形）和「综合测试」（综合到寄存器和组合逻辑描述，再仿真或判断等价性）。
+- name: Output Zero
+  description: |-
+    欢迎您，Verilog OJ 的可爱用户！~
+    Verilog 是为数字电路设计和仿真开发的一种「硬件描述语言」。您要设计的逻辑电路对应着一整块「Verilog Module」，而 Module 内部又可以实例化出之前写好的子 Module。Module 实例化的过程，也就是告诉仿真器和模拟器「如何接线」的过程。
+    Verilog 最初是为仿真数字电路所设计，后来才有人将其应用于「综合器」的输入描述中。所谓「仿真 (Simulation)」，就是指用计算机一步一步的模拟数字电路某个时刻的状态，而「综合 (Synthesize)」则是将充满了子 Module，高级硬件描述语言特性的 Module 转化成为一些基本组件的连接的过程。
+    正因为 Verilog 在仿真和综合都有应用，所以学习时请您着重区分那些语法结构是「可仿真、可综合」的，哪些只是「可仿真」的。对此，我们的 Verilog OJ 也会有「仿真测试」（即通过仿真器进行测试，并且比对波形）和「综合测试」（综合到寄存器和组合逻辑描述，再仿真或判断等价性）。
 
-      这次的题目旨在帮助您上手 Verilog OJ。请您构造一个没有输入且只有一个输出常值 0 的电路。
+    这次的题目旨在帮助您上手 Verilog OJ。请您构造一个没有输入且只有一个输出常值 0 的电路。
 
-    template: |-
+  description_input: |-
+    这个题目没有输入信号。
+    
+  description_output: |-
+    这个题目中，您应该输出常值信号 0。
+
+  template_code_file:
+    name: template_code.v
+    content: |-
       module top_module(
         output out
       );
         // Write your code here
       endmodule
     
-  - name: XNOR 门
-    description: |-
-      请写一个描述同或 (XNOR) 门的 Verilog module。
+  app_data: |-
+    {"signal": [
+      {"name": 'out', "wave": '0..'},
+    ]}
 
-      同或门的逻辑特点是，当两个输入端一个为“0”，另一个为“1”时，输出为“0”; 当两个输入端均为“1”或均为“0”时，输出为“1”。
+  judge_files:
+    - name: code_ref.v
+      content: |-
+        module top_module(
+          output out
+        );
+          assign out = 0;
+        endmodule
+
+  testcases:
+  - type: SIM
+    grade: 10
+    testcase_files:
+    - name: wavedump.py
+      content: |+
+        #!/usr/bin/env python3
+
+        from pyDigitalWaveTools.vcd.parser import VcdParser
+
+        class VcdSignalTraversalError(Exception):
+            pass
+
+        class VcdSignalComparationError(Exception):
+            pass
+
+        class VcdComparator:
+            def find_signal_inst(self, data_obj, signal_path):
+                components = signal_path.split("/")
+                cur = data_obj
+                for i in range(0, len(components) - 1):
+                    if cur['name'] != components[i]:
+                        raise VcdSignalTraversalError("{} mismatch with {} while traversing {}".format(
+                            cur['name'], components[i], signal_path))
+
+                    if not 'children' in cur.keys():
+                        raise VcdSignalTraversalError("{} have no data k-v pair while traversing {}".format(
+                            cur['name'], signal_path))
+
+                    found = False
+                    for child in cur['children']:
+                        if child['name'] == components[i+1]:
+                            found = True
+                            cur = child
+                            break
+
+                    if not found:
+                        raise VcdSignalTraversalError("{} have no children called {} while traversing {}".format(
+                            cur['name'], components[i+1], signal_path))
+
+                if cur['name'] != components[-1]:
+                    raise VcdSignalTraversalError("{} mismatch with {} while traversing {}".format(
+                        cur['name'], components[-1], signal_path))
+
+                return cur
+
+            def compare_signals(self, ref, ud):
+                # compare width
+                if ref['type']['width'] != ud['type']['width']:
+                    raise VcdSignalComparationError("Signal {} have different width between ref ({}) and ud ({})".format(
+                        ref['name'], ref['type']['width'], ud['type']['width']))
+
+                # No need to compare sigType (reg/wire.. anything else?)
+
+                # signal comparation
+                # TODO: support for different types ('b0' with 'b000' or 'd0' or something...)
+
+                # Since value change dump theoretically only generates data when changes
+                # so direct diffing should work
+                for i, val in enumerate(ref['data']):
+                    if ud['data'][i] != val:
+                        raise VcdSignalComparationError("Signal {} have difference on time {} (ref={}, ud={})".format(
+                            ref['name'], val[0], val, ud['data'][i]))
+
+            def dump_hierarchy(self, data_obj):
+                # TODO: only dump names
+                print(data_obj.toJSON())
+
+            def __init__(self, vcd_ref, vcd_ut, signal_names):
+                """Initialize signals for comparation
+                vcd_ref: the reference vcd file
+                vcd_ut: the vcd file under test
+                signal_names: the signal for comparation, uses "/" to express hierarchy.
+                         and the top module name shall also be included.
+                """
+
+                with open(vcd_ref) as vcd_ref_file:
+                    vcd = VcdParser()
+                    vcd.parse(vcd_ref_file)
+                    self.data_ref = vcd.scope.toJson()
+                    print(self.data_ref)
+
+                with open(vcd_ut) as vcd_ut_file:
+                    vcd_ut = VcdParser()
+                    vcd_ut.parse(vcd_ut_file)
+                    self.data_ut = vcd_ut.scope.toJson()
+                    print(self.data_ut)
+
+                # find all signals
+                self.signals_ref = [self.find_signal_inst(self.data_ref, i) for i in signal_names]
+                self.signals_ut = [self.find_signal_inst(self.data_ut, i) for i in signal_names]
+
+            def compare(self):
+                try:
+                    # compare all signals
+                    for i in range(0, len(self.signals_ref)):
+                        self.compare_signals(self.signals_ref[i], self.signals_ut[i])
+                    return (True, "No error")
+                except VcdSignalComparationError as e:
+                    return (False, "{}".format(e))
+
+    - name: vcd_main.py
+      content: |
+        #!/usr/bin/env python3
+        import sys
+
+        def main():
+
+            from wavedump import VcdComparator
+            cmpr = VcdComparator("./out_ref.vcd", "./out_dut.vcd", ['root/testbench/y'])
+            ret, msg = cmpr.compare()
+            return (ret, msg)
+
+        ret, msg = main()
+        print(msg)
+        print("Ret status: {}".format(ret))
+        sys.exit(0 if ret is True else 1)
+    - name: testbench.v
+      content: |2
+
+        module testbench();
+            wire y;
+            top_module DUT(y);
+
+            // http://www.referencedesigner.com/tutorials/verilog/verilog_62.php
+            initial begin
+                $dumpfile("out.vcd");
+                // This will dump all signal, which may not be useful
+                //$dumpvars;
+
+                // dumping only this module
+                //$dumpvars(1, testbench);
+
+                // dumping only these variable
+                // the first number (level) is actually useless
+                $dumpvars(0, y);
+            end
+
+            integer i;
+            initial begin
+                #1;
+            end
+
+        endmodule
+    - name: main.sh
+      content: |-
+        #!/bin/bash
+        iverilog ./testcase/testbench.v ./problem/code_ref.v -o ref_run
+        vvp ref_run
+        mv out.vcd out_ref.vcd
+
+        iverilog ./testcase/testbench.v ./submit/code.v -o dut_run
+        vvp dut_run
+        mv out.vcd out_dut.vcd
+
+        python3 ./testcase/vcd_main.py         # This will compare out_ref.vcd and out_dut.vcd
+
+        if [ $? -ne 0 ]; then
+          echo "0" > score.txt
+        else
+          echo "10" > score.txt
+        fi
+
+        echo "NONE" > possible_error.txt
+
+- name: XNOR 门
+  description: |-
+    请写一个描述同或 (XNOR) 门的 Verilog module。
+
+    同或门的逻辑特点是，当两个输入端一个为“0”，另一个为“1”时，输出为“0”; 当两个输入端均为“1”或均为“0”时，输出为“1”。
     
-    template: |-
+  description_input: |-
+    输入为 a 和 b，均为 1-bit wire。
+  
+  description_output: |-
+    输出为 out，位宽为 1。
+
+    您应当输出 a 和 b 进行同或运算的结果。
+
+  app_data: |-
+    {'signal': [
+      {'name': 'a', 'wave': '0101'},
+      {'name': 'b', 'wave': '0.1.'},
+      {'name': 'out', 'wave': '10.1'},
+    ]}
+  
+  template_code_file:
+    name: template_code.v
+    content: |-
       module top_module( 
       input a, 
       input b, 
-      output out );
+      output out);
         // Write your code here
       endmodule
 
-  - name: Testbench Basics
-    description:
-      这次的题目你需要写一个叫「Testbench」的东西。
+  judge_files:
+    - name: code_ref.v
+      content: |-
+        module top_module( 
+        input a, 
+        input b, 
+        output out);
+          assign out = ~(a ^ b);
+        endmodule
+
+  testcases:
+  - type: SIM
+    grade: 10
+    testcase_files:
+    - name: wavedump.py
+      content: |+
+        #!/usr/bin/env python3
+
+        from pyDigitalWaveTools.vcd.parser import VcdParser
+
+        class VcdSignalTraversalError(Exception):
+            pass
+
+        class VcdSignalComparationError(Exception):
+            pass
+
+        class VcdComparator:
+            def find_signal_inst(self, data_obj, signal_path):
+                components = signal_path.split("/")
+                cur = data_obj
+                for i in range(0, len(components) - 1):
+                    if cur['name'] != components[i]:
+                        raise VcdSignalTraversalError("{} mismatch with {} while traversing {}".format(
+                            cur['name'], components[i], signal_path))
+
+                    if not 'children' in cur.keys():
+                        raise VcdSignalTraversalError("{} have no data k-v pair while traversing {}".format(
+                            cur['name'], signal_path))
+
+                    found = False
+                    for child in cur['children']:
+                        if child['name'] == components[i+1]:
+                            found = True
+                            cur = child
+                            break
+
+                    if not found:
+                        raise VcdSignalTraversalError("{} have no children called {} while traversing {}".format(
+                            cur['name'], components[i+1], signal_path))
+
+                if cur['name'] != components[-1]:
+                    raise VcdSignalTraversalError("{} mismatch with {} while traversing {}".format(
+                        cur['name'], components[-1], signal_path))
+
+                return cur
+
+            def compare_signals(self, ref, ud):
+                # compare width
+                if ref['type']['width'] != ud['type']['width']:
+                    raise VcdSignalComparationError("Signal {} have different width between ref ({}) and ud ({})".format(
+                        ref['name'], ref['type']['width'], ud['type']['width']))
+
+                # No need to compare sigType (reg/wire.. anything else?)
+
+                # signal comparation
+                # TODO: support for different types ('b0' with 'b000' or 'd0' or something...)
+
+                # Since value change dump theoretically only generates data when changes
+                # so direct diffing should work
+                for i, val in enumerate(ref['data']):
+                    if ud['data'][i] != val:
+                        raise VcdSignalComparationError("Signal {} have difference on time {} (ref={}, ud={})".format(
+                            ref['name'], val[0], val, ud['data'][i]))
+
+            def dump_hierarchy(self, data_obj):
+                # TODO: only dump names
+                print(data_obj.toJSON())
+
+            def __init__(self, vcd_ref, vcd_ut, signal_names):
+                """Initialize signals for comparation
+                vcd_ref: the reference vcd file
+                vcd_ut: the vcd file under test
+                signal_names: the signal for comparation, uses "/" to express hierarchy.
+                         and the top module name shall also be included.
+                """
+
+                with open(vcd_ref) as vcd_ref_file:
+                    vcd = VcdParser()
+                    vcd.parse(vcd_ref_file)
+                    self.data_ref = vcd.scope.toJson()
+                    print(self.data_ref)
+
+                with open(vcd_ut) as vcd_ut_file:
+                    vcd_ut = VcdParser()
+                    vcd_ut.parse(vcd_ut_file)
+                    self.data_ut = vcd_ut.scope.toJson()
+                    print(self.data_ut)
+
+                # find all signals
+                self.signals_ref = [self.find_signal_inst(self.data_ref, i) for i in signal_names]
+                self.signals_ut = [self.find_signal_inst(self.data_ut, i) for i in signal_names]
+
+            def compare(self):
+                try:
+                    # compare all signals
+                    for i in range(0, len(self.signals_ref)):
+                        self.compare_signals(self.signals_ref[i], self.signals_ut[i])
+                    return (True, "No error")
+                except VcdSignalComparationError as e:
+                    return (False, "{}".format(e))
+
+    - name: vcd_main.py
+      content: |
+        #!/usr/bin/env python3
+        import sys
+
+        def main():
+
+            from wavedump import VcdComparator
+            cmpr = VcdComparator("./out_ref.vcd", "./out_dut.vcd", ['root/testbench/a', 'root/testbench/b', 'root/testbench/out'])
+            ret, msg = cmpr.compare()
+            return (ret, msg)
+
+        ret, msg = main()
+        print(msg)
+        print("Ret status: {}".format(ret))
+        sys.exit(0 if ret is True else 1)
+    - name: testbench.v
+      content: |2
+
+        module testbench();
+            reg a;
+            reg b;
+            wire out;
+            decoder DUT(a, b, out);
+
+            // http://www.referencedesigner.com/tutorials/verilog/verilog_62.php
+            initial begin
+                $dumpfile("out.vcd");
+                // This will dump all signal, which may not be useful
+                //$dumpvars;
+
+                // dumping only this module
+                //$dumpvars(1, testbench);
+
+                // dumping only these variable
+                // the first number (level) is actually useless
+                $dumpvars(0, a, b, out);
+            end
+
+            integer i;
+            initial begin
+                #1 a = 0; b = 0;
+                #1 a = 1; b = 0;
+                #1 a = 0; b = 1;
+                #1 a = 1; b = 1;
+            end
+
+        endmodule
+    - name: main.sh
+      content: |-
+        #!/bin/bash
+        iverilog ./testcase/testbench.v ./problem/code_ref.v -o ref_run
+        vvp ref_run
+        mv out.vcd out_ref.vcd
+
+        iverilog ./testcase/testbench.v ./submit/code.v -o dut_run
+        vvp dut_run
+        mv out.vcd out_dut.vcd
+
+        python3 ./testcase/vcd_main.py         # This will compare out_ref.vcd and out_dut.vcd
+
+        if [ $? -ne 0 ]; then
+          echo "0" > score.txt
+        else
+          echo "10" > score.txt
+        fi
+
+        echo "NONE" > possible_error.txt
+
+# - name: Testbench Basics
+#   description: |-
+#     这次的题目您需要写一个叫「Testbench」的东西。所谓「Testbench」，就是电路设计人员为了检验自己电路设计的正确性而编写的测试程序片段。
+      
+#     通常，Testbench 应该实例化电路，并且检查电路在不同输入下的输出是否符合预期。Testbench 在电路设计的各个阶段（RTL，门级网表...）都会用到，不过这里您只需要编写一个对综合前电路进行行为级仿真的 Testbench。
+
+#     这次，您需要完成对 3-8 译码器的测试工作，请您补充完成下面的模板代码并提交。您的 Testbench 将会被数个正确和不正确的电路进行测试，并且根据您对这些电路的评测结果来计算最终结果。
+    
+#   template: |-
+#     module testbench(
+
+#     );
+
+#     endmodule
