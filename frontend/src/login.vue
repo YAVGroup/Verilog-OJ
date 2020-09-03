@@ -22,7 +22,7 @@
       <el-button @click="dialogLoginVisible = false">Cancel</el-button>
       <el-button type="primary" @click="loginClick">OK</el-button>
     </div>
-    <a href="/api/user/ustc-login">统一身份认证登陆</a>
+    <a href="/api/user/ustc-login">统一身份认证登录</a>
   </el-dialog>
 </template>
 

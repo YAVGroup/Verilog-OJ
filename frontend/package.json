@@ -1,14 +1,16 @@
 {
   "name": "frontend",
   "version": "3.4.0",
+  "private": true,
   "description": "LPOJ",
   "author": "LP_Cong <504603913@qq.com>",
-  "private": true,
   "scripts": {
+    "build": "node build/build.js",
+    "test:unit": "vue-cli-service test:unit",
+    "analyz": "set NODE_ENV=production && set npm_config_report=true && npm run build",
     "dev": "webpack-dev-server --inline --progress --hot --config build/webpack.dev.conf.js",
     "start": "npm run dev",
-    "build": "node build/build.js",
-    "analyz": "set NODE_ENV=production && set npm_config_report=true && npm run build"
+    "test": "jest"
   },
   "dependencies": {
     "codemirror": "^5.44.0",
@@ -33,6 +35,8 @@
     "xlsx": "^0.15.2"
   },
   "devDependencies": {
+    "@vue/cli-plugin-unit-jest": "^4.5.4",
+    "@vue/test-utils": "^1.0.3",
     "autoprefixer": "^7.1.2",
     "axios": "^0.18.1",
     "babel-core": "^6.22.1",
@@ -74,13 +78,13 @@
     "webpack-dev-server": ">=3.1.11",
     "webpack-merge": "^4.1.0"
   },
-  "engines": {
-    "node": ">= 6.0.0",
-    "npm": ">= 3.0.0"
-  },
   "browserslist": [
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "engines": {
+    "node": ">= 6.0.0",
+    "npm": ">= 3.0.0"
+  }
 }
