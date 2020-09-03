@@ -24,6 +24,7 @@ class DownloadFileWidget(widgets.AdminFileWidget):
 
 # ref: https://stackoverflow.com/questions/51492206/how-can-i-add-a-link-to-download-a-file-in-a-django-admin-detail-page/
 class FileAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
     my_id_for_formfield = None
 
     # Notice: This rely on the calling sequence (get_form -> formfield_for_dbfield)
