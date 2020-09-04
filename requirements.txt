@@ -5,3 +5,4 @@ django-cors-headers==3.4.0
 six==1.15.0
 pycryptodome==3.9.8
 celery==4.4.7
+PyYAML==5.3.1

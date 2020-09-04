@@ -5,7 +5,9 @@ from django.urls import path
 from django.template.response import TemplateResponse
 import sys, io
 from django.db import transaction
-import django.core.files
+import django.core.files, django.contrib.messages
+from django.http import HttpResponse
+import yaml
 
 class TestCaseInline(admin.StackedInline):
     model = TestCase
@@ -17,6 +19,7 @@ class ProblemAdmin(admin.ModelAdmin):
         TestCaseInline,
     ]
     change_list_template = ['admin/custom_change_list.html']
+    actions = ['export_yaml', 'export_binary_yaml']
 
     def total_grade(self, obj):
         return obj.get_total_grade()
@@ -24,17 +27,96 @@ class ProblemAdmin(admin.ModelAdmin):
     def related_testcases_id(self, obj):
         return ",".join([str(p.id) for p in obj.get_testcases()])
 
+    def export_binary_yaml(self, request, queryset):
+        return self.export_yaml(request, queryset, dump_binary=True)
+
+    export_binary_yaml.short_description = "Export problems to Yaml (Binary)"
+
+    def export_yaml(self, request, queryset, dump_binary=False):
+        """ Export selected problems to Yaml. Only UTF-8 charset supported. """
+    
+        res = {"problems": []}
+
+        def read_file_into_info(f_inst):
+            info = {}
+            info['name'] = f_inst.name
+            info['content'] = f_inst.file.read() if \
+                dump_binary else f_inst.file.read().decode("utf-8")
+            return info
+
+        def read_test_info(t_inst):
+            info = {}
+            info['type'] = t_inst.type
+            info['grade'] = t_inst.grade
+            res_t = t_inst.testcase_files.all()
+            if len(res_t) > 0:
+                info['testcase_files'] = []
+                for f_inst in res_t:
+                    info['testcase_files'].append(
+                        read_file_into_info((f_inst))
+                    )
+            return info
+
+        for prob_inst in queryset:
+            prob = {}
+            prob["name"] = prob_inst.name
+            prob["description"] = prob_inst.description
+            prob["description_input"] = prob_inst.description_input
+            prob["app_data"] = prob_inst.app_data
+            
+            res_d = prob_inst.description_files.all()
+            if len(res_d) > 0:
+                prob["description_files"] = []
+                for f_inst in res_d:
+                    prob["description_files"].append(
+                        read_file_into_info(f_inst)
+                    )
+
+            res_j = prob_inst.judge_files.all()
+            if len(res_j) > 0:
+                prob["judge_files"] = []
+                for f_inst in res_j:
+                    prob["judge_files"].append(
+                        read_file_into_info(f_inst)
+                    )
+
+            if prob_inst.template_code_file is not None:
+                prob["template_code_file"] = read_file_into_info(
+                    prob_inst.template_code_file)
+
+            # Read out testcases
+            t_cases = prob_inst.get_testcases()
+            if len(t_cases) > 0:
+                prob["testcases"] = []
+                for t_inst in t_cases:
+                    prob["testcases"].append(
+                        read_test_info(t_inst)
+                    )
+
+            res["problems"].append(prob)
+        
+        class CustomDumper(yaml.Dumper):
+            def str_presenter(self, data):
+                if len(data.splitlines()) > 1:  # check for multiline string
+                    return self.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+                return self.represent_scalar('tag:yaml.org,2002:str', data)
+
+        CustomDumper.add_representer(str, CustomDumper.str_presenter)
+
+        response = HttpResponse(content_type="text/plain")
+        response.write(yaml.dump(
+            res, 
+            default_flow_style=False,
+            sort_keys=False,
+            Dumper=CustomDumper
+        ))
+        return response
+
+    export_yaml.short_description = "Export problems to Yaml"
 
     def import_yaml(self, yaml_data):
         log = ""
         success = False
-
-        log += "Importing pyyaml library...\n"
-        try:
-            import yaml
-        except ImportError:
-            log += "Error: Failed to import pyyaml library, make sure the server side have pyyaml installed.\n"
-            return log, success
 
         ys = yaml.load(yaml_data, Loader=yaml.SafeLoader)
         try:
@@ -67,15 +149,28 @@ class ProblemAdmin(admin.ModelAdmin):
                     file_info['content'] = info['content']
                     return file_info
 
+                def read_testcase(info):
+                    testcase_info = {}
+                    testcase_info['type'] = info['type']
+                    testcase_info['grade'] = info['grade']
+                    testcase_info['testcase_files'] = []
+                    for f in testcase_info['testcase_files']:
+                        info = read_file_info(f)
+                        testcase_info['testcase_files'].append(f)
+                    return testcase_info
+
                 ys_prob = ys['problems'][i]
                 problem_info['name'] = ys_prob['name']
                 problem_info['description'] = ys_prob['description']
                 problem_info['description_input'] = ys_prob['description_input']
                 problem_info['description_output'] = ys_prob['description_output']
+                problem_info['app_data'] = read_optional('app_data')
 
                 problem_info['template_code_file'] = read_file_info(read_optional('template_code_file'))
                 problem_info['description_files'] = read_optionals('description_files', read_file_info)
                 problem_info['judge_files'] = read_optionals('judge_files', read_file_info)
+                problem_info['testcases'] = read_optionals('testcases', read_testcase)
+                
                 log += str(problem_info)
                 log += "\n"
             except:
@@ -93,6 +188,21 @@ class ProblemAdmin(admin.ModelAdmin):
             )
             return file_inst
 
+        def save_testcase_to_db(prob_inst, tinfo):
+            f_insts = []
+            for finfo in tinfo['testcase_files']:
+                 f_insts.append(save_file_to_db(finfo))
+
+            t_inst = TestCase.objects.create(
+                problem=prob_inst,
+                grade=tinfo['grade'],
+                type=tinfo['type'],
+            )
+            for f_inst in f_insts:
+                t_inst.testcase_files.add(f_inst)
+            
+            t_inst.save()
+
         with transaction.atomic():
             log += "Saving to the database...\n"
             for prob in validated_probs:
@@ -101,7 +211,8 @@ class ProblemAdmin(admin.ModelAdmin):
                     name=prob['name'],
                     description=prob['description'],
                     description_input=prob['description_input'],
-                    description_output=prob['description_output']
+                    description_output=prob['description_output'],
+                    app_data="" if prob['app_data'] is None else prob['app_data']
                 )
 
                 if prob['template_code_file'] is not None:
@@ -118,9 +229,13 @@ class ProblemAdmin(admin.ModelAdmin):
                         file_inst = save_file_to_db(finfo)
                         prob_inst.judge_files.add(file_inst)
                 
+                if prob['testcases'] is not None:
+                    log += "Saving related testcases..\n"
+                    # Save related testcase first
+                    for tinfo in prob['testcases']:
+                        test_inst = save_testcase_to_db(prob_inst, tinfo)
+
                 prob_inst.save()
-            
-                # Save related testcase
 
         success = True
         return log, success
