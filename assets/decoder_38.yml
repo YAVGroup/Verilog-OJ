@@ -59,6 +59,42 @@ problems:
       content: |+
         #!/usr/bin/env python3
 
+        """
+        Example signal:
+
+        {
+            'name': 'root', 
+            'type': {'name': 'struct'}, 
+            'children': [
+                {
+                    'name': 'testbench', 
+                    'type': {'name': 'struct'}, 
+                    'children': [
+                        {
+                            'name': 'x', 
+                            'type': {'width': 3, 'name': 'reg'}, 
+                            'data': [
+                                (0, 'bx'), (1, 'b0'), (2, 'b1'), (3, 'b10'), (4, 'b11'), (5, 'b100'), (6, 'b101'), (7, 'b110'), (8, 'b111')
+                            ]
+                        }, 
+                        {
+                            'name': 'y', 
+                            'type': {
+                                'width': 8, 
+                                'name': 'wire'
+                            }, 
+                            'data': [
+                                (0, 'bx'), (1, 'b1'), (2, 'b10'), (3, 'b100'), (4, 'b1000'), (5, 'b10000'), (6, 'b100000'), (7, 'b1000000'), (8, 'b10000000')
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+
+        """
+
+
         from pyDigitalWaveTools.vcd.parser import VcdParser
 
         class VcdSignalTraversalError(Exception):
@@ -67,35 +103,36 @@ problems:
         class VcdSignalComparationError(Exception):
             pass
 
-        class VcdComparator:
-            def find_signal_inst(self, data_obj, signal_path):
-                components = signal_path.split("/")
-                cur = data_obj
-                for i in range(0, len(components) - 1):
-                    if cur['name'] != components[i]:
-                        raise VcdSignalTraversalError("{} mismatch with {} while traversing {}".format(
-                            cur['name'], components[i], signal_path))
-
-                    if not 'children' in cur.keys():
-                        raise VcdSignalTraversalError("{} have no data k-v pair while traversing {}".format(
-                            cur['name'], signal_path))
-
-                    found = False
-                    for child in cur['children']:
-                        if child['name'] == components[i+1]:
-                            found = True
-                            cur = child
-                            break
-
-                    if not found:
-                        raise VcdSignalTraversalError("{} have no children called {} while traversing {}".format(
-                            cur['name'], components[i+1], signal_path))
-
-                if cur['name'] != components[-1]:
+        def find_signal_inst(data_obj, signal_path):
+            components = signal_path.split("/")
+            cur = data_obj
+            for i in range(0, len(components) - 1):
+                if cur['name'] != components[i]:
                     raise VcdSignalTraversalError("{} mismatch with {} while traversing {}".format(
-                        cur['name'], components[-1], signal_path))
+                        cur['name'], components[i], signal_path))
 
-                return cur
+                if not 'children' in cur.keys():
+                    raise VcdSignalTraversalError("{} have no data k-v pair while traversing {}".format(
+                        cur['name'], signal_path))
+
+                found = False
+                for child in cur['children']:
+                    if child['name'] == components[i+1]:
+                        found = True
+                        cur = child
+                        break
+
+                if not found:
+                    raise VcdSignalTraversalError("{} have no children called {} while traversing {}".format(
+                        cur['name'], components[i+1], signal_path))
+
+            if cur['name'] != components[-1]:
+                raise VcdSignalTraversalError("{} mismatch with {} while traversing {}".format(
+                    cur['name'], components[-1], signal_path))
+
+            return cur
+
+        class VcdComparator:
 
             def compare_signals(self, ref, ud):
                 # compare width
@@ -107,7 +144,7 @@ problems:
 
                 # signal comparation
                 # TODO: support for different types ('b0' with 'b000' or 'd0' or something...)
-
+                
                 # Since value change dump theoretically only generates data when changes
                 # so direct diffing should work
                 for i, val in enumerate(ref['data']):
@@ -124,7 +161,7 @@ problems:
                 vcd_ref: the reference vcd file
                 vcd_ut: the vcd file under test
                 signal_names: the signal for comparation, uses "/" to express hierarchy.
-                         and the top module name shall also be included.
+                        and the top module name shall also be included.
                 """
 
                 with open(vcd_ref) as vcd_ref_file:
@@ -140,8 +177,8 @@ problems:
                     print(self.data_ut)
 
                 # find all signals
-                self.signals_ref = [self.find_signal_inst(self.data_ref, i) for i in signal_names]
-                self.signals_ut = [self.find_signal_inst(self.data_ut, i) for i in signal_names]
+                self.signals_ref = [find_signal_inst(self.data_ref, i) for i in signal_names]
+                self.signals_ut = [find_signal_inst(self.data_ut, i) for i in signal_names]
 
             def compare(self):
                 try:
@@ -151,6 +188,140 @@ problems:
                     return (True, "No error")
                 except VcdSignalComparationError as e:
                     return (False, "{}".format(e))
+
+        import json
+
+        class VcdSignalValueParseError(Exception):
+            pass
+
+        class VcdConverter:
+
+            def __init__(self, data_vcd):
+                self.output = {'signal': []}
+                self.data_vcd = data_vcd
+
+            def emitWaveDict(self):
+                return self.output
+
+            def mergeWaveDict(self, wdict):
+                self.output['signal'] += wdict['signal']
+
+            def emitWaveJson(self):
+                return json.dumps(self.output)
+
+            def parseValue(self, val_str):
+                if val_str[0] == "b":
+                    if val_str[1] == "x":
+                        return "x"
+                    return int(val_str[1:], base=2)
+                else:
+                    raise VcdSignalValueParseError("Unknown value type")
+
+            def toBinRepr(self, val, width):
+                if val == 'x':
+                    return 'x' * width
+
+                striped = bin(val)[2:]
+                assert(width >= len(striped))
+                return "0" * (width - len(striped)) + striped
+
+            def addToWaveJsonSeparate(self, signal_names, prefix=""):
+                for signal_name in signal_names:
+                    sig_jsons = []
+                    sig_inst = find_signal_inst(self.data_vcd, signal_name)
+
+                    width = sig_inst['type']['width']
+                    # decompose
+                    for i in range(0, width):
+                        sig_jsons.append({})
+                        sig_jsons[i]['name'] = prefix + sig_inst['name'] + "[" + str(i) + "]"
+
+                    time_max = sig_inst['data'][-1][0]
+                    waves = ["" for i in range(0, width)]
+                    cur_step_ptr = 0
+
+                    # "x" or int or "SOME.."
+                    cur_wave = "SOMETHING_NEVER_HAPPEN"
+
+                    # TODO: Avoid multiple transitions at same timestep
+                    for i in range(0, time_max + 1):
+                        if sig_inst['data'][cur_step_ptr][0] > i:
+                            # maintain current value
+                            for i in range(0, width):
+                                waves[i] += "."
+                        else:
+                            new_wave = self.parseValue(sig_inst['data'][cur_step_ptr][1])
+                            if new_wave == cur_wave:
+                                waves[i] += "."
+                            else:
+                                # do bitwise comparation
+                                if cur_wave == "SOMETHING_NEVER_HAPPEN":
+                                    # new_wave_bin[0] is MSB
+                                    new_wave_bin = self.toBinRepr(new_wave, width)
+                                    for i in range(0, width):
+                                        waves[i] += new_wave_bin[::-1][i]
+                                else:
+                                    cur_wave_bin = self.toBinRepr(cur_wave, width)
+                                    new_wave_bin = self.toBinRepr(new_wave, width)
+
+                                    for i in range(0, width):
+                                        old = cur_wave_bin[::-1][i]
+                                        new = new_wave_bin[::-1][i]
+                                        if old != new:
+                                            waves[i] += new
+                                        else:
+                                            waves[i] += '.'
+                                    
+                                cur_wave = new_wave
+
+                            cur_step_ptr += 1
+
+                    for i in range(0, width):
+                        sig_jsons[i]['wave'] = waves[i]
+
+                    self.output['signal'] += sig_jsons
+
+            def addToWaveJsonAggregated(self, signal_names, prefix=""):
+                """ Aggregated view, which uses '=' on every timeslice. """
+                for signal_name in signal_names:
+                    sig_json = {}
+                    sig_inst = find_signal_inst(self.data_vcd, signal_name)
+                    sig_json['name'] = prefix + sig_inst['name']
+
+                    # [0, time_max]
+                    time_max = sig_inst['data'][-1][0]
+                    wave = ""
+                    cur_step_ptr = 0
+                    cur_wave = "SOMETHING_NEVER_HAPPEN"
+                    data = []
+
+                    # TODO: Avoid multiple transitions at same timestep
+                    for i in range(0, time_max + 1):
+                        if sig_inst['data'][cur_step_ptr][0] > i:
+                            # maintain current value
+                            wave += "."
+                        else:
+                            new_wave = self.parseValue(sig_inst['data'][cur_step_ptr][1])
+                            if new_wave == cur_wave:
+                                wave += "."
+                            else:
+                                wave += "="
+                                data.append(new_wave)
+                                cur_wave = new_wave
+
+                            cur_step_ptr += 1
+
+                    sig_json['wave'] = wave
+                    sig_json['data'] = data
+
+                    self.output['signal'].append(sig_json)
+
+        if __name__ == "__main__":
+            sample_vcd = {'name': 'root', 'type': {'name': 'struct'}, 'children': [{'name': 'testbench', 'type': {'name': 'struct'}, 'children': [{'name': 'x', 'type': {'width': 3, 'name': 'reg'}, 'data': [(0, 'bx'), (1, 'b0'), (2, 'b1'), (3, 'b10'), (4, 'b11'), (5, 'b100'), (6, 'b101'), (7, 'b110'), (8, 'b111')]}, {'name': 'y', 'type': {'width': 8, 'name': 'wire'}, 'data': [(0, 'bx'), (1, 'b1'), (2, 'b10'), (3, 'b100'), (4, 'b1000'), (5, 'b10000'), (6, 'b100000'), (7, 'b1000000'), (8, 'b10000000')]}]}]}
+            vc = VcdConverter(sample_vcd)
+            vc.addToWaveJsonSeparate(['root/testbench/x', 'root/testbench/y'], "mysig_")
+            vc.addToWaveJsonAggregated(['root/testbench/x', 'root/testbench/y'], "mysig_")
+            print(vc.emitWaveJson())
 
     - name: vcd_main.py
       content: |
@@ -168,6 +339,41 @@ problems:
         print(msg)
         print("Ret status: {}".format(ret))
         sys.exit(0 if ret is True else 1)
+    - name: vcd_visualize.py
+      content: |
+        #!/usr/bin/env python3
+        import sys
+
+        def main():
+            from pyDigitalWaveTools.vcd.parser import VcdParser
+            from wavedump import VcdConverter
+
+            with open("./out_ref.vcd") as vcd_ref_file:
+                vcd = VcdParser()
+                vcd.parse(vcd_ref_file)
+                data_ref = vcd.scope.toJson()
+
+            with open("./out_dut.vcd") as vcd_dut_file:
+                vcd = VcdParser()
+                vcd.parse(vcd_dut_file)
+                data_dut = vcd.scope.toJson()
+
+            vc_ref = VcdConverter(data_ref)
+            vc_ref.addToWaveJsonSeparate(['root/testbench/x', 'root/testbench/y'], "reference_")
+            vc_ref.addToWaveJsonAggregated(['root/testbench/x', 'root/testbench/y'], "reference_")
+
+            vc_dut = VcdConverter(data_dut)
+            vc_dut.addToWaveJsonSeparate(['root/testbench/x', 'root/testbench/y'], "your_")
+            vc_dut.addToWaveJsonAggregated(['root/testbench/x', 'root/testbench/y'], "your_")
+
+            vc_ref.mergeWaveDict(vc_dut.emitWaveDict())
+            out = vc_ref.emitWaveJson()
+
+            with open("./appdata.txt", "w") as f:
+                f.write(out)
+
+        main()
+
     - name: testbench.v
       content: |2
 
@@ -216,5 +422,7 @@ problems:
         else
           echo "10" > score.txt
         fi
+
+        python3 ./testcase/vcd_visualize.py    # This will output app_data.txt
 
         echo "NONE" > possible_error.txt
