@@ -5,7 +5,7 @@ from django.urls import path
 from django.template.response import TemplateResponse
 import sys, io
 from django.db import transaction
-import django.core.files, django.contrib.messages
+import django.core.files
 from django.http import HttpResponse
 import yaml
 
