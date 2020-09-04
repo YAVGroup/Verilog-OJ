@@ -154,9 +154,9 @@ class ProblemAdmin(admin.ModelAdmin):
                     testcase_info['type'] = info['type']
                     testcase_info['grade'] = info['grade']
                     testcase_info['testcase_files'] = []
-                    for f in testcase_info['testcase_files']:
-                        info = read_file_info(f)
-                        testcase_info['testcase_files'].append(f)
+                    for f in info['testcase_files']:
+                        f_info = read_file_info(f)
+                        testcase_info['testcase_files'].append(f_info)
                     return testcase_info
 
                 ys_prob = ys['problems'][i]
