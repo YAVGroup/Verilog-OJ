@@ -95,15 +95,10 @@ class UserUSTCLoginView(APIView):
                     user = User.objects.get(student_id=student_id)
                     login(request, user)
                 except:
+                    # print(cas_response.data)
                     # 没有人用该学号注册账户, 默认使用科大邮箱用户名作为用户名，密码设置为学号，否则随机生成字符串作为用户名
-                    email = cas_response.data.get('attributes').get('email')
-                    username = ''
-                    i = 0
-                    while True:
-                        if email[i] == '@':
-                            break
-                        username += email[i]
-                        i = i + 1
+                    gid = cas_response.data.get('attributes', {}).get('gid')
+                    username = str(gid)
                     
                     while True:
                         try:
@@ -111,12 +106,14 @@ class UserUSTCLoginView(APIView):
                             serializer = UserSerializer(data=user)
                             serializer.is_valid(True)
                             serializer.save()
+                            user = User.objects.get(student_id=student_id)
                             login(request, user)
                             break
                         except Exception:
-                            username = ''
-                            for i in range(0,10):
-                                username += random.choice('abcdefghijklmnopqrstuvwxyz!@#$%^&*()')
+                            # import sys
+                            # exc_type, exc_obj, exc_tb = sys.exc_info()
+                            # print(f"{exc_type.__name__}: {exc_obj}")
+                            username = "".join(random.choices('0123456789abcdefghijklmnopqrstuvwxyz@.+-_', k=10))
 
                 rep = Response('OK', status.HTTP_200_OK)        # 更换为 rep = redirect('home')
                 return rep
