@@ -8,7 +8,7 @@ class Submission(models.Model):
     id = models.AutoField(primary_key=True, help_text='提交ID')
     problem = models.ForeignKey(
         Problem,
-        on_delete=models.SET_NULL, null=True,
+        on_delete=models.CASCADE, null=True,
         help_text='提交的题目',
     )
     user = models.ForeignKey(
