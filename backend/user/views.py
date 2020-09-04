@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
 from rest_framework.compat import coreapi, coreschema
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.http import HttpResponseRedirect
 
 from cas_client import CASClient
 
@@ -77,7 +78,7 @@ class UserUSTCLoginView(APIView):
         # 统一身份认证登录
         ticket = request.GET.get('ticket')
         cas_url = 'https://passport.ustc.edu.cn'
-        app_login_url = 'http://home.ustc.edu.cn/~zkdliushuo'
+        app_login_url = 'http://home.ustc.edu.cn/~via'
         cas_client = CASClient(cas_url, auth_prefix='')
         if ticket:
             try:
@@ -91,12 +92,13 @@ class UserUSTCLoginView(APIView):
             if cas_response and cas_response.success:
                 student_id = cas_response.user
                 try:
-                    # 已经有用户使用该学号注册过账户了
                     user = User.objects.get(student_id=student_id)
+                    request.session['username'] = user.username
+                    request.session['userid'] = user.id
+                    request.session['isadmin'] = user.is_superuser
                     login(request, user)
                 except:
                     # print(cas_response.data)
-                    # 没有人用该学号注册账户, 默认使用科大邮箱用户名作为用户名，密码设置为学号，否则随机生成字符串作为用户名
                     gid = cas_response.data.get('attributes', {}).get('gid')
                     username = str(gid)
                     
@@ -107,6 +109,9 @@ class UserUSTCLoginView(APIView):
                             serializer.is_valid(True)
                             serializer.save()
                             user = User.objects.get(student_id=student_id)
+                            request.session['username'] = user.username
+                            request.session['userid'] = user.id
+                            request.session['isadmin'] = user.is_superuser
                             login(request, user)
                             break
                         except Exception:
@@ -115,7 +120,8 @@ class UserUSTCLoginView(APIView):
                             # print(f"{exc_type.__name__}: {exc_obj}")
                             username = "".join(random.choices('0123456789abcdefghijklmnopqrstuvwxyz@.+-_', k=10))
 
-                rep = Response('OK', status.HTTP_200_OK)        # 更换为 rep = redirect('home')
+                # rep = Response('OK', status.HTTP_200_OK)        # 更换为 rep = redirect('home')
+                rep = redirect('http://oj.libreliu.info')
                 return rep
         cas_login_url = cas_client.get_login_url(service_url=app_login_url)
         return redirect(cas_login_url)
