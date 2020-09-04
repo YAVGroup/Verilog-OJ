@@ -166,7 +166,11 @@ def push_result(result, submission_id, testcase_id, submission_result_id):
             'possible_failure': result['possible_failure']
         })
         #print(r.text)
-        r.raise_for_status()
+        try:
+            r.raise_for_status()
+        except:
+            print(r.text)
+            raise Exception("Bad response code")
     return True
 
 def prepare_and_run(detail):
@@ -220,6 +224,9 @@ def prepare_and_run(detail):
             with open(score_file_path, "r") as f:
                 score = int(f.read())
         print("Final score: {}".format(score))
+
+        if score is None:
+            score = 0
 
         # Grab all logs
         if judge_config['submit_logs']:
