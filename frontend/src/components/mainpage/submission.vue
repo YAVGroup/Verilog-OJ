@@ -1,4 +1,4 @@
-<template>
+<template><div>
   <el-card shadow="always" id="card">
 
     <!-- 整体结果 -->
@@ -29,6 +29,10 @@
           <h5 style="white-space:pre;margin-left:15px;">
             {{result.log}}
           </h5>
+
+          <wavedrom :waveId="String(10 + index)" 
+                    :parentText="result.app_data" 
+                    errorMessage="Sorry, no waveform available."></wavedrom>
           <!-- <h5 style="white-space:pre;margin-left:15px;"
               v-if="data.casedata!=''">{{'Time: '+ data.casetime + 'MS'+' Memory: '+data.casememory+'MB'}}</h5>
           <h5 style="white-space:pre;margin-left:15px;"
@@ -46,6 +50,7 @@
           <div style="white-space:pre;margin-left:15px;word-wrap:break-word;word-break: normal;"
                 v-if="data.casedata!=''">{{data.caseoutputdata+'\n'}}</div> -->
         </el-alert>
+
       </el-collapse-item>
     </el-collapse>
 
@@ -70,6 +75,8 @@
                 :options="cmOptions"></codemirror>
 
   </el-card>
+
+  </div>
 </template>
 
 
@@ -88,11 +95,14 @@ require("codemirror/theme/base16-light.css");
 
 require("codemirror/mode/verilog/verilog");
 import languageselect from "@/components/utils/languageselect";
+import wavedrom from "@/components/utils/wavedrom";
+
 export default {
   name: "submission",
   components: {
     codemirror,
-    languageselect
+    languageselect,
+    wavedrom
   },
   methods: {
     alerttype (status) {
@@ -152,6 +162,7 @@ export default {
       results: [],
       score: 0,
       total_score: 0,
+      app_data: "",
     };
   },
   destroyed () {
@@ -161,6 +172,7 @@ export default {
     this.submissionid = this.$route.params.submissionid;
     this.$axios.get('/submissions/' + this.submissionid + '/').then(response => {
       this.results = response.data.results;
+      this.app_data = this.results[0].app_data;
       this.status = response.data.result;
       this.score = response.data.total_grade;
       this.total_score = response.data.problem_belong.total_grade;
