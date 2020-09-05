@@ -7,7 +7,7 @@ install:
 
 script:
   - cd backend
-  - python manage.py makemigrations file judge problem submission user
+  - python manage.py makemigrations file judge problem submission user news
   - python manage.py migrate
   - python manage.py test
   - pip install coverage coveralls
