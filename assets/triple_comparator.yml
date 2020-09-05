@@ -428,7 +428,8 @@ problems:
             vc_ref.addToWaveJsonSeparate([
                 'root/testbench/clk',
                 'root/testbench/rst',
-                'root/testbench/done'
+                'root/testbench/done',
+                'root/testbench/correct'
             ], "reference_")
             vc_ref.addToWaveJsonAggregated([
                 'root/testbench/s0',
@@ -443,7 +444,8 @@ problems:
             vc_dut.addToWaveJsonSeparate([
                 'root/testbench/clk',
                 'root/testbench/rst',
-                'root/testbench/done'
+                'root/testbench/done',
+                'root/testbench/correct'
             ], "your_")
             vc_dut.addToWaveJsonAggregated([
                 'root/testbench/s0',
@@ -507,7 +509,7 @@ problems:
             end
             integer i;
             initial begin
-                clk = 1; correct = 0;
+                clk = 1; correct = 0; faulty_value = 0;
                 for (i = 0; i < 14; i = i + 1) begin
                     #1 clk = ~clk;
                 end
@@ -895,7 +897,8 @@ problems:
             vc_ref.addToWaveJsonSeparate([
                 'root/testbench/clk',
                 'root/testbench/rst',
-                'root/testbench/done'
+                'root/testbench/done',
+                'root/testbench/correct'
             ], "reference_")
             vc_ref.addToWaveJsonAggregated([
                 'root/testbench/s0',
@@ -910,7 +913,8 @@ problems:
             vc_dut.addToWaveJsonSeparate([
                 'root/testbench/clk',
                 'root/testbench/rst',
-                'root/testbench/done'
+                'root/testbench/done',
+                'root/testbench/correct'
             ], "your_")
             vc_dut.addToWaveJsonAggregated([
                 'root/testbench/s0',
@@ -974,7 +978,7 @@ problems:
             end
             integer i;
             initial begin
-                clk = 1; correct = 0;
+                clk = 1; correct = 0; faulty_value = 0;
                 for (i = 0; i < 14; i = i + 1) begin
                     #1 clk = ~clk;
                 end
