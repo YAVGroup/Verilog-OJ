@@ -70,6 +70,8 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie';
+
 export default {
   name: "App",
   components: {
@@ -106,10 +108,11 @@ export default {
               message: "登出成功！",
               type: "success"
             });
-            sessionStorage.setItem("username", "");
-            sessionStorage.setItem("name", "");
-            sessionStorage.setItem("userid", "");
-            sessionStorage.setItem("isadmin", "");
+            // sessionStorage.setItem("username", "");
+            // sessionStorage.setItem("name", "");
+            // sessionStorage.setItem("userid", "");
+            // sessionStorage.setItem("isadmin", "");
+            Cookies.remove('userid');
             this.$router.go(0);
           })
           .catch(error => {

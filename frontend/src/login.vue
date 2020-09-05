@@ -59,7 +59,6 @@ export default {
           else
             sessionStorage.setItem("name", response.data.last_name+response.data.first_name);
           sessionStorage.setItem("userid", response.data.id);
-
           sessionStorage.setItem("isadmin", response.data.is_superuser);
           this.$router.go(0);
         })

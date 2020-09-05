@@ -8,6 +8,7 @@ import md5 from 'js-md5';
 import axios from 'axios';
 import VueClipboard from 'vue-clipboard2'
 import 'babel-polyfill' //兼容IE6
+import Cookies from 'js-cookie'
 
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
@@ -39,48 +40,26 @@ const store = new Vuex.Store({
   },
 })
 
-// axios
-// .get("/settingboard/")
-// .then(res => {
-//   store.state.sb = res.data
-// });
-
-if (sessionStorage.userid == undefined || sessionStorage.userid == null)
+// 根据cookie里设置的userid，获取用户信息；但这个是异步的，可能需要刷新一下页面
+const userid = Cookies.get('userid');
+if (userid == undefined) {
   sessionStorage.setItem("userid", "");
-
-// if (sessionStorage.username != "" && sessionStorage.username != undefined) {
-  //获取一下用户的AC题目，全局保存。
-  // axios
-  //   .get("/userdata/?username=" + sessionStorage.username)
-  //   .then(response => {
-  //     sessionStorage.setItem("rating", response.data[0].rating);
-  //     var acpro = response.data[0].acpro.split("|")
-  //     acpro.shift() //因为最前面会多出一个空，去掉它
-  //     store.state.acpro = acpro
-  //     sessionStorage.setItem("acpro", acpro);
-  //   });
-  //   //更新一下本地的rating，如果没有登录则刷新一下，更新成功返回updated，否则返回ok
-  // axios
-  //   .get("/updaterating/")
-  //   .then(response => {
-  //     if (response.data == "ok") {
-  //       sessionStorage.setItem("username", "");
-  //       sessionStorage.setItem("name", "");
-  //       sessionStorage.setItem("rating", "");
-  //       sessionStorage.setItem("type", "");
-  //       sessionStorage.setItem("acpro", "");
-  //       router.go(0)
-  //     }
-  //   });
-// } else {
-//   sessionStorage.setItem("username", "");
-//   sessionStorage.setItem("name", "");
-//   sessionStorage.setItem("rating", "");
-//   sessionStorage.setItem("type", "");
-//   sessionStorage.setItem("acpro", "");
-// }
-
-
+  sessionStorage.setItem("username", "");
+  sessionStorage.setItem("name", "");
+  sessionStorage.setItem("is_admin", false);
+} else {
+  if(sessionStorage.getItem("userid") == undefined || sessionStorage.getItem("userid") == ""){
+    sessionStorage.setItem("userid", userid);
+    axios.get("/users/" + userid + "/").then(response => {
+      sessionStorage.setItem("username", response.data.username);
+      var name = response.data.last_name+response.data.first_name;
+      if(name == "")
+        name = response.data.username;
+      sessionStorage.setItem("name", name);
+      sessionStorage.setItem("isadmin", response.data.is_superuser);
+    })
+  }
+}
 
 new Vue({
   el: '#app',
