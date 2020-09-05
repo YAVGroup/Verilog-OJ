@@ -215,6 +215,11 @@ problems:
                     if val_str.find("x") != -1:
                         return "x"
                     return int(val_str[1:], base=2)
+                elif len(val_str) == 1:
+                    if val_str[0] == "x":
+                        return "x"
+                    else:
+                        return int(val_str, base=2)
                 else:
                     raise VcdSignalValueParseError("Unknown value type")
 
@@ -227,6 +232,12 @@ problems:
                 return "0" * (width - len(striped)) + striped
 
             def addToWaveJsonSeparate(self, signal_names, prefix=""):
+                # find common time_max
+                time_max = 0
+                for signal_name in signal_names:
+                    sig_inst = find_signal_inst(self.data_vcd, signal_name)
+                    time_max = max(time_max, sig_inst['data'][-1][0])
+
                 for signal_name in signal_names:
                     sig_jsons = []
                     sig_inst = find_signal_inst(self.data_vcd, signal_name)
@@ -237,7 +248,7 @@ problems:
                         sig_jsons.append({})
                         sig_jsons[i]['name'] = prefix + sig_inst['name'] + "[" + str(i) + "]"
 
-                    time_max = sig_inst['data'][-1][0]
+                    local_time_max = sig_inst['data'][-1][0]
                     waves = ["" for i in range(0, width)]
                     cur_step_ptr = 0
 
@@ -245,7 +256,7 @@ problems:
                     cur_wave = "SOMETHING_NEVER_HAPPEN"
 
                     # TODO: Avoid multiple transitions at same timestep
-                    for i in range(0, time_max + 1):
+                    for i in range(0, local_time_max + 1):
                         if sig_inst['data'][cur_step_ptr][0] > i:
                             # maintain current value
                             for i in range(0, width):
@@ -272,10 +283,14 @@ problems:
                                             waves[i] += new
                                         else:
                                             waves[i] += '.'
-                                    
+
                                 cur_wave = new_wave
 
                             cur_step_ptr += 1
+
+                    for i in range(local_time_max, time_max + 1):
+                        for i in range(0, width):
+                            waves[i] += "."
 
                     for i in range(0, width):
                         sig_jsons[i]['wave'] = waves[i]
@@ -284,20 +299,26 @@ problems:
 
             def addToWaveJsonAggregated(self, signal_names, prefix=""):
                 """ Aggregated view, which uses '=' on every timeslice. """
+                # find common time_max
+                time_max = 0
+                for signal_name in signal_names:
+                    sig_inst = find_signal_inst(self.data_vcd, signal_name)
+                    time_max = max(time_max, sig_inst['data'][-1][0])
+
                 for signal_name in signal_names:
                     sig_json = {}
                     sig_inst = find_signal_inst(self.data_vcd, signal_name)
                     sig_json['name'] = prefix + sig_inst['name']
 
                     # [0, time_max]
-                    time_max = sig_inst['data'][-1][0]
+                    local_time_max = sig_inst['data'][-1][0]
                     wave = ""
                     cur_step_ptr = 0
                     cur_wave = "SOMETHING_NEVER_HAPPEN"
                     data = []
 
                     # TODO: Avoid multiple transitions at same timestep
-                    for i in range(0, time_max + 1):
+                    for i in range(0, local_time_max + 1):
                         if sig_inst['data'][cur_step_ptr][0] > i:
                             # maintain current value
                             wave += "."
@@ -312,17 +333,27 @@ problems:
 
                             cur_step_ptr += 1
 
+                    for i in range(local_time_max, time_max + 1):
+                        wave += "."
+
                     sig_json['wave'] = wave
                     sig_json['data'] = data
 
                     self.output['signal'].append(sig_json)
 
+
         if __name__ == "__main__":
             sample_vcd = {'name': 'root', 'type': {'name': 'struct'}, 'children': [{'name': 'testbench', 'type': {'name': 'struct'}, 'children': [{'name': 'x', 'type': {'width': 3, 'name': 'reg'}, 'data': [(0, 'bx'), (1, 'b0'), (2, 'b1'), (3, 'b10'), (4, 'b11'), (5, 'b100'), (6, 'b101'), (7, 'b110'), (8, 'b111')]}, {'name': 'y', 'type': {'width': 8, 'name': 'wire'}, 'data': [(0, 'bx'), (1, 'b1'), (2, 'b1x'), (3, 'b100'), (4, 'b1000'), (5, 'b10000'), (6, 'b100000'), (7, 'b1000000'), (8, 'b10000000')]}]}]}
+            sample_vcd2 = {'name': 'root', 'type': {'name': 'struct'}, 'children': [{'name': 'testbench', 'type': {'name': 'struct'}, 'children': [{'name': 'a', 'type': {'width': 1, 'name': 'reg'}, 'data': [(0, 'x'), (1, '0'), (2, '1'), (3, '0'), (4, '1')]}, {'name': 'b', 'type': {'width': 1, 'name': 'reg'}, 'data': [(0, 'x'), (1, '0'), (3, '1')]}, {'name': 'out', 'type': {'width': 1, 'name': 'wire'}, 'data': [(0, 'x'), (1, '1'), (2, '0'), (4, '1')]}]}]}
             vc = VcdConverter(sample_vcd)
             vc.addToWaveJsonSeparate(['root/testbench/x', 'root/testbench/y'], "mysig_")
             vc.addToWaveJsonAggregated(['root/testbench/x', 'root/testbench/y'], "mysig_")
             print(vc.emitWaveJson())
+
+            vc2 = VcdConverter(sample_vcd2)
+            vc2.addToWaveJsonSeparate(['root/testbench/a', 'root/testbench/b', 'root/testbench/out'], "mysig_")
+            vc2.addToWaveJsonAggregated(['root/testbench/a', 'root/testbench/b', 'root/testbench/out'], "mysig_")
+            print(vc2.emitWaveJson())
 
     - name: vcd_main.py
       content: |
@@ -413,17 +444,29 @@ problems:
         mv out.vcd out_ref.vcd
 
         iverilog ./testcase/testbench.v ./submit/code.v -o dut_run
+
+        if [ $? -ne 0 ]; then
+          echo "CE" > possible_error.txt
+          exit 1
+        fi
+
         vvp dut_run
+
+        if [ $? -ne 0 ]; then
+          echo "CE" > possible_error.txt
+          exit 1
+        fi
+
         mv out.vcd out_dut.vcd
 
         python3 ./testcase/vcd_main.py         # This will compare out_ref.vcd and out_dut.vcd
 
         if [ $? -ne 0 ]; then
           echo "0" > score.txt
+          echo "WA" > possible_error.txt
         else
           echo "10" > score.txt
+          echo "NONE" > possible_error.txt
         fi
 
         python3 ./testcase/vcd_visualize.py    # This will output app_data.txt
-
-        echo "NONE" > possible_error.txt
