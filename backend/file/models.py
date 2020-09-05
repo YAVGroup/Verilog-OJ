@@ -29,3 +29,10 @@ class File(models.Model):
 
     def __str__(self):
         return self.name
+
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
+
+@receiver(pre_delete, sender=File)
+def file_delete(sender, instance, **kwargs):
+    instance.file.storage.delete(instance.file.name)
