@@ -62,9 +62,10 @@ export default {
   },
   methods: {
     problemclick(id) {
+      console.log("problemclick " + id);
       this.$router.push({
         name: "problemdetail",
-        params: { problemID: id }
+        params: { problemid: id }
       });
     }
   },
