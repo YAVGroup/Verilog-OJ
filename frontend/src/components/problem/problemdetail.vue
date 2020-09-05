@@ -108,7 +108,7 @@
               <div>{{addtime}}</div>
             </el-collapse-item>
             <!---->
-            <!-- <el-collapse-item name="7"
+            <el-collapse-item name="7"
                               id="des">
               <template slot="title">
                 <font color="deepskyblue"
@@ -118,22 +118,22 @@
                       :type="problemlevel(level)"
                       disable-transitions
                       hit>{{ level }}</el-tag>
-            </el-collapse-item> -->
+            </el-collapse-item>
             <!---->
-            <!-- <el-collapse-item name="6"
+            <el-collapse-item name="6"
                               id="des">
               <template slot="title">
                 <font color="deepskyblue"
                       size="4">Tags:</font>
               </template>
-              <el-tag id="tag"
+              <el-tag id="tags"
                       v-for="(name,index) in tagnames"
                       :key="index"
                       size="medium"
                       type="info"
                       disable-transitions
                       hit>{{ name }}</el-tag>
-            </el-collapse-item> -->
+            </el-collapse-item>
           </el-collapse>
         </el-card>
       </el-row>
@@ -280,19 +280,19 @@ export default {
         // this.$axios
         //   .get("/problemdata/" + this.ID + "/")
         //   .then(response => {
-        // if (response.data["level"] == "1") response.data["level"] = "Easy";
-        // if (response.data["level"] == "2")
-        //   response.data["level"] = "Medium";
-        // if (response.data["level"] == "3") response.data["level"] = "Hard";
-        // if (response.data["level"] == "4")
-        //   response.data["level"] = "VeryHard";
-        // if (response.data["level"] == "5")
-        //   response.data["level"] = "ExtremelyHard";
-        response.data.level = "Easy";
+        if (response.data["level"] == "1") response.data["level"] = "Easy";
+        if (response.data["level"] == "2")
+          response.data["level"] = "Medium";
+        if (response.data["level"] == "3") response.data["level"] = "Hard";
+        if (response.data["level"] == "4")
+          response.data["level"] = "VeryHard";
+        if (response.data["level"] == "5")
+          response.data["level"] = "ExtremelyHard";
+        // response.data.level = "Easy";
 
-        // if (response.data["tag"] == null) response.data["tag"] = ["无"];
-        // else response.data["tag"] = response.data["tag"].split("|");
-        response.data.tag = ["无"];
+        if (response.data["tags"] == null) response.data["tags"] = ["无"];
+        else response.data["tags"] = response.data["tags"].split("|");
+        // response.data.tag = ["无"];
 
         // if (response.data.submission == 0) {
         //   this.ac = 0;
@@ -346,7 +346,7 @@ export default {
 
         this.title = response.data.name;
         this.level = response.data.level;
-        this.tagnames = response.data.tag;
+        this.tagnames = response.data.tags;
         this.submissions = response.data.submissions;
         this.submissions_refresh();
 
