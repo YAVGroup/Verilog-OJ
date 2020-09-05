@@ -210,8 +210,9 @@ problems:
                 return json.dumps(self.output)
 
             def parseValue(self, val_str):
+                """ Note: b111xx1 -> x """
                 if val_str[0] == "b":
-                    if val_str[1] == "x":
+                    if val_str.find("x") != -1:
                         return "x"
                     return int(val_str[1:], base=2)
                 else:
@@ -317,7 +318,7 @@ problems:
                     self.output['signal'].append(sig_json)
 
         if __name__ == "__main__":
-            sample_vcd = {'name': 'root', 'type': {'name': 'struct'}, 'children': [{'name': 'testbench', 'type': {'name': 'struct'}, 'children': [{'name': 'x', 'type': {'width': 3, 'name': 'reg'}, 'data': [(0, 'bx'), (1, 'b0'), (2, 'b1'), (3, 'b10'), (4, 'b11'), (5, 'b100'), (6, 'b101'), (7, 'b110'), (8, 'b111')]}, {'name': 'y', 'type': {'width': 8, 'name': 'wire'}, 'data': [(0, 'bx'), (1, 'b1'), (2, 'b10'), (3, 'b100'), (4, 'b1000'), (5, 'b10000'), (6, 'b100000'), (7, 'b1000000'), (8, 'b10000000')]}]}]}
+            sample_vcd = {'name': 'root', 'type': {'name': 'struct'}, 'children': [{'name': 'testbench', 'type': {'name': 'struct'}, 'children': [{'name': 'x', 'type': {'width': 3, 'name': 'reg'}, 'data': [(0, 'bx'), (1, 'b0'), (2, 'b1'), (3, 'b10'), (4, 'b11'), (5, 'b100'), (6, 'b101'), (7, 'b110'), (8, 'b111')]}, {'name': 'y', 'type': {'width': 8, 'name': 'wire'}, 'data': [(0, 'bx'), (1, 'b1'), (2, 'b1x'), (3, 'b100'), (4, 'b1000'), (5, 'b10000'), (6, 'b100000'), (7, 'b1000000'), (8, 'b10000000')]}]}]}
             vc = VcdConverter(sample_vcd)
             vc.addToWaveJsonSeparate(['root/testbench/x', 'root/testbench/y'], "mysig_")
             vc.addToWaveJsonAggregated(['root/testbench/x', 'root/testbench/y'], "mysig_")
