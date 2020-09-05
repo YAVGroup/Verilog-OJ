@@ -15,7 +15,7 @@
             <el-row>
               <el-col :span="12">
                 <p class="left-aligned">{{ passed_testcase }} / {{ num_testcase }} 个通过测试用例，获 {{ score }} / {{ total_score }} 分</p>
-                
+
               </el-col>
 
               <el-col :span="12">
@@ -43,8 +43,8 @@
                 <p style="white-space: pre-wrap; margin-left: 15px; word-wrap: break-word; word-break: normal;">{{result.log}}</p>
 
                 <h3>波形</h3>
-                <wavedrom :waveId="String(10 + index)" 
-                          :parentText="result.app_data" 
+                <wavedrom :waveId="String(10 + index)"
+                          :parentText="result.app_data"
                           errorMessage="Sorry, no waveform available."></wavedrom>
 
               </el-card>
@@ -137,7 +137,7 @@ export default {
       let date = new Date((time || "").replace(/-/g,"/").replace(/[TZ]/g," ")),
         diff = (((new Date()).getTime() - date.getTime()) / 1000),
         day_diff = Math.floor(diff / 86400);
-      
+
       // return date for anything greater than a day
       if ( isNaN(day_diff) || day_diff < 0 || day_diff > 0 )
         return date.getDate() + " " + date.toDateString().split(" ")[1];
@@ -151,6 +151,33 @@ export default {
         day_diff == 1 && "昨天" ||
         day_diff < 7 && day_diff + " 天前" ||
         day_diff < 31 && Math.ceil( day_diff / 7 ) + " 周前";
+    },
+
+    updateStatus () {
+      this.$axios.get('/submissions/' + this.submissionid + '/').then(response => {
+        // console.log(response.data);
+        this.results = response.data.results;
+        this.status = response.data.result;
+        this.score = response.data.total_grade;
+        this.total_score = response.data.problem_belong.total_grade;
+        this.num_testcase = this.results.length;
+        this.submit_time = new Date(response.data.submit_time);
+
+        let passed = 0;
+        for (let i = 0; i < this.results.length; i++) {
+          // console.log(this.results[i]);
+          if (this.results[i].result == "Accepted") {
+            passed++;
+          }
+        }
+        this.passed_testcase = passed;
+
+        // TODO: support for multiple files
+        return this.$axios.get('/files/' + response.data.submit_files[0] + '/');
+      }).then(response => {
+        // console.log(response.data);
+        this.code = response.data;
+      })
     }
   },
   data () {
@@ -188,30 +215,11 @@ export default {
   created () {
     this.isadmin = sessionStorage.isadmin;
     this.submissionid = this.$route.params.submissionid;
-    this.$axios.get('/submissions/' + this.submissionid + '/').then(response => {
-      // console.log(response.data);
-      this.results = response.data.results;
-      this.status = response.data.result;
-      this.score = response.data.total_grade;
-      this.total_score = response.data.problem_belong.total_grade;
-      this.num_testcase = this.results.length;
-      this.submit_time = new Date(response.data.submit_time);
-
-      let passed = 0;
-      for (let i = 0; i < this.results.length; i++) {
-        // console.log(this.results[i]);
-        if (this.results[i].result == "Accepted") {
-          passed++;
-        }
-      }
-      this.passed_testcase = passed;
-
-      // TODO: support for multiple files
-      return this.$axios.get('/files/' + response.data.submit_files[0] + '/');
-    }).then(response => {
-      // console.log(response.data);
-      this.code = response.data;
-    })
+    this.updateStatus();
+    this.timer = setInterval(this.updateStatus, 500);
+  },
+  beforeDestroy () {
+    clearInterval(this.timer);
   }
 };
 </script>
