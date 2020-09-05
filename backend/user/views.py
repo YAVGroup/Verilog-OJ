@@ -53,7 +53,12 @@ class UserLoginView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         login(request, user)
-        return Response(UserSerializer(user).data)
+        # request.session['username1'] = user.username
+        # request.session['userid1'] = user.id
+        # request.session['isadmin1'] = user.is_superuser
+        rep = Response(UserSerializer(user).data)
+        rep.set_cookie('userid', user.id)
+        return rep
 
 class UserLogoutView(APIView):
     """
@@ -93,12 +98,11 @@ class UserUSTCLoginView(APIView):
                 student_id = cas_response.user
                 try:
                     user = User.objects.get(student_id=student_id)
-                    request.session['username'] = user.username
-                    request.session['userid'] = user.id
-                    request.session['isadmin'] = user.is_superuser
+                    # request.session['username'] = user.username
+                    # request.session['userid'] = user.id
+                    # request.session['isadmin'] = user.is_superuser
                     login(request, user)
                 except:
-                    # print(cas_response.data)
                     gid = cas_response.data.get('attributes', {}).get('gid')
                     username = str(gid)
                     
@@ -109,9 +113,9 @@ class UserUSTCLoginView(APIView):
                             serializer.is_valid(True)
                             serializer.save()
                             user = User.objects.get(student_id=student_id)
-                            request.session['username'] = user.username
-                            request.session['userid'] = user.id
-                            request.session['isadmin'] = user.is_superuser
+                            # request.session['username'] = user.username
+                            # request.session['userid'] = user.id
+                            # request.session['isadmin'] = user.is_superuser
                             login(request, user)
                             break
                         except Exception:
@@ -122,6 +126,7 @@ class UserUSTCLoginView(APIView):
 
                 # rep = Response('OK', status.HTTP_200_OK)        # 更换为 rep = redirect('home')
                 rep = redirect('http://oj.libreliu.info')
+                rep.set_cookie('userid', user.id)
                 return rep
         cas_login_url = cas_client.get_login_url(service_url=app_login_url)
         return redirect(cas_login_url)
