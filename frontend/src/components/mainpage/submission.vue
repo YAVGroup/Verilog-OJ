@@ -32,10 +32,10 @@
 
               <template slot="title">
                 <el-col :span="12">
-                  <div style="margin-left: 15px;">测试用例 {{ index }} ： {{ result.result }} </div>
+                  <div style="margin-left: 15px;">测试用例 {{ index }} （{{ prettyType(related_testcases[index].type) }}）： {{ result.result }} </div>
                 </el-col>
                 <el-col :span=12>
-                  <div style="text-align: right;">{{ result.grade }} / {{ '?' }} 分</div>
+                  <div style="text-align: right;">{{ result.grade }} / {{ related_testcases[index].grade }} 分</div>
                 </el-col>
               </template>
               <el-card shadow="never">
@@ -151,6 +151,15 @@ export default {
         day_diff == 1 && "昨天" ||
         day_diff < 7 && day_diff + " 天前" ||
         day_diff < 31 && Math.ceil( day_diff / 7 ) + " 周前";
+    },
+    prettyType (type) {
+      if (type == 'SIM') {
+        return "仿真";
+      } else if (type == 'SYNTH') {
+        return "综合";
+      } else {
+        return type;
+      }
     }
   },
   data () {
@@ -175,6 +184,7 @@ export default {
       num_testcase: 0,
       passed_testcase: 0,
       submit_time: new Date(),
+      related_testcases: [],
     }
   },
   computed: {
@@ -195,6 +205,7 @@ export default {
       this.score = response.data.total_grade;
       this.total_score = response.data.problem_belong.total_grade;
       this.num_testcase = this.results.length;
+      this.related_testcases = response.data.problem_belong.testcases;
       this.submit_time = new Date(response.data.submit_time);
 
       let passed = 0;
