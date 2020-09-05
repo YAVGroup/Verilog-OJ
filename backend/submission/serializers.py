@@ -34,8 +34,8 @@ class SubmissionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class SubmissionPublicSerializer(serializers.ModelSerializer):
-    problem_belong = ProblemSerializer(read_only=True)
-    user_belong = UserPublicSerializer(read_only=True)
+    problem_belong = ProblemSerializer(source='problem', read_only=True)
+    user_belong = UserPublicSerializer(source='user', read_only=True)
     
     results = SubmissionResultPublicSerializer(source='get_results', read_only=True, many=True)
     total_grade = serializers.IntegerField(source='get_total_grade', read_only=True)
