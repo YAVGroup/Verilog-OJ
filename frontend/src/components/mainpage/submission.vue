@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div>    
+    <el-row>
+      &nbsp;
+    </el-row>
     <el-row>
       <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6">
         <!-- placeholder only -->
@@ -154,9 +157,9 @@ export default {
     },
     prettyType (type) {
       if (type == 'SIM') {
-        return "仿真";
-      } else if (type == 'SYNTH') {
-        return "综合";
+        return "行为级仿真";
+      } else if (type == 'SYNTHSIM') {
+        return "门级仿真";
       } else {
         return type;
       }
