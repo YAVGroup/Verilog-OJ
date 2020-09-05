@@ -33,10 +33,10 @@
 
           <!--这里放样例波形图-->
           <el-row :gutter="18"
-                  class="problem-description-title">Sample waveform</el-row>          
+                  class="problem-description-title">Sample waveform</el-row>
           <el-row :gutter="18"
                   id="sample_waveform" class="problem-descriptions">
-            <wavedrom waveId="1" 
+            <wavedrom waveId="1"
                       :parentText="waveform"
                       errorMessage="Sorry, no sample waveform available"></wavedrom>
           </el-row>
@@ -138,9 +138,9 @@
         </el-card>
       </el-row>
       <!--prostatistics-->
-      <el-row :gutter="15">
+      <!-- <el-row :gutter="15">
         <prostatistice ref="prosta"></prostatistice>
-      </el-row>
+      </el-row> -->
       <!--提交记录-->
       <el-row :gutter="15">
         <el-card>
