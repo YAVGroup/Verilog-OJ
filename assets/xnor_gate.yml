@@ -433,7 +433,19 @@ problems:
         mv out.vcd out_ref.vcd
 
         iverilog ./testcase/testbench.v ./submit/code.v -o dut_run
+
+        if [ $? -ne 0 ]; then
+          echo "CE" > possible_error.txt
+          exit 1
+        fi
+
         vvp dut_run
+
+        if [ $? -ne 0 ]; then
+          echo "CE" > possible_error.txt
+          exit 1
+        fi
+
         mv out.vcd out_dut.vcd
 
         python3 ./testcase/vcd_main.py         # This will compare out_ref.vcd and out_dut.vcd
