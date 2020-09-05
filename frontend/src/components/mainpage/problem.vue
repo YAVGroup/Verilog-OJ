@@ -1,6 +1,6 @@
 <template>
   <el-row :gutter="15">
-    <el-col :span="18">
+    <el-col :span="24">
       <el-card shadow="always">
         <!--上方选页-->
         <el-pagination @size-change="handleSizeChange"
@@ -21,9 +21,8 @@
                            label="ID"
                            :width="70"></el-table-column>
           <el-table-column prop="name"
-                           label="Title"
-                           :width="250"></el-table-column>
-          <el-table-column prop="level"
+                           label="Title"></el-table-column>
+          <!-- <el-table-column prop="level"
                            label="Level"
                            :width="170">
             <template slot-scope="scope1">
@@ -33,11 +32,11 @@
                       disable-transitions
                       hit>{{ scope1.row.level }}</el-tag>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column prop="rate"
                            label="A/S"
                            :width="70"></el-table-column>
-          <el-table-column prop="tag"
+          <!-- <el-table-column prop="tag"
                            label="Tag">
             <template slot-scope="scope">
               <el-tag id="protag"
@@ -47,7 +46,7 @@
                       disable-transitions
                       hit>{{ name }}</el-tag>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column prop="total_grade"
                            label="Score"
                            :width="70"></el-table-column>
@@ -65,15 +64,15 @@
       </el-card>
     </el-col>
     <!--右侧栏-->
-    <el-col :span="6">
+    <!-- <el-col :span="6"> -->
       <!--Statistics-->
-      <el-row :gutter="15">
+      <!-- <el-row :gutter="15">
         <el-col>
           <prostatistice ref="prosta"></prostatistice>
         </el-col>
-      </el-row>
+      </el-row> -->
       <!--搜索框-->
-      <el-row>
+      <!-- <el-row>
         <el-card shadow="always">
           <el-input placeholder="Search..."
                     v-model="searchtext"
@@ -83,9 +82,9 @@
                        @click="searchtitle"></el-button>
           </el-input>
         </el-card>
-      </el-row>
+      </el-row> -->
       <!--tag filter-->
-      <el-row :gutter="15">
+      <!-- <el-row :gutter="15">
         <el-col>
           <el-card shadow="always">
             <h4>Tags (Click to filter)</h4>
@@ -97,8 +96,8 @@
                        :ref="name">{{ name }}</el-button>
           </el-card>
         </el-col>
-      </el-row>
-    </el-col>
+      </el-row> -->
+    <!-- </el-col> -->
   </el-row>
 </template>
 

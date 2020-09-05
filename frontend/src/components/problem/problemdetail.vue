@@ -68,10 +68,10 @@
                          @click="code = ''"
                          style="font-weight:bold;margin-left:30px;">Reset</el-button>
             </el-col>
-            <el-col :span="2">
+            <!-- <el-col :span="2">
               <el-button type="info"
                          style="font-weight:bold;margin-left:30px;">Submit Files</el-button>
-            </el-col>
+            </el-col> -->
           </el-row>
 
           <!--代码编辑-->
@@ -108,7 +108,7 @@
               <div>{{addtime}}</div>
             </el-collapse-item>
             <!---->
-            <el-collapse-item name="7"
+            <!-- <el-collapse-item name="7"
                               id="des">
               <template slot="title">
                 <font color="deepskyblue"
@@ -118,9 +118,9 @@
                       :type="problemlevel(level)"
                       disable-transitions
                       hit>{{ level }}</el-tag>
-            </el-collapse-item>
+            </el-collapse-item> -->
             <!---->
-            <el-collapse-item name="6"
+            <!-- <el-collapse-item name="6"
                               id="des">
               <template slot="title">
                 <font color="deepskyblue"
@@ -133,7 +133,7 @@
                       type="info"
                       disable-transitions
                       hit>{{ name }}</el-tag>
-            </el-collapse-item>
+            </el-collapse-item> -->
           </el-collapse>
         </el-card>
       </el-row>
