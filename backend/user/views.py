@@ -98,7 +98,6 @@ class UserUSTCLoginView(APIView):
                     request.session['isadmin'] = user.is_superuser
                     login(request, user)
                 except:
-                    # print(cas_response.data)
                     gid = cas_response.data.get('attributes', {}).get('gid')
                     username = str(gid)
                     
