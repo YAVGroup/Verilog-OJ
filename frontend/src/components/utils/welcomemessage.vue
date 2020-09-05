@@ -1,6 +1,6 @@
 <template>
   <div>
-      <el-col offset="1" span="22">
+      <el-col :offset="1" :span="22">
         <h2>欢迎您使用 Verilog 在线评测服务</h2>
 
         <p>本评测服务由 Yet Another Verilog Group 小组开发，提供 Verilog 题目在线评测和可视化功能。</p>

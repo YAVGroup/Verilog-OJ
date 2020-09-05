@@ -6,7 +6,7 @@
     </el-row>
 
     <el-row>
-      <el-col offset="1" span="22">
+      <el-col :offset="1" :span="22">
         <el-input v-model="input" placeholder="输入题号，快速跳转" prefix-icon="el-icon-search"></el-input>
         
       </el-col>
