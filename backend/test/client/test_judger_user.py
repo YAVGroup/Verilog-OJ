@@ -237,10 +237,10 @@ class JudgerAPITester(django.test.TestCase):
         # 别人的提交只能看到部分信息
         resp = c.get('/api/submission-results/1/')
         self.assertEqual(resp.status_code, 200)
-        self.assertFalse("log" in resp.content.decode("utf-8"))
+        self.assertFalse('"log"' in resp.content.decode("utf-8"))  # ZDX:这里是不是有点太简单粗暴了
         # 自己的提交能够看到全部信息
         resp = c.get('/api/submission-results/2/')
-        self.assertTrue("log" in resp.content.decode("utf-8"))
+        self.assertTrue('"log"' in resp.content.decode("utf-8"))
 
         # 测试用于生成文档的接口
         resp = c.get('/docs/')
@@ -269,10 +269,10 @@ class JudgerAPITester(django.test.TestCase):
         # 别人的提交只能看到部分信息
         resp = c.get('/api/submissions/1/')
         self.assertEqual(resp.status_code, 200)
-        self.assertFalse("log" in resp.content.decode("utf-8"))
+        self.assertFalse('"log"' in resp.content.decode("utf-8"))
         # 自己的提交能够看到全部信息
         resp = c.get('/api/submissions/2/')
-        self.assertTrue("log" in resp.content.decode("utf-8"))
+        self.assertTrue('"log"' in resp.content.decode("utf-8"))
 
         resp = c.post('/api/submissions/1/')
         self.assertContains(resp, "detail", status_code=403)
@@ -284,4 +284,4 @@ class JudgerAPITester(django.test.TestCase):
 
         c.force_authenticate(user=None)
         resp = c.get('/api/submissions/1/')
-        self.assertFalse("log" in resp.content.decode("utf-8"))
+        self.assertFalse('"log"' in resp.content.decode("utf-8"))
