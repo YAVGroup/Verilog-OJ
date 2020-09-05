@@ -44,7 +44,7 @@
       <el-input v-model="ddl" autosize style="width:800px;"></el-input>
     </el-form-item>
 
-    <!-- <el-form-item label="难度：">
+    <el-form-item label="难度：">
       <el-select v-model="addproblemform.level" placeholder="请选择" style="width:200px;">
         <el-option key="1" label="简单" :value="1"></el-option>
         <el-option key="2" label="普通" :value="2"></el-option>
@@ -54,9 +54,9 @@
       </el-select>
     </el-form-item>
     <el-form-item label="标签（用|分割）：">
-      <el-input v-model="addproblemform.tag" style="width:400px;"></el-input>
+      <el-input v-model="addproblemform.tags" style="width:400px;"></el-input>
     </el-form-item>
-    <el-form-item label="分数（建议100~10000）：">
+    <!-- <el-form-item label="分数（建议100~10000）：">
       <el-input-number
         style="width:200px;"
         v-model="addproblemform.score"
@@ -112,10 +112,10 @@ export default {
         template_code_file: null,
         judge_files: [],
 
-        // tag: "简单题|模拟",
+        tags: "简单题|模拟",
         // template:
         //   "*****Verilog*****\n\n",
-        // level: 3,
+        level: 1,
       },
     };
   },

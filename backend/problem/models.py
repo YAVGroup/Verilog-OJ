@@ -8,6 +8,8 @@ class Problem(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, help_text='题目的创建时间')
     deadline_time = models.DateTimeField(null=True, blank=True, help_text='题目的截止时间')
     
+    level = models.IntegerField(default=1, help_text="难度等级")
+    tags = models.CharField(max_length=100, help_text="题目标签", blank=True)
     description = models.TextField(help_text='题目描述（文字）')
     description_input = models.TextField(help_text='输入描述（文字）')
     description_output = models.TextField(help_text='输出描述（文字）')

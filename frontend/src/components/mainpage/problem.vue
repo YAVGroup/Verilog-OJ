@@ -22,7 +22,7 @@
                            :width="70"></el-table-column>
           <el-table-column prop="name"
                            label="Title"></el-table-column>
-          <!-- <el-table-column prop="level"
+          <el-table-column prop="level"
                            label="Level"
                            :width="170">
             <template slot-scope="scope1">
@@ -32,21 +32,21 @@
                       disable-transitions
                       hit>{{ scope1.row.level }}</el-tag>
             </template>
-          </el-table-column> -->
+          </el-table-column>
           <el-table-column prop="rate"
                            label="A/S"
                            :width="70"></el-table-column>
-          <!-- <el-table-column prop="tag"
+          <el-table-column prop="tags"
                            label="Tag">
             <template slot-scope="scope">
               <el-tag id="protag"
-                      v-for="(name,index) in scope.row.tag"
+                      v-for="(name,index) in scope.row.tags"
                       :key="index"
                       size="medium"
                       disable-transitions
                       hit>{{ name }}</el-tag>
             </template>
-          </el-table-column> -->
+          </el-table-column>
           <el-table-column prop="total_grade"
                            label="Score"
                            :width="70"></el-table-column>
@@ -144,29 +144,27 @@ export default {
             // };
             // response.data[i].level = mapping[response.data[i].level];
 
-            // if (response.data.results[i]["level"] == "1")
-            //   response.data.results[i]["level"] = "Easy";
-            // if (response.data.results[i]["level"] == "2")
-            //   response.data.results[i]["level"] = "Medium";
-            // if (response.data.results[i]["level"] == "3")
-            //   response.data.results[i]["level"] = "Hard";
-            // if (response.data.results[i]["level"] == "4")
-            //   response.data.results[i]["level"] = "VeryHard";
-            // if (response.data.results[i]["level"] == "5")
-            //   response.data.results[i]["level"] = "ExtremelyHard";
-            response.data[i].level = "Easy";
+            if (response.data[i].level == "1")
+              response.data[i].level = "Easy";
+            if (response.data[i].level == "2")
+              response.data[i].level = "Medium";
+            if (response.data[i].level == "3")
+              response.data[i].level = "Hard";
+            if (response.data[i].level == "4")
+              response.data[i].level = "VeryHard";
+            if (response.data[i].level == "5")
+              response.data[i].level = "ExtremelyHard";
+            // response.data[i].level = "Easy";
 
             response.data[i].ac = response.data[i].ac_users.length;
             response.data[i].submitted = response.data[i].submitted_users.length;
             response.data[i].rate = response.data[i].ac + "/" + response.data[i].submitted;
 
-            // if (response.data.results[i]["tag"] == null)
-            //   response.data.results[i]["tag"] = ["无"];
-            // else
-            //   response.data.results[i]["tag"] = response.data.results[i][
-            //     "tag"
-            //   ].split("|");
-            response.data[i].tag = ["无"];
+            if (!response.data[i].tags)
+              response.data[i].tags = ["无"];
+            else
+              response.data[i].tags = response.data[i].tags.split("|");
+            // response.data[i].tags = ["无"];
           }
 
           this.tableData = response.data;
