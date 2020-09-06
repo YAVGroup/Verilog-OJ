@@ -2,7 +2,6 @@ problems:
 - name: XNOR 门
   description: |-
     请写一个描述同或 (XNOR) 门的 Verilog module。
-
     同或门的逻辑特点是，当两个输入端一个为“0”，另一个为“1”时，输出为“0”; 当两个输入端均为“1”或均为“0”时，输出为“1”。
     
   description_input: |-
@@ -10,7 +9,6 @@ problems:
   
   description_output: |-
     输出为 out，位宽为 1。
-
     您应当输出 a 和 b 进行同或运算的结果。
 
   app_data: |-

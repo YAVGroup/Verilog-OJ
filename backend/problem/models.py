@@ -64,7 +64,7 @@ class TestCase(models.Model):
         on_delete=models.CASCADE,
         help_text='测试点所属的题目'
     )
-    TYPE_CHOICES = [('SIM', 'Simulation'),]
+    TYPE_CHOICES = [('SIM', 'Behavioral Simulation'), ('SYNTHSIM', 'Gate-Level Simulation')]
     type = models.CharField(
         max_length=20, choices=TYPE_CHOICES,
         help_text='测试点类型'

@@ -2,9 +2,7 @@ problems:
 - name: 3-8 Decoder
   description: |- 
     本次实验中，您需要使用 Verilog 描述一个 3-8 译码器。
-
     3-8 译码器接受一个 3-bit 宽度的输入 x，并产生一个 8-bit 宽度的输出 y。
-
     详细的情况可以参照波形。
   description_input: 您的模块应该以 decoder 命名，并且接受一个 3-bit 宽度的输入 x。
   description_output: 您的模块应该产生一个 8-bit 宽度的输出 y。

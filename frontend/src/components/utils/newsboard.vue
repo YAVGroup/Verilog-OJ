@@ -6,13 +6,10 @@
     </el-row>
 
     <el-row>
-      <el-col offset="1" span="22">
-        <ul class="news-item" >
+      <el-col :offset="1" :span="22">
+        <ul class="news-item" :key="index" v-for="(item, index) in news">
           <li>
-            <a href="#">YAVG 是否还能如期上线？拭目以待</a>
-          </li>
-          <li>
-            <a href="#"><del>zdx</del> lzt 是永远滴神！</a>
+            <a @click="goToNews(item.id)">{{ item.title }}</a>
           </li>
         </ul>
 
@@ -27,11 +24,21 @@ export default {
   name: "newsboard",
   data() {
     return {
-
+      news: [],
     };
   },
   methods:{
-
+    goToNews: function (index) {
+      this.$router.push({
+        name: "newsdetail",
+        params: { newsid: index }
+      });
+    }
+  },
+  created() {
+    this.$axios.get('/news/').then(response => {
+      this.news = response.data;
+    })
   }
 };
 </script>

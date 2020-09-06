@@ -1,30 +1,37 @@
 <template>
+  <div>
+  <el-row>
+    &nbsp;
+  </el-row>
   <el-row :gutter="15">
-    <el-col :span="24">
-      <el-card shadow="always">
-        <!--上方选页-->
+    <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6">
+      <!-- placeholder only -->
+      &nbsp;
+    </el-col>
+    <el-col :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
+        <!-- 上方选页
         <el-pagination @size-change="handleSizeChange"
                        @current-change="handleCurrentChange"
                        :current-page="currentpage"
                        :page-sizes="[15, 20, 30, 50]"
                        :page-size="pagesize"
                        layout="total, sizes, prev, pager, next, jumper"
-                       :total="totalproblem"></el-pagination>
+                       :total="totalproblem"></el-pagination> -->
 
         <!--表格-->
         <el-table :data="tableData"
                   :row-class-name="tableRowClassName"
                   @cell-mouse-enter="changestatistices"
                   @cell-click="problemclick"
-                  size="small">
+                  size="medium">
           <el-table-column prop="id"
                            label="ID"
-                           :width="70"></el-table-column>
+                           :width="50"></el-table-column>
           <el-table-column prop="name"
-                           label="Title"></el-table-column>
+                           label="题名"></el-table-column>
           <el-table-column prop="level"
-                           label="Level"
-                           :width="170">
+                           label="难度"
+                           :width="100">
             <template slot-scope="scope1">
               <el-tag id="leveltag"
                       size="medium"
@@ -34,8 +41,8 @@
             </template>
           </el-table-column>
           <el-table-column prop="rate"
-                           label="A/S"
-                           :width="70"></el-table-column>
+                           label="通过 / 提交"
+                           :width="100"></el-table-column>
           <el-table-column prop="tags"
                            label="Tag">
             <template slot-scope="scope">
@@ -48,7 +55,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="total_grade"
-                           label="Score"
+                           label="总分"
                            :width="70"></el-table-column>
         </el-table>
         <!--下方选页-->
@@ -61,7 +68,6 @@
                          layout="total, sizes, prev, pager, next, jumper"
                          :total="totalproblem"></el-pagination>
         </center>
-      </el-card>
     </el-col>
     <!--右侧栏-->
     <!-- <el-col :span="6"> -->
@@ -99,6 +105,7 @@
       </el-row> -->
     <!-- </el-col> -->
   </el-row>
+  </div>
 </template>
 
 <script>
@@ -158,7 +165,7 @@ export default {
 
             response.data[i].ac = response.data[i].ac_users.length;
             response.data[i].submitted = response.data[i].submitted_users.length;
-            response.data[i].rate = response.data[i].ac + "/" + response.data[i].submitted;
+            response.data[i].rate = response.data[i].ac + " / " + response.data[i].submitted;
 
             if (!response.data[i].tags)
               response.data[i].tags = ["无"];

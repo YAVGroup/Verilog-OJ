@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="overflow: auto;">
     <div v-show="isError" id="wavedrom-error">{{ errorMessage }}</div>
     <div :id="'waveform' +  waveId"></div>
   </div>
@@ -36,6 +36,7 @@ export default {
             // console.log(this.text)
             // console.log(this.waveId)
             WaveDrom.renderWaveForm(this.waveId, JSON.parse(this.text), 'waveform');
+            document.getElementById("svgcontent_" + this.waveId).setAttribute("overflow", "auto");
             this.isError = false;
           } catch (e) {
             console.warn(e);

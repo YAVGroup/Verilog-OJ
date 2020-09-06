@@ -1,6 +1,9 @@
 <template>
   <div>
     <el-row>
+      &nbsp;
+    </el-row>
+    <el-row>
       <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6">
         <!-- placeholder only -->
         &nbsp;
@@ -32,10 +35,10 @@
 
               <template slot="title">
                 <el-col :span="12">
-                  <div style="margin-left: 15px;">测试用例 {{ index }} ： {{ result.result }} </div>
+                  <div style="margin-left: 15px;">测试用例 {{ index }} （{{ prettyType(related_testcases[index].type) }}）： {{ result.result }} </div>
                 </el-col>
                 <el-col :span=12>
-                  <div style="text-align: right;">{{ result.grade }} / {{ '?' }} 分</div>
+                  <div style="text-align: right;">{{ result.grade }} / {{ related_testcases[index].grade }} 分</div>
                 </el-col>
               </template>
               <el-card shadow="never">
@@ -178,6 +181,14 @@ export default {
         // console.log(response.data);
         this.code = response.data;
       })
+    prettyType (type) {
+      if (type == 'SIM') {
+        return "行为级仿真";
+      } else if (type == 'SYNTHSIM') {
+        return "门级仿真";
+      } else {
+        return type;
+      }
     }
   },
   data () {
@@ -202,6 +213,7 @@ export default {
       num_testcase: 0,
       passed_testcase: 0,
       submit_time: new Date(),
+      related_testcases: [],
     }
   },
   computed: {
