@@ -15,6 +15,7 @@ const homework = r => require.ensure([], () => r(require("@/components/mainpage/
 const classes = r => require.ensure([], () => r(require("@/components/mainpage/classes")), 'mainpage');
 const classdetail = r => require.ensure([], () => r(require("@/components/mainpage/classdetail")), 'mainpage');
 const submission = r => require.ensure([], () => r(require("@/components/mainpage/submission")), 'mainpage');
+const newsdetail = r => require.ensure([], () => r(require("@/components/mainpage/newsdetail")), 'mainpage');
 
 
 Vue.use(Router)
@@ -27,6 +28,13 @@ export default new Router({
       path: '/',
       name: 'homepage',
       component: homepage
+    },
+
+    // News
+    {
+      path: '/newsdetail/:newsid',
+      name: 'newsdetail',
+      component: newsdetail
     },
 
     // 用户信息及修改
