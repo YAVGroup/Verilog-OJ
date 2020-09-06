@@ -1,7 +1,14 @@
 <template>
-  <el-card shadow="always"
-           id="card">
-
+  <div>
+    <el-row>
+      &nbsp;
+    </el-row>
+    <el-row>
+      <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6">
+        <!-- placeholder only -->
+        &nbsp;
+      </el-col>
+    <el-col :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
     <el-dialog :visible.sync="searchdialogVisible">
       <el-form :model="searchform"
                label-position="right"
@@ -70,44 +77,43 @@
       </div>
     </el-dialog>
 
-    <el-switch style="float: right;margin:10px;"
+    <el-switch style="float: right; margin: 10px;"
                v-model="showall"
-               active-text="Show Mine"
-               inactive-text="Show All"
+               active-text="仅自己"
+               inactive-text="所有人"
                @change="statuechange"></el-switch>
-    <el-button type="primary"
+    <el-button plain
                @click="resetsearch"
                style="float: right;margin-top:6px;margin-right:10px;"
-               size="mini">Refresh</el-button>
-    <el-button type="primary"
+               size="mini">刷新</el-button>
+    <!-- <el-button type="primary"
                @click="searchdialogVisible = true"
                style="float: right;margin-top:6px;margin-right:15px;"
-               size="mini">Filter</el-button>
+               size="mini">Filter</el-button> -->
 
-    <el-pagination @size-change="handleSizeChange"
+    <!-- <el-pagination @size-change="handleSizeChange"
                    @current-change="handleCurrentChange"
                    :current-page="currentpage"
                    :page-sizes="[10, 20, 30, 50]"
                    :page-size="pagesize"
                    layout="total, sizes, prev, pager, next, jumper"
-                   :total="totalstatus"></el-pagination>
+                   :total="totalstatus"></el-pagination> -->
 
     <el-table :default-sort="{prop: 'id', order: 'descending'}"
               :data="tableData"
               style="width: 100%"
               :row-style="ratingcolor"
               @row-click="rowClick"
-              size="small"
+              size="medium"
               v-loading="loading">
       <el-table-column prop="id"
                        label="ID"
-                       :width="70"></el-table-column>
+                       :width="50"></el-table-column>
       <el-table-column prop="user_belong.username"
-                       label="User"
-                       :width="140"></el-table-column>
+                       label="用户"
+                       :width="70"></el-table-column>
       <el-table-column prop="problem_belong.name"
-                       label="Problem"
-                       :width="320">
+                       label="题名">
         <template slot-scope="scope">
           <font color="#409EFF">
             <b style="cursor:pointer;">{{ scope.row.problem_belong.name }}</b>
@@ -115,8 +121,8 @@
         </template>
       </el-table-column>
       <el-table-column prop="result"
-                       label="Status"
-                       :width="285">
+                       label="状态"
+                       :width="200">
         <template slot-scope="scope">
           <el-tag size="medium"
                   :type="statuetype(scope.row.result)"
@@ -128,20 +134,13 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="time"
-                       label="Time"></el-table-column>
-      <el-table-column prop="memory"
-                       label="Memory"></el-table-column>
-      <el-table-column prop="length"
-                       label="Length"></el-table-column>
-      <el-table-column prop="language"
-                       label="Language"></el-table-column>
       <el-table-column prop="submittime"
-                       label="Submit time"
+                       label="提交时间"
                        :width="180"></el-table-column>
-      <el-table-column prop="judger"
-                       label="Judger"></el-table-column>
     </el-table>
+    <el-row>
+      &nbsp;
+    </el-row>
     <center>
       <el-pagination @size-change="handleSizeChange"
                      @current-change="handleCurrentChange"
@@ -151,7 +150,9 @@
                      layout="total, sizes, prev, pager, next, jumper"
                      :total="totalstatus"></el-pagination>
     </center>
-  </el-card>
+    </el-col>
+    </el-row>
+  </div>
 </template>
 
 
