@@ -181,6 +181,7 @@ export default {
         // console.log(response.data);
         this.code = response.data;
       })
+    },
     prettyType (type) {
       if (type == 'SIM') {
         return "行为级仿真";
