@@ -164,6 +164,7 @@ export default {
         this.score = response.data.total_grade;
         this.total_score = response.data.problem_belong.total_grade;
         this.num_testcase = this.results.length;
+        this.related_testcases = response.data.problem_belong.testcases;
         this.submit_time = new Date(response.data.submit_time);
 
         let passed = 0;
@@ -180,6 +181,11 @@ export default {
       }).then(response => {
         // console.log(response.data);
         this.code = response.data;
+
+        if ((!this.needRefresh()) && this.autoRefresh) {
+          this.autoRefresh = false;
+          clearInterval(this.timer);
+        }
       })
     },
     prettyType (type) {
@@ -189,6 +195,13 @@ export default {
         return "门级仿真";
       } else {
         return type;
+      }
+    },
+    needRefresh () {
+      if (this.status.substr(0, 8) != "Accepted" && this.status.substr(0, 5) != "ERROR") {
+        return true;
+      } else {
+        return false;
       }
     }
   },
@@ -215,6 +228,8 @@ export default {
       passed_testcase: 0,
       submit_time: new Date(),
       related_testcases: [],
+
+      autoRefresh: false,
     }
   },
   computed: {
@@ -229,10 +244,15 @@ export default {
     this.isadmin = sessionStorage.isadmin;
     this.submissionid = this.$route.params.submissionid;
     this.updateStatus();
-    this.timer = setInterval(this.updateStatus, 500);
+    if (this.needRefresh()) {
+      this.autoRefresh = true;
+      this.timer = setInterval(this.updateStatus, 2000);
+    }
   },
   beforeDestroy () {
-    clearInterval(this.timer);
+    if (this.autoRefresh) {
+      clearInterval(this.timer);
+    }
   }
 };
 </script>
