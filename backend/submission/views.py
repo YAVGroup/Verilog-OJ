@@ -14,6 +14,7 @@ from rest_framework import mixins
 from .models import Submission, SubmissionResult
 from .serializers import SubmissionSerializer, SubmissionResultSerializer
 from .serializers import SubmissionPublicSerializer, SubmissionResultPublicSerializer
+from .serializers import SubmissionPublicListSerializer
 from user.permissions import GetOnlyPermission
 from judge.judger_auth import IsJudger
 from problem.models import Problem
@@ -39,11 +40,16 @@ class SubmissionViewSet(ReadOnlyModelViewSet):
         if not hasattr(self.request, 'user'): # 生成文档用
             return SubmissionSerializer
         elif self.request.auth == "Judger" or self.request.user.is_superuser:
-            return SubmissionSerializer
+            if self.request.method == 'GET' and (not 'pk' in self.kwargs):
+                # Check if we're querying a specific one
+                # In list mode, the log and app_data is always hidden
+                return SubmissionPublicListSerializer
+            else:
+                return SubmissionSerializer
         elif self.request.method == 'GET' and (not 'pk' in self.kwargs):
             # Check if we're querying a specific one
             # In list mode, the log and app_data is always hidden
-            return SubmissionPublicSerializer
+            return SubmissionPublicListSerializer
         elif self.request.method == 'GET' and 'pk' in self.kwargs:
             # In retrieve mode
             user_id = self.request.user.id

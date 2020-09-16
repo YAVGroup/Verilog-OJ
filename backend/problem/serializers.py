@@ -9,6 +9,11 @@ class TestCaseSerializer(serializers.ModelSerializer):
         #exclude = ['id', 'problem']
         fields = '__all__'
 
+class ProblemListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Problem
+        fields = ['id', 'name', 'create_time', 'deadline_time', 'level', 'tags']
+
 class ProblemSerializer(serializers.ModelSerializer):
     testcases = TestCaseSerializer(source='get_testcases', read_only=True, many=True)
     total_grade = serializers.IntegerField(source='get_total_grade', read_only=True)
