@@ -36,6 +36,17 @@ class User(AbstractUser):
             if submission.is_ac():
                 ac_problems.add(submission.problem.id)
         return list(ac_problems)
+
+    def get_ac_submission(self):
+        "获得该用户AC的所有submission（仅id）"
+        from submission.models import Submission, SubmissionResult
+        ac_submission = set()
+        ac_problems = set()
+        for submission in self.get_submissions():
+            if submission.is_ac() and submission.problem.id not in ac_problems:
+                ac_submission.add(submission.id)
+                ac_problems.add(submission.problem.id)
+        return list(ac_submission)
     
     def get_total_score(self):
         "获得该用户提交的所有题目最大分数总和"
