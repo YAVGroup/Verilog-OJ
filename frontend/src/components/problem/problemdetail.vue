@@ -7,10 +7,8 @@
           <el-row :gutter="18" id="title">
             {{title}}
           </el-row>
-          <el-row :gutter="18" id="ddl" v-show="have_ddl">
-            DDL: {{ddl}}
-          </el-row>
-          <br>
+          <el-row :gutter="18" id="ddl" v-show="have_ddl">Deadline</el-row>
+          <el-row :gutter="18" class="problem-descriptions" v-show="have_ddl">{{ ddl }}</el-row>
 
           <!--题目描述、输入、输出-->
           <el-row :gutter="18"
@@ -340,7 +338,9 @@ export default {
           this.ddl = "";
           this.have_ddl = false;
         } else {
-          this.ddl = response.data.deadline_time;
+          let ddlTime = moment(response.data.deadline_time);
+          this.ddl = ddlTime.format("YYYY-MM-DD hh:mm:ss") + " (" + ddlTime.endOf('day').fromNow() + ")";
+          //this.ddl = response.data.deadline_time;
           this.have_ddl = true;
         }
 
@@ -513,6 +513,12 @@ export default {
 #title {
   color: dimgrey;
   left: 10px;
+  font-size: 20px;
+}
+#ddl {
+  color: tomato;
+  font-weight: bold;
+  left: 20px;
   font-size: 20px;
 }
 #text {
