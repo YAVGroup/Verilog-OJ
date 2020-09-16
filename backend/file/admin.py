@@ -45,7 +45,9 @@ class FileAdmin(admin.ModelAdmin):
         return self.ref_in_problem(obj) + self.ref_in_submission(obj) + self.ref_in_testcase(obj)
 
     def ref_in_problem(self, obj):
-        return len(obj.problem_set.all())
+        # NOTE: the obj.problem_set method WILL NOT join all the three, since RelationManager is only
+        #       bound to one of them
+        return len(obj.description.all()) + len(obj.judge.all()) + len(obj.template_code.all())
 
     def ref_in_testcase(self, obj):
         return len(obj.testcase_set.all())

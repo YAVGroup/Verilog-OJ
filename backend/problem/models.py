@@ -17,7 +17,7 @@ class Problem(models.Model):
     
     template_code_file = models.ForeignKey(
         File, on_delete=models.SET_NULL, null=True, blank=True,
-        help_text='模板代码文件'
+        help_text='模板代码文件', related_name="template_code"
     )
     app_data = models.TextField(help_text='样例用到的波形图', blank=True)
     judge_files = models.ManyToManyField(File, help_text='评测所用文件', related_name='judge', blank=True)
