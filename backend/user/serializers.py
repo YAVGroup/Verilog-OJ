@@ -33,6 +33,10 @@ class UserPublicSerializer(serializers.ModelSerializer):
         model = User
         exclude = ['password', 'is_staff', 'is_active', 'is_mail_authenticated', 'groups', 'user_permissions']
 
+class UserPublicListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
 
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField()

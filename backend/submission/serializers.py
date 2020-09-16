@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Submission, SubmissionResult
-from problem.serializers import ProblemSerializer
-from user.serializers import UserSerializer, UserPublicSerializer
+from problem.serializers import ProblemSerializer, ProblemListSerializer
+from user.serializers import UserSerializer, UserPublicSerializer, UserPublicListSerializer
 
 class SubmissionResultSerializer(serializers.ModelSerializer):
     result = serializers.CharField(source='get_result', read_only=True)
@@ -32,6 +32,17 @@ class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
         fields = '__all__'
+
+class SubmissionPublicListSerializer(serializers.ModelSerializer):
+    total_grade = serializers.IntegerField(source='get_total_grade', read_only=True)
+    result = serializers.CharField(source='get_result', read_only=True)
+
+    problem_belong = ProblemListSerializer(source='problem', read_only=True)
+    user_belong = UserPublicListSerializer(source='user', read_only=True)
+    class Meta:
+        model = Submission
+        # fields = '__all__'
+        exclude = ['submit_files']
 
 class SubmissionPublicSerializer(serializers.ModelSerializer):
     problem_belong = ProblemSerializer(source='problem', read_only=True)
