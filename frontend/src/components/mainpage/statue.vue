@@ -311,15 +311,15 @@ export default {
         "&limit=" +
         this.pagesize +
         "&offset=" +
-        (this.currentpage - 1) * this.pagesize +
-        "&problemtitle=" +
-        this.searchform.problem +
-        "&language=" +
-        this.searchform.language +
-        "&result=" +
-        this.searchform.result +
-        "&contest=" +
-        this.contest;
+        (this.currentpage - 1) * this.pagesize;
+        // "&problemtitle=" +
+        // this.searchform.problem +
+        // "&language=" +
+        // this.searchform.language +
+        // "&result=" +
+        // this.searchform.result +
+        // "&contest=" +
+        // this.contest;
 
       this.$axios
         .get(url)
@@ -334,24 +334,26 @@ export default {
         });
     },
 
-    setusername (name) {
+    setusername (name) {   //实际为userid
       this.$route.query.username = "";
       this.username = name;
     },
     statuechange (val) {
       if (val == true) {
-        if (!sessionStorage.username) {
+        if (!sessionStorage.userid) {
           this.showall = false;
           this.$message.error("请先登录！");
-        } else this.setusername(sessionStorage.username);
+        } else this.setusername(sessionStorage.userid);
       } else {
         this.setusername("");
       }
+      this.getstatusdata();
     },
     creattimer () {
       clearInterval(this.$store.state.timer);
       this.timer();
-      //this.$store.state.timer = setInterval(this.timer, 60000); 取消自动刷新
+      // this.$store.state.timer = setInterval(this.timer, 500); 
+      // 取消自动刷新
     },
   },
   data () {
@@ -390,7 +392,8 @@ export default {
     //创建一个全局定时器，定时刷新状态
     this.isadmin = sessionStorage.isadmin;
     this.timer();
-    //this.$store.state.timer = setInterval(this.timer, 60000);取消自动刷新
+    // this.$store.state.timer = setInterval(this.timer, 500);
+    // 取消自动刷新
   }
 };
 </script>
