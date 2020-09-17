@@ -31,8 +31,6 @@ class UserAdmin(admin.ModelAdmin):
             user_ac = user_info.get_ac_submission()
             if len(user_ac) > 0:
                 for p_inst in user_ac:
-                    print('export csv')
-                    print(p_inst)
                     submit = Submission.objects.filter(id = p_inst)
                     usr[submit[0].problem.name] = submit[0].get_total_grade()
             usr_all.append(usr)
