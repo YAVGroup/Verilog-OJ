@@ -125,16 +125,21 @@ export default {
     },
 
     downloadFile (codeid, content) {
-      var aLink = document.createElement("a");
-      var blob = new Blob([content], { type: "data:text/plain" });
-      var downloadElement = document.createElement("a");
-      var href = window.URL.createObjectURL(blob); //创建下载的链接
-      downloadElement.href = href;
-      downloadElement.download = codeid + '.' + this.curlang; //下载后文件名
-      document.body.appendChild(downloadElement);
-      downloadElement.click(); //点击下载
-      document.body.removeChild(downloadElement); //下载完成移除元素
-      window.URL.revokeObjectURL(href); //释放掉blob对象
+      if(sessionStorage.userid!=this.userid) {
+        this.$message.error("只允许下载自己的文件");
+      }
+      else {
+        var aLink = document.createElement("a");
+        var blob = new Blob([content], { type: "data:text/plain" });
+        var downloadElement = document.createElement("a");
+        var href = window.URL.createObjectURL(blob); //创建下载的链接
+        downloadElement.href = href;
+        downloadElement.download = codeid + '.' + this.curlang; //下载后文件名
+        document.body.appendChild(downloadElement);
+        downloadElement.click(); //点击下载
+        document.body.removeChild(downloadElement); //下载完成移除元素
+        window.URL.revokeObjectURL(href); //释放掉blob对象
+      }
     },
     prettyDate (time) {
       let date = new Date((time || "").replace(/-/g,"/").replace(/[TZ]/g," ")),
@@ -166,6 +171,7 @@ export default {
         this.num_testcase = this.results.length;
         this.related_testcases = response.data.problem_belong.testcases;
         this.submit_time = new Date(response.data.submit_time);
+        this.userid = response.data.user;
 
         let passed = 0;
         for (let i = 0; i < this.results.length; i++) {
@@ -228,6 +234,7 @@ export default {
       passed_testcase: 0,
       submit_time: new Date(),
       related_testcases: [],
+      userid:"",
 
       autoRefresh: false,
     }

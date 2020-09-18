@@ -9,6 +9,7 @@ from rest_framework.permissions import AllowAny
 from judge.tasks import do_judge_task
 
 from rest_framework.viewsets import GenericViewSet
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
 
 from .models import Submission, SubmissionResult
@@ -30,7 +31,9 @@ class SubmissionViewSet(ReadOnlyModelViewSet):
     queryset = Submission.objects.all()
     #serializer_class = SubmissionSerializer
     # TODO: 提交信息的查看权限问题
+    filter_backends = (DjangoFilterBackend,)
     permission_classes = (GetOnlyPermission,)
+    filter_fields = ('id','user', "problem", "submit_time")
 
     def get_serializer_class(self):
         """
