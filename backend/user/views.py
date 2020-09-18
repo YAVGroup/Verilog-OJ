@@ -125,7 +125,7 @@ class UserUSTCLoginView(APIView):
                             username = "".join(random.choices('0123456789abcdefghijklmnopqrstuvwxyz@.+-_', k=10))
 
                 # rep = Response('OK', status.HTTP_200_OK)        # 更换为 rep = redirect('home')
-                rep = redirect('http://oj.libreliu.info')
+                rep = redirect('http://202.38.75.113/')
                 rep.set_cookie('userid', user.id)
                 return rep
         cas_login_url = cas_client.get_login_url(service_url=app_login_url)
