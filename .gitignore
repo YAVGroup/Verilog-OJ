@@ -16,4 +16,4 @@ db.sqlite3
 backend/storage
 
 # backend migrations
-backend/*/migrations
+#backend/*/migrations
