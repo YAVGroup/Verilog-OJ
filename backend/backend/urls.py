@@ -21,7 +21,7 @@ from rest_framework.documentation import include_docs_urls
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin-django/', admin.site.urls),
     url('docs/', include_docs_urls(title="接口文档", authentication_classes=[], permission_classes=[])),
     url('api/', include('user.urls')),
     url('api/', include('file.urls')),
