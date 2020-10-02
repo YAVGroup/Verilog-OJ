@@ -24,6 +24,10 @@ problem 和 testcase 都会引用一定数量的文件。在判题时，判题�
 
 submit 中保存着用户提交的文件，对于现在的版本而言，用户只能提交一个名为 code.v 的文件，其内容就是用户在 Verilog OJ 的代码编辑框中编辑的内容。
 
+### Yaml 提交入口
+
+现在 Yaml 提交还只能通过 Django admin 进行。您可以用管理员账号登陆 `http://202.38.75.113/admin-django/` 并且在 problem 选项卡中找到 Yaml 导入的相关设定。在框中粘贴您的 Yaml，并点击提交即可。
+
 ### 一个简单的 Yaml 描述的题目
 
 在阅读此段落前，可以考虑先阅读 [3-8 Decoder 的 Yaml 导入文件](https://github.com/lluckydog/Verilog-OJ/blob/ad8232c2e182b4eb7150b9a3a4b285992c796eef/assets/decoder_38.yml) 作为起手。
