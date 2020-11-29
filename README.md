@@ -10,7 +10,7 @@ Verilog OJ 是面向数字电路学习和实践的在线评测平台。
 
 需要的依赖：
 - Python 3
-  - 请注意，PyPI 上目前没有 Python 3.8 预编译的 Pandas 软件包，您可能需要安装 Cython, g++ 等再进行 pip install 操作，否则可能出现错误。
+  - ~~请注意，PyPI 上目前没有 Python 3.8 预编译的 Pandas 软件包，您可能需要安装 Cython, g++ 等再进行 pip install 操作，否则可能出现错误。~~ (Bumped Pandas to 1.1.4)
 - NodeJS & NPM (需要选择支持 package-lock.json 功能的 NPM 版本，过旧的版本请不要使用)
 - RabbitMQ 消息中间件
   - 此项用于后端向判题服务传递消息，是 Celery 的依赖
@@ -20,6 +20,13 @@ Verilog OJ 是面向数字电路学习和实践的在线评测平台。
 
 大致过程：
 ```bash
+# Update repo to latest
+sudo apt update && sudo apt upgrade
+
+# Install essential software
+sudo apt install build-essential rabbitmq-server yosys nodejs npm python3-virtualenv 
+sudo systemctl start rabbitmq-server
+
 git clone https://github.com/lluckydog/Verilog-OJ
 cd Verilog-OJ
 virtualenv venv
@@ -31,7 +38,7 @@ cd frontend
 npm install .
 
 cd ../backend
-python manage.py makemigrations
+python manage.py migrate
 
 # 此处创建您测试环境的超级用户的用户名和密码
 python manage.py createsuperuser
