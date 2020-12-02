@@ -6,17 +6,10 @@ const problem = r => require.ensure([], () => r(require("@/components/mainpage/p
 const statue = r => require.ensure([], () => r(require("@/components/mainpage/statue")), 'mainpage');
 const user = r => require.ensure([], () => r(require("@/components/mainpage/user")), 'mainpage');
 const setting = r => require.ensure([], () => r(require("@/components/mainpage/setting")), 'mainpage');
-const contest = r => require.ensure([], () => r(require("@/components/mainpage/contest")), 'mainpage');
-const contestdetail = r => require.ensure([], () => r(require("@/components/contest/contestdetail")), 'contest');
 const problemdetail = r => require.ensure([], () => r(require("@/components/problem/problemdetail")), 'problem');
-const rank = r => require.ensure([], () => r(require("@/components/mainpage/rank")), 'mainpage');
 const admin = r => require.ensure([], () => r(require("@/components/mainpage/admin")), 'mainpage');
-const homework = r => require.ensure([], () => r(require("@/components/mainpage/homework")), 'mainpage');
-const classes = r => require.ensure([], () => r(require("@/components/mainpage/classes")), 'mainpage');
-const classdetail = r => require.ensure([], () => r(require("@/components/mainpage/classdetail")), 'mainpage');
 const submission = r => require.ensure([], () => r(require("@/components/mainpage/submission")), 'mainpage');
 const newsdetail = r => require.ensure([], () => r(require("@/components/mainpage/newsdetail")), 'mainpage');
-
 
 Vue.use(Router)
 

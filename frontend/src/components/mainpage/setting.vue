@@ -172,7 +172,8 @@ export default {
         }
       ).then(() => {
 
-      this.form.password = this.$md5(this.form.password);
+      // TODO: fix this
+      this.form.password = this.form.password;
       this.$axios
         .put(
           "/changeone/",
