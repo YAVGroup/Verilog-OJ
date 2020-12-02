@@ -4,7 +4,7 @@
       &nbsp;
     </el-row>
     <el-row>
-      <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6">
+      <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6" class="placeholder">
         <!-- placeholder only -->
         &nbsp;
       </el-col>
@@ -172,23 +172,6 @@ export default {
     languageselect
   },
   methods: {
-    deletestatus (id) {
-      this.$axios
-        .delete("/submissions/" + id + "/").then(response => {
-          this.$message.success("成功！")
-        })
-        .catch(error => {
-          this.$message.error("失败！" + error)
-        });
-    },
-    onCopy (e) {
-      this.$message.success("复制成功！");
-    },
-    // 复制失败
-    onError (e) {
-      this.$message.error("复制失败：" + e);
-    },
-
     rowClick (row, col, e) {
       if (col.label == "Problem") {
         if (this.contest != "0")

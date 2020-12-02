@@ -4,7 +4,7 @@
       &nbsp;
     </el-row>
     <el-row>
-      <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6">
+      <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6" class="placeholder">
         <!-- placeholder only -->
         &nbsp;
       </el-col>
