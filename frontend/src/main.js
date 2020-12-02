@@ -6,13 +6,14 @@ import router from './router'
 import Vuex from 'vuex'
 import axios from 'axios';
 import VueClipboard from 'vue-clipboard2'
-import 'babel-polyfill' //兼容IE6
+//import 'babel-polyfill' //兼容IE6
 import Cookies from 'js-cookie'
+
+import './assets/site.css';
 
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
-
 
 Vue.use(VueClipboard)
 Vue.use(Vuex)
@@ -24,7 +25,8 @@ Vue.config.debug = true;
 axios.defaults.withCredentials = true;
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 axios.defaults.xsrfCookieName = "csrftoken";
-axios.defaults.baseURL = process.env.API_ROOT
+// This will be bundled by Vue CLI
+axios.defaults.baseURL = process.env.VUE_APP_API_ROOT
 Vue.prototype.$axios = axios;
 
 const store = new Vuex.Store({
