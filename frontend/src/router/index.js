@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-const homepage = r => require.ensure([], () => r(require("@/components/main")), 'main"');
+const homepage = r => require.ensure([], () => r(require("@/components/main")), 'main');
 const problem = r => require.ensure([], () => r(require("@/components/mainpage/problem")), 'mainpage');
 const statue = r => require.ensure([], () => r(require("@/components/mainpage/statue")), 'mainpage');
 const user = r => require.ensure([], () => r(require("@/components/mainpage/user")), 'mainpage');
