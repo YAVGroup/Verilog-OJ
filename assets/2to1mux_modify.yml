@@ -1,0 +1,652 @@
+problems:
+- name: "MUX 2-to-1多路选择器 test"
+  description: "请写一个描述二路选择器的 Verilog module。\n二路选择器的逻辑特点是，当选择器sel为“0”选择a的值，当选择器sel为“1”时，输出为b的值。"
+  description_input: "输入a,b,sel都为1bit"
+  description_output: "输出为 out，位宽为 1。\n您应当通过sel来控制 x0 和 x1 的结果"
+  app_data: |-
+    {"signal": [
+      {"name": "sel", "wave": "0...1..."},
+      {"name": "a", "wave": "0.1.0.1."},
+      {"name": "b", "wave":"01010101"},
+      {"name": "out", "wave": "0.1.0101"}
+    ]}
+  judge_files:
+  - name: code_ref.v
+    content: |-
+      module top_module(
+            input sel,
+            input a,
+            input b,
+            output reg out
+        );
+        
+        always @(*)
+        if(sel)
+          out = b;
+        else
+          out = a;
+
+      endmodule
+  template_code_file:
+    name: template_code.v
+    content: |-
+      module top_module(
+            input sel,
+            input a,
+            input b,
+            output out
+        );
+        // Write your code here
+      endmodule
+  testcases:
+  - type: SIM
+    grade: 10
+    testcase_files:
+    - name: wavedump.py
+      content: |+
+        #!/usr/bin/env python3
+
+        """
+        Example signal:
+
+        {
+            'name': 'root', 
+            'type': {'name': 'struct'}, 
+            'children': [
+                {
+                    'name': 'testbench', 
+                    'type': {'name': 'struct'}, 
+                    'children': [
+                        {
+                            'name': 'x', 
+                            'type': {'width': 3, 'name': 'reg'}, 
+                            'data': [
+                                (0, 'bx'), (1, 'b0'), (2, 'b1'), (3, 'b10'), (4, 'b11'), (5, 'b100'), (6, 'b101'), (7, 'b110'), (8, 'b111')
+                            ]
+                        }, 
+                        {
+                            'name': 'y', 
+                            'type': {
+                                'width': 8, 
+                                'name': 'wire'
+                            }, 
+                            'data': [
+                                (0, 'bx'), (1, 'b1'), (2, 'b10'), (3, 'b100'), (4, 'b1000'), (5, 'b10000'), (6, 'b100000'), (7, 'b1000000'), (8, 'b10000000')
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+
+        """
+
+
+        from pyDigitalWaveTools.vcd.parser import VcdParser
+
+        class VcdSignalTraversalError(Exception):
+            pass
+
+        class VcdSignalComparationError(Exception):
+            pass
+
+        def find_signal_inst(data_obj, signal_path):
+            components = signal_path.split("/")
+            cur = data_obj
+            for i in range(0, len(components) - 1):
+                if cur['name'] != components[i]:
+                    raise VcdSignalTraversalError("{} mismatch with {} while traversing {}".format(
+                        cur['name'], components[i], signal_path))
+
+                if not 'children' in cur.keys():
+                    raise VcdSignalTraversalError("{} have no data k-v pair while traversing {}".format(
+                        cur['name'], signal_path))
+
+                found = False
+                for child in cur['children']:
+                    if child['name'] == components[i+1]:
+                        found = True
+                        cur = child
+                        break
+
+                if not found:
+                    raise VcdSignalTraversalError("{} have no children called {} while traversing {}".format(
+                        cur['name'], components[i+1], signal_path))
+
+            if cur['name'] != components[-1]:
+                raise VcdSignalTraversalError("{} mismatch with {} while traversing {}".format(
+                    cur['name'], components[-1], signal_path))
+
+            return cur
+
+        class VcdComparator:
+
+            def compare_signals(self, ref, ud):
+                # compare width
+                if ref['type']['width'] != ud['type']['width']:
+                    raise VcdSignalComparationError("Signal {} have different width between ref ({}) and ud ({})".format(
+                        ref['name'], ref['type']['width'], ud['type']['width']))
+
+                # No need to compare sigType (reg/wire.. anything else?)
+
+                # signal comparation
+                # TODO: support for different types ('b0' with 'b000' or 'd0' or something...)
+                
+                # Since value change dump theoretically only generates data when changes
+                # so direct diffing should work
+                for i, val in enumerate(ref['data']):
+                    if ud['data'][i] != val:
+                        raise VcdSignalComparationError("Signal {} have difference on time {} (ref={}, ud={})".format(
+                            ref['name'], val[0], val, ud['data'][i]))
+
+            def dump_hierarchy(self, data_obj):
+                # TODO: only dump names
+                print(data_obj.toJSON())
+
+            def __init__(self, vcd_ref, vcd_ut, signal_names):
+                """Initialize signals for comparation
+                vcd_ref: the reference vcd file
+                vcd_ut: the vcd file under test
+                signal_names: the signal for comparation, uses "/" to express hierarchy.
+                        and the top module name shall also be included.
+                """
+
+                with open(vcd_ref) as vcd_ref_file:
+                    vcd = VcdParser()
+                    vcd.parse(vcd_ref_file)
+                    self.data_ref = vcd.scope.toJson()
+                    print(self.data_ref)
+
+                with open(vcd_ut) as vcd_ut_file:
+                    vcd_ut = VcdParser()
+                    vcd_ut.parse(vcd_ut_file)
+                    self.data_ut = vcd_ut.scope.toJson()
+                    print(self.data_ut)
+
+                # find all signals
+                self.signals_ref = [find_signal_inst(self.data_ref, i) for i in signal_names]
+                self.signals_ut = [find_signal_inst(self.data_ut, i) for i in signal_names]
+
+            def compare(self):
+                try:
+                    # compare all signals
+                    for i in range(0, len(self.signals_ref)):
+                        self.compare_signals(self.signals_ref[i], self.signals_ut[i])
+                    return (True, "No error")
+                except VcdSignalComparationError as e:
+                    return (False, "{}".format(e))
+
+        import json
+
+        class VcdSignalValueParseError(Exception):
+            pass
+
+        class VcdConverter:
+
+            def __init__(self, data_vcd):
+                self.output = {'signal': []}
+                self.data_vcd = data_vcd
+
+            def emitWaveDict(self):
+                return self.output
+
+            def mergeWaveDict(self, wdict):
+                self.output['signal'] += wdict['signal']
+
+            def emitWaveJson(self):
+                return json.dumps(self.output)
+
+            def parseValue(self, val_str):
+                """ Note: b111xx1 -> x """
+                if val_str[0] == "b":
+                    if val_str.find("x") != -1:
+                        return "x"
+                    return int(val_str[1:], base=2)
+                elif len(val_str) == 1:
+                    if val_str[0] == "x":
+                        return "x"
+                    else:
+                        return int(val_str, base=2)
+                else:
+                    raise VcdSignalValueParseError("Unknown value type")
+
+            def toBinRepr(self, val, width):
+                if val == 'x':
+                    return 'x' * width
+
+                striped = bin(val)[2:]
+                assert(width >= len(striped))
+                return "0" * (width - len(striped)) + striped
+
+            def addToWaveJsonSeparate(self, signal_names, prefix=""):
+                # find common time_max
+                time_max = 0
+                for signal_name in signal_names:
+                    sig_inst = find_signal_inst(self.data_vcd, signal_name)
+                    time_max = max(time_max, sig_inst['data'][-1][0])
+
+                for signal_name in signal_names:
+                    sig_jsons = []
+                    sig_inst = find_signal_inst(self.data_vcd, signal_name)
+
+
+                    width = sig_inst['type']['width']
+                    # decompose
+                    for i in range(0, width):
+                        sig_jsons.append({})
+                        sig_jsons[i]['name'] = prefix + sig_inst['name'] + "[" + str(i) + "]"
+
+                    local_time_max = sig_inst['data'][-1][0]
+                    waves = ["" for i in range(0, width)]
+                    cur_step_ptr = 0
+
+                    # "x" or int or "SOME.."
+                    cur_wave = "SOMETHING_NEVER_HAPPEN"
+
+                    # TODO: Avoid multiple transitions at same timestep
+                    for i in range(0, local_time_max + 1):
+                        if sig_inst['data'][cur_step_ptr][0] > i:
+                            # maintain current value
+                            for i in range(0, width):
+                                waves[i] += "."
+                        else:
+                            new_wave = self.parseValue(sig_inst['data'][cur_step_ptr][1])
+                            if new_wave == cur_wave:
+                                waves[i] += "."
+                            else:
+                                # do bitwise comparation
+                                if cur_wave == "SOMETHING_NEVER_HAPPEN":
+                                    # new_wave_bin[0] is MSB
+                                    new_wave_bin = self.toBinRepr(new_wave, width)
+                                    for i in range(0, width):
+                                        waves[i] += new_wave_bin[::-1][i]
+                                else:
+                                    cur_wave_bin = self.toBinRepr(cur_wave, width)
+                                    new_wave_bin = self.toBinRepr(new_wave, width)
+
+                                    for i in range(0, width):
+                                        old = cur_wave_bin[::-1][i]
+                                        new = new_wave_bin[::-1][i]
+                                        if old != new:
+                                            waves[i] += new
+                                        else:
+                                            waves[i] += '.'
+
+                                cur_wave = new_wave
+
+                            cur_step_ptr += 1
+
+                    for i in range(local_time_max, time_max + 1):
+                        for i in range(0, width):
+                            waves[i] += "."
+
+                    for i in range(0, width):
+                        sig_jsons[i]['wave'] = waves[i]
+
+
+                    self.output['signal'] += sig_jsons
+              
+                return time_max
+
+
+
+            def addToWaveJsonSeparate_modify(self, signal_names, time_max, prefix=""):
+                # find common time_max
+                time_max = time_max
+
+                for signal_name in signal_names:
+                    sig_jsons = []
+                    sig_inst = find_signal_inst(self.data_vcd, signal_name)
+
+
+                    width = sig_inst['type']['width']
+                    # decompose
+                    for i in range(0, width):
+                        sig_jsons.append({})
+                        sig_jsons[i]['name'] = prefix + sig_inst['name'] + "[" + str(i) + "]"
+
+                    local_time_max = sig_inst['data'][-1][0]
+                    waves = ["" for i in range(0, width)]
+                    cur_step_ptr = 0
+
+                    # "x" or int or "SOME.."
+                    cur_wave = "SOMETHING_NEVER_HAPPEN"
+
+                    # TODO: Avoid multiple transitions at same timestep
+                    for i in range(0, local_time_max + 1):
+                        if sig_inst['data'][cur_step_ptr][0] > i:
+                            # maintain current value
+                            for i in range(0, width):
+                                waves[i] += "."
+                        else:
+                            new_wave = self.parseValue(sig_inst['data'][cur_step_ptr][1])
+                            if new_wave == cur_wave:
+                                waves[i] += "."
+                            else:
+                                # do bitwise comparation
+                                if cur_wave == "SOMETHING_NEVER_HAPPEN":
+                                    # new_wave_bin[0] is MSB
+                                    new_wave_bin = self.toBinRepr(new_wave, width)
+                                    for i in range(0, width):
+                                        waves[i] += new_wave_bin[::-1][i]
+                                else:
+                                    cur_wave_bin = self.toBinRepr(cur_wave, width)
+                                    new_wave_bin = self.toBinRepr(new_wave, width)
+
+                                    for i in range(0, width):
+                                        old = cur_wave_bin[::-1][i]
+                                        new = new_wave_bin[::-1][i]
+                                        if old != new:
+                                            waves[i] += new
+                                        else:
+                                            waves[i] += '.'
+
+                                cur_wave = new_wave
+
+                            cur_step_ptr += 1
+
+                    for i in range(local_time_max, time_max + 1):
+                        for i in range(0, width):
+                            waves[i] += "."
+
+                    for i in range(0, width):
+                        sig_jsons[i]['wave'] = waves[i]
+
+
+                    self.output['signal'] += sig_jsons
+              
+
+            def addToWaveJsonAggregated(self, signal_names, prefix=""):
+                """ Aggregated view, which uses '=' on every timeslice. """
+                # find common time_max
+                time_max = 0
+                for signal_name in signal_names:
+                    sig_inst = find_signal_inst(self.data_vcd, signal_name)
+                    time_max = max(time_max, sig_inst['data'][-1][0])
+
+                for signal_name in signal_names:
+                    sig_json = {}
+                    sig_inst = find_signal_inst(self.data_vcd, signal_name)
+                    sig_json['name'] = prefix + sig_inst['name']
+
+                    # [0, time_max]
+                    local_time_max = sig_inst['data'][-1][0]
+                    wave = ""
+                    cur_step_ptr = 0
+                    cur_wave = "SOMETHING_NEVER_HAPPEN"
+                    data = []
+
+                    # TODO: Avoid multiple transitions at same timestep
+                    for i in range(0, local_time_max + 1):
+                        if sig_inst['data'][cur_step_ptr][0] > i:
+                            # maintain current value
+                            wave += "."
+                        else:
+                            new_wave = self.parseValue(sig_inst['data'][cur_step_ptr][1])
+                            if new_wave == cur_wave:
+                                wave += "."
+                            else:
+                                wave += "="
+                                data.append(new_wave)
+                                cur_wave = new_wave
+
+                            cur_step_ptr += 1
+
+                    for i in range(local_time_max, time_max + 1):
+                        wave += "."
+
+                    sig_json['wave'] = wave
+                    sig_json['data'] = data
+
+                    self.output['signal'].append(sig_json)
+
+            def addCompare(self,signal_names,prefix1,prefix2,width):
+                #have to be the same length and width
+
+                for signal_name in signal_names:
+
+                    signal1 = prefix1 + signal_name
+                    signal2 = prefix2 + signal_name
+
+                    for j in range(width):
+                        name1 = signal1 +'['+str(j) +']' 
+                        get1 = ""
+                        wave1 = ""
+                        name2 = signal2 +'['+str(j) +']' 
+                        get2 = ""
+                        wave2 = ""
+
+                        for each in self.output['signal']:
+                            if each['name'] == name1:
+                                get1 = each['wave']
+                            if each['name'] == name2:
+                                get2 = each['wave']
+
+                        temp1 = list(get1)
+                        temp2 = list(get2)
+                        for i in range(len(get1)):
+                            if temp1[i] == '.':
+                                wave1 += wave1[i-1]
+                            else:
+                                wave1 += temp1[i]
+                        
+                            if temp2[i] == '.':
+                                wave2 += wave2[i-1]
+                            else:
+                                wave2 += temp2[i]
+
+                        sig_json = {}
+                        sig_json['name'] = "missmatch_" + signal_name + '[' + str(j) + ']'
+                        wave = ""
+                        get = ""
+                        for i in range(len(wave1)):
+                            if wave1[i]==wave2[i]:
+                                if get == "0":
+                                    wave += "." 
+                                    get = "0"
+                                else:
+                                    wave += "0"
+                                    get = "0"
+                            else:
+                                if get == "1":
+                                    wave+= "."
+                                    get = "1"
+                                else:
+                                    wave+= "."
+                                    get = "1"
+                        sig_json['wave'] = wave
+                        self.output['signal'].append(sig_json)
+
+
+
+        if __name__ == "__main__":
+            sample_vcd = {'name': 'root', 'type': {'name': 'struct'}, 'children': [{'name': 'testbench', 'type': {'name': 'struct'}, 'children': [{'name': 'x', 'type': {'width': 3, 'name': 'reg'}, 'data': [(0, 'bx'), (1, 'b0'), (2, 'b1'), (3, 'b10'), (4, 'b11'), (5, 'b100'), (6, 'b101'), (7, 'b110'), (8, 'b111')]}, {'name': 'y', 'type': {'width': 8, 'name': 'wire'}, 'data': [(0, 'bx'), (1, 'b1'), (2, 'b1x'), (3, 'b100'), (4, 'b1000'), (5, 'b10000'), (6, 'b100000'), (7, 'b1000000'), (8, 'b10000000')]}]}]}
+            sample_vcd2 = {'name': 'root', 'type': {'name': 'struct'}, 'children': [{'name': 'testbench', 'type': {'name': 'struct'}, 'children': [{'name': 'a', 'type': {'width': 1, 'name': 'reg'}, 'data': [(0, 'x'), (1, '0'), (2, '1'), (3, '0'), (4, '1')]}, {'name': 'b', 'type': {'width': 1, 'name': 'reg'}, 'data': [(0, 'x'), (1, '0'), (3, '1')]}, {'name': 'out', 'type': {'width': 1, 'name': 'wire'}, 'data': [(0, 'x'), (1, '1'), (2, '0'), (4, '1')]}]}]}
+            vc = VcdConverter(sample_vcd)
+            vc.addToWaveJsonSeparate(['root/testbench/x', 'root/testbench/y'], "mysig_")
+            vc.addToWaveJsonAggregated(['root/testbench/x', 'root/testbench/y'], "mysig_")
+            print(vc.emitWaveJson())
+
+            vc2 = VcdConverter(sample_vcd2)
+            vc2.addToWaveJsonSeparate(['root/testbench/a', 'root/testbench/b', 'root/testbench/out'], "mysig_")
+            vc2.addToWaveJsonAggregated(['root/testbench/a', 'root/testbench/b', 'root/testbench/out'], "mysig_")
+            print(vc2.emitWaveJson())
+
+    - name: vcd_main.py
+      content: |
+        #!/usr/bin/env python3
+        import sys
+
+        def main():
+
+            from wavedump import VcdComparator
+            from pyverilog.dataflow.dataflow_analyzer import VerilogDataflowAnalyzer
+
+            filelist = ['./problem/code_ref.v']
+
+            topmodule = 'top_module'
+            noreorder = False
+            nobind = False
+            include = None
+            define = None
+
+            analyzer = VerilogDataflowAnalyzer(filelist, topmodule,
+                                              noreorder=noreorder,
+                                              nobind=nobind,
+                                              preprocess_include=include,
+                                              preprocess_define=define)
+
+            analyzer.generate()
+            terms = analyzer.getTerms()
+
+            compare_list = []
+            for tk, tv in sorted(terms.items(), key=lambda x:str(x[0])):
+              if 'Input' in tv.termtype or 'Output' in tv.termtype: 
+                compare_list.append('root/testbench/'+str(tk.scopechain[1]))
+
+            print('compare list')
+            print(compare_list)
+            cmpr = VcdComparator("./out_ref.vcd", "./out_code.vcd", compare_list)
+            ret, msg = cmpr.compare()
+            return (ret, msg)
+
+        ret, msg = main()
+        print(msg)
+        print("Ret status: {}".format(ret))
+        sys.exit(0 if ret is True else 1)
+    - name: testbench.v
+      content: |2
+
+        module testbench();
+            reg sel;
+            reg a;
+            reg b;
+            wire out;
+            top_module MUX(sel, a, b, out);
+
+            // http://www.referencedesigner.com/tutorials/verilog/verilog_62.php
+            initial begin
+                $dumpfile("out.vcd");
+                // This will dump all signal, which may not be useful
+                //$dumpvars;
+
+                // dumping only this module
+                //$dumpvars(1, testbench);
+
+                // dumping only these variable
+                // the first number (level) is actually useless
+                $dumpvars(0, sel, a, b, out);
+            end
+
+            integer i;
+            initial begin
+                #1 sel = 0; a = 0; b = 0;
+                #1 a = 1; b = 0;
+                #1 a = 1; b = 1;
+                #1 a = 0; b = 1;
+                #1 sel = 1; a = 0; b = 0;
+                #1 a = 1; b = 0;
+                #1 a = 1; b = 1;
+                #1 a = 0; b = 1;
+            end
+
+        endmodule
+    - name: vcd_visualize.py
+      content: |
+        #!/usr/bin/env python3
+        import sys
+
+        def main():
+            from pyDigitalWaveTools.vcd.parser import VcdParser
+            from wavedump import VcdConverter
+            from pyverilog.dataflow.dataflow_analyzer import VerilogDataflowAnalyzer
+
+            filelist = ['./problem/code_ref.v']
+
+            topmodule = 'top_module'
+            noreorder = False
+            nobind = False
+            include = None
+            define = None
+
+            analyzer = VerilogDataflowAnalyzer(filelist, topmodule,
+                                              noreorder=noreorder,
+                                              nobind=nobind,
+                                              preprocess_include=include,
+                                              preprocess_define=define)
+
+            analyzer.generate()
+            terms = analyzer.getTerms()
+
+            input_list = []
+            output_list = []
+            compare_list = []
+
+            for tk, tv in sorted(terms.items(), key=lambda x:str(x[0])):
+              if 'Input' in tv.termtype:
+                input_list.append('root/testbench/'+str(tk.scopechain[1]))
+
+              if 'Output' in tv.termtype:
+                output_list.append('root/testbench/'+str(tk.scopechain[1]))
+                compare_list.append(str(tk.scopechain[1]))
+
+            with open("./out_ref.vcd") as vcd_ref_file:
+                vcd = VcdParser()
+                vcd.parse(vcd_ref_file)
+                data_ref = vcd.scope.toJson()
+
+            with open("./out_code.vcd") as vcd_dut_file:
+                vcd = VcdParser()
+                vcd.parse(vcd_dut_file)
+                data_dut = vcd.scope.toJson()
+
+            vc_ref = VcdConverter(data_ref)
+            time = vc_ref.addToWaveJsonSeparate(signal_names=input_list+output_list, prefix = "reference_")
+
+            vc_dut = VcdConverter(data_dut)
+            vc_dut.addToWaveJsonSeparate_modify(signal_names=output_list, time_max=time,prefix= "your_")
+
+            vc_ref.mergeWaveDict(vc_dut.emitWaveDict())
+
+            vc_ref.addCompare(compare_list,"your_","reference_",1)
+
+            out = vc_ref.emitWaveJson()
+
+            with open("./appdata.txt", "w") as f:
+                f.write(out)
+
+        main()
+    - name: main.sh
+      content: |-
+        #!/bin/bash
+        iverilog ./testcase/testbench.v ./problem/code_ref.v -o ref_run
+        vvp ref_run
+        mv out.vcd out_ref.vcd
+
+        iverilog ./testcase/testbench.v ./submit/code.v -o code_run
+
+        if [ $? -ne 0 ]; then
+          echo "CE" > possible_error.txt
+          exit 1
+        fi
+
+        vvp code_run
+
+        if [ $? -ne 0 ]; then
+          echo "CE" > possible_error.txt
+          exit 1
+        fi
+
+        mv out.vcd out_code.vcd
+
+        python3 ./testcase/vcd_main.py         # This will compare out_ref.vcd and out_code.vcd
+
+        if [ $? -ne 0 ]; then
+          echo "0" > score.txt
+          echo "WA" > possible_error.txt
+        else
+          echo "10" > score.txt
+          echo "NONE" > possible_error.txt
+        fi
+
+        python3 ./testcase/vcd_visualize.py    # This will output app_data.txt
