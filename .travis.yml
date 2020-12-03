@@ -7,6 +7,7 @@ jobs:
       - node
       script:
         - cd frontend
+        - rm package-lock.json
         - npm install
         - npm run build
 
