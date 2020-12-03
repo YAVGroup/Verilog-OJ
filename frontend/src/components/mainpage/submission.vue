@@ -105,14 +105,14 @@ require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
 
 require("codemirror/mode/verilog/verilog");
-import languageselect from "@/components/utils/languageselect";
+//import languageselect from "@/components/utils/languageselect";
 import wavedrom from "@/components/utils/wavedrom";
 
 export default {
   name: "submission",
   components: {
     codemirror,
-    languageselect,
+    //languageselect,
     wavedrom
   },
   methods: {

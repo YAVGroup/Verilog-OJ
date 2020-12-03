@@ -109,11 +109,11 @@
 </template>
 
 <script>
-prostatistice;
-import prostatistice from "@/components/utils/prostatistice";
+//prostatistice;
+// import prostatistice from "@/components/utils/prostatistice";
 export default {
   components: {
-    prostatistice
+    // prostatistice
   },
   data () {
     return {
@@ -188,7 +188,7 @@ export default {
     tagclick (name) {
       if (this.currenttag.indexOf(name) >= 0) {
         this.$refs[name][0].type = "default";
-        var li = this.currenttag.split("+");
+        let li = this.currenttag.split("+");
         for (var i = 0; i < li.length; i++) {
           if (li[i] == name) {
             li.splice(i, 1);
@@ -198,7 +198,7 @@ export default {
         this.currenttag = li.join("+");
       } else {
         this.$refs[name][0].type = "primary";
-        var li = this.currenttag.split("+");
+        let li = this.currenttag.split("+");
         li.push(name);
         this.currenttag = li.join("+");
       }

@@ -173,7 +173,7 @@ export default {
       ).then(() => {
 
       // TODO: fix this
-      this.form.password = this.form.password;
+      //this.form.password = this.form.password;
       this.$axios
         .put(
           "/changeone/",

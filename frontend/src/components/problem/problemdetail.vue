@@ -162,7 +162,7 @@
               </template>
             </el-table-column>
             <el-table-column prop="submittime" align="right">
-              <template slot="header" slot-scope="scrop">
+              <template slot="header">
                 <el-button size="mini" @click="submissions_refresh" type="primary">刷新</el-button>
               </template>
             </el-table-column>
@@ -184,7 +184,7 @@ import qs from "qs";
 import { codemirror } from "vue-codemirror";
 // import statusmini from "@/components/utils/statusmini";
 import languageselect from "@/components/utils/languageselect";
-import prostatistice from "@/components/utils/prostatistice";
+// import prostatistice from "@/components/utils/prostatistice";
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
 require("codemirror/theme/base16-dark.css");
@@ -198,7 +198,7 @@ export default {
   components: {
     codemirror,
     // statusmini,
-    prostatistice,
+    // prostatistice,
     languageselect,
     wavedrom
   },

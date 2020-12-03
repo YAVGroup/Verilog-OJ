@@ -11,19 +11,19 @@
       <adminaddcontest></adminaddcontest>
     </el-tab-pane> -->
 
-    <el-tab-pane label="题目列表"
+    <!-- <el-tab-pane label="题目列表"
                  :lazy="true">
       <adminchangepro></adminchangepro>
-    </el-tab-pane>
+    </el-tab-pane> -->
     <!-- <el-tab-pane label="比赛列表"
                  :lazy="true">
       <adminchangecontest></adminchangecontest>
     </el-tab-pane> -->
-    <el-tab-pane label="用户列表"
+    <!-- <el-tab-pane label="用户列表"
                  :disabled="!isadmin"
                  :lazy="true">
       <adminmanageuser></adminmanageuser>
-    </el-tab-pane>
+    </el-tab-pane> -->
 
     <!-- <el-tab-pane label="Rejudge"
                  :disabled="!isadmin"
@@ -41,9 +41,9 @@
 <script>
 import adminaddproblem from "@/components/admin/adminaddproblem";
 // import adminaddcontest from "@/components/admin/adminaddcontest";
-import adminchangepro from "@/components/admin/adminchangepro";
+// import adminchangepro from "@/components/admin/adminchangepro";
 // import adminchangecontest from "@/components/admin/adminchangecontest";
-import adminmanageuser from "@/components/admin/adminmanageuser";
+// import adminmanageuser from "@/components/admin/adminmanageuser";
 // import adminrejudge from "@/components/admin/adminrejudge";
 // import adminclassmanage from "@/components/admin/adminclassmanage";
 
@@ -52,9 +52,9 @@ export default {
   components: {
     adminaddproblem,
     // adminaddcontest,
-    adminchangepro,
+    // adminchangepro,
     // adminchangecontest,
-    adminmanageuser,
+    // adminmanageuser,
     // adminrejudge,
     // adminclassmanage,
   },
