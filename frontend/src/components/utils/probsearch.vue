@@ -34,8 +34,8 @@ export default {
   methods:{
     jumpToProblem: function(problemID) {
       if (problemID == -1) {
-        if (lastSuggestions.length >= 1) {
-          problemID = lastSuggestions[0].id;
+        if (this.lastSuggestions.length >= 1) {
+          problemID = this.lastSuggestions[0].id;
         } else {
           console.warn("Invalid choice in jumpToProblem()");
         }
