@@ -1,0 +1,17 @@
+FROM python:3.8-alpine
+LABEL maintainer="libreliu@foxmail.com"
+
+WORKDIR /app
+COPY ./ /app
+
+ARG USE_PIP_MIRROR=no
+RUN (test ${USE_PIP_MIRROR} = yes \
+       && \
+       (pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple) \
+       || \
+       (echo "pip mirror config untouched.");) \
+    && pip install -r requirements.txt \
+    && pip install gunicorn==20.0.4
+
+# Make sure env are set before you do this
+ENTRYPOINT ["gunicorn", "--workers=4", "-b", "0.0.0.0:8000", "backend.wsgi:application"]
