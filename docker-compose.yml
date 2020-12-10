@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  # public port 80, the only port exposed
+  web:
+    build:
+      content: ./frontend
+      dockerfile: Dockerfile.nginx
+      args:
+        USE_NPM_MIRROR: yes
+    ports:
+      - "80:80"
+  
+  # api address on 0.0.0.0:8000
+  backend:
+    build:
+      content: ./backend
+      dockerfile: Dockerfile.django
+      args:
+        USE_PIP_MIRROR: yes
+    environment:
+      VERILOG_OJ_JUDGER_SECRET: A_SECRET_BACKEND_JUDGER_SECRET
+      VERILOG_OJ_SECRET_KEY: A_SECRET_BACKEND_SECRET_KEY
+
+  db:
+    image: "mysql:5.7"
+
+    # Notice the env below will only useful when no db file is given
+    environment:
+      MYSQL_ROOT_PASSWORD: A_SECRET_MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: django_db
+      MYSQL_USER: django
+      MYSQL_PASSWORD: A_SECRET_MYSQL_DJANGO_PASSWORD
+    
+  # TODO: judger & mq
