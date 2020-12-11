@@ -50,7 +50,7 @@ python manage.py createsuperuser
 
 ```bash
 cd frontend
-npm run dev
+npm run serve
 ```
 
 ### 运行后端
@@ -69,3 +69,20 @@ cd backend
 # (use systemctl enable to start on system boot)
 celery -A judge worker -l INFO
 ```
+
+## 生产环境部署指南
+
+> 针对 Git commit 00ee2a51，内容可能有落后之处。
+
+1. 首先确保有 Docker（`sudo apt install docker.io`），然后换国内源，最后启动 daemon（`sudo systemctl start docker`）
+2. 生产环境相关的值都统一维护在 `docker-compose.override.yml` 中了，按需编辑
+3. `docker-compose up`
+4. 第一次的时候，记得手动进 backend 容器，进行一下 `python manage.py migrate` 和 `python manage.py createsuperuser` 的操作
+
+### 数据备份和回复
+
+TBD
+
+### 负载均衡
+
+目前还没啥需求，一台机器而且用户量最高也不会超过几百的小打小闹就不上 swarm 或者 k8s 这种容器编排系统了。
