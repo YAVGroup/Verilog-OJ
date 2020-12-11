@@ -31,6 +31,11 @@ SECRET_KEY = os.environ['VERILOG_OJ_SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+if 'VERILOG_OJ_PUBLIC_HOST' not in os.environ:
+    raise Exception("Verilog OJ should have VERILOG_OJ_PUBLIC_HOST passed by envvars")
+
 ALLOWED_HOSTS = [
-    '127.0.0.1'
+    '127.0.0.1',
+    'localhost',
+    os.environ['VERILOG_OJ_PUBLIC_HOST']
 ]
