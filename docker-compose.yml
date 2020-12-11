@@ -18,6 +18,7 @@ services:
       dockerfile: Dockerfile.django
       args:
         USE_PIP_MIRROR: "yes"
+        USE_MYSQL: "yes"
     environment:
       VERILOG_OJ_JUDGER_SECRET: A_SECRET_BACKEND_JUDGER_SECRET
       VERILOG_OJ_SECRET_KEY: A_SECRET_BACKEND_SECRET_KEY
@@ -27,6 +28,7 @@ services:
       VERILOG_OJ_MYSQL_PORT: 3306
       VERILOG_OJ_MYSQL_USER: django
       VERILOG_OJ_MYSQL_PASSWORD: A_SECRET_MYSQL_DJANGO_PASSWORD
+      VERILOG_OJ_PUBLIC_HOST: YOUR_PUBLIC_SITE_HOST
 
   db:
     image: "mysql:5.7"
@@ -37,5 +39,10 @@ services:
       MYSQL_DATABASE: django_db
       MYSQL_USER: django
       MYSQL_PASSWORD: A_SECRET_MYSQL_DJANGO_PASSWORD
-    
+    volumes:
+      - db-volume:/var/lib/mysql
   # TODO: judger & mq
+
+volumes:
+  db-volume:
+    driver: local
