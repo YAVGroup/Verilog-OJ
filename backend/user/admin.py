@@ -1,8 +1,7 @@
 from django.contrib import admin
 from .models import User
 from django.http import HttpResponse
-import pandas as pd
-import io
+import io, csv
 from submission.models import Submission, SubmissionResult
 
 
@@ -36,7 +35,15 @@ class UserAdmin(admin.ModelAdmin):
             usr_all.append(usr)
                 
         writer = io.StringIO()
-        df = pd.DataFrame(usr_all).to_csv(writer)
+        csv_writer = csv.writer(writer)
+        for row in usr_all:
+            csv_writer.writerow(
+                [
+                    row['student_id'] if row['student_id'] != None else "N/A",
+                    row['username']
+                ]
+            )
+        
         response = HttpResponse(content_type="text/plain")
         response.write(writer.getvalue())
         return response
