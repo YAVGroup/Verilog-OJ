@@ -110,3 +110,28 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# Database
+# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+
+if 'VERILOG_OJ_USE_MYSQL' in os.environ:
+    DATABASES = {
+        # MySQL
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['VERILOG_OJ_MYSQL_DATABASE'],
+            'USER': os.environ['VERILOG_OJ_MYSQL_USER'],
+            'PASSWORD': os.environ['VERILOG_OJ_MYSQL_PASSWORD'],
+            'HOST': os.environ['VERILOG_OJ_MYSQL_HOST'],
+            'PORT': os.environ['VERILOG_OJ_MYSQL_PORT'],
+        }
+    }
+else:
+    DATABASES = {
+        # SQLite
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }

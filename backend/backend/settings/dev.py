@@ -1,25 +1,5 @@
 from .base import *
 
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-DATABASES = {
-    # SQLite
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-    # MySQL
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'VerilogOJ',
-    #     'USER':'mysql',
-    #     'PASSWORD':'mysql',
-    #     'HOST':'localhost',
-    #     'PORT':'',
-    # }
-}
-
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [

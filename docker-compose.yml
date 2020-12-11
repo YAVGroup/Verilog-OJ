@@ -1,26 +1,32 @@
-version: "3.9"
+version: "3.7"
 
 services:
   # public port 80, the only port exposed
   web:
     build:
-      content: ./frontend
+      context: ./frontend
       dockerfile: Dockerfile.nginx
       args:
-        USE_NPM_MIRROR: yes
+        USE_NPM_MIRROR: "yes"
     ports:
       - "80:80"
   
   # api address on 0.0.0.0:8000
   backend:
     build:
-      content: ./backend
+      context: ./backend
       dockerfile: Dockerfile.django
       args:
-        USE_PIP_MIRROR: yes
+        USE_PIP_MIRROR: "yes"
     environment:
       VERILOG_OJ_JUDGER_SECRET: A_SECRET_BACKEND_JUDGER_SECRET
       VERILOG_OJ_SECRET_KEY: A_SECRET_BACKEND_SECRET_KEY
+      VERILOG_OJ_USE_MYSQL: "yes"
+      VERILOG_OJ_MYSQL_DATABASE: django_db
+      VERILOG_OJ_MYSQL_HOST: db
+      VERILOG_OJ_MYSQL_PORT: 3306
+      VERILOG_OJ_MYSQL_USER: django
+      VERILOG_OJ_MYSQL_PASSWORD: A_SECRET_MYSQL_DJANGO_PASSWORD
 
   db:
     image: "mysql:5.7"
