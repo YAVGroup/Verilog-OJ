@@ -72,6 +72,9 @@ class TestCase(models.Model):
     testcase_files = models.ManyToManyField(File, help_text='测试点所用文件', blank=True)
     grade = models.IntegerField(default=10, help_text='测试点分值')
 
+    mem_limit = models.IntegerField(default=128, help_text='测试内存限制 (MiB)')
+    time_limit = models.IntegerField(default=60, help_text='测试时间限制 (s)')
+
     def __str__(self):
         return "TestCase #{} (Problem #{}, {})".format(
             self.id, self.problem.id, self.problem.name

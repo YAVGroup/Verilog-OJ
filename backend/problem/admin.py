@@ -273,7 +273,7 @@ class ProblemAdmin(admin.ModelAdmin):
         return my_urls + urls
 
 class TestCaseAdmin(admin.ModelAdmin):
-    list_display = ('id', 'related_problem', 'type', 'grade')
+    list_display = ('id', 'related_problem', 'type', 'grade', 'mem_limit', 'time_limit')
 
     def related_problem(self, obj):
         return obj.problem
