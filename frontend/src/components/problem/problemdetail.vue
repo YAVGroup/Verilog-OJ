@@ -484,8 +484,8 @@ export default {
       }
       else{
         this.is_edit = false;
-        return this.$axios.put(
-          "/problem/"+this.id+"/",{
+        return this.$axios.patch(
+          "/problems/"+this.id+"/",{
             name: this.title,
             deadline_time: this.ddl_time,
             description: this.dec,
