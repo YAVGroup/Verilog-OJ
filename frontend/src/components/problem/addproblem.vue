@@ -7,7 +7,7 @@
           <el-row :gutter="18" id="title">
             <el-col :span="20">
               <el-input v-model="title"></el-input>
-              </div>
+              
             </el-col>
             <el-col :span="2">
               <el-button type="success"
