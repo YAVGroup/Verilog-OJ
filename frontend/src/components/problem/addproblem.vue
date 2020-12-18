@@ -6,21 +6,18 @@
           <!--标题、DDL-->
           <el-row :gutter="18" id="title">
             <el-col :span="20">
-              <el-input v-if="is_edit" v-model="title"></el-input>
-              <div v-else v-html="title" :key="title">
+              <el-input v-model="title"></el-input>
               </div>
             </el-col>
             <el-col :span="2">
               <el-button type="success"
                          @click="problemedit"
-                         style="font-weight:bold;margin-left:10px;">Edit</el-button>
+                         style="font-weight:bold;margin-left:10px;">Submit</el-button>
             </el-col>
           </el-row>
-          <el-row :gutter="18" id="ddl" v-show="have_ddl">Deadline</el-row>
-          <el-row :gutter="18" class="problem-descriptions" v-show="have_ddl">
-            <el-input v-if="is_edit" type="textarea" v-model="ddl_time"></el-input>
-            <div v-else v-html="ddl" :key="ddl">
-            </div>
+          <el-row :gutter="18" id="ddl" >Deadline</el-row>
+          <el-row :gutter="18" class="problem-descriptions" >
+            <el-input  type="textarea" v-model="ddl_time"></el-input>
           </el-row>
           
 
@@ -215,7 +212,7 @@ require("codemirror/mode/verilog/verilog");
 import wavedrom from "@/components/utils/wavedrom";
 
 export default {
-  name: "problemdetail",
+  name: "addproblem",
   components: {
     codemirror,
     // statusmini,
@@ -235,11 +232,12 @@ export default {
       des: "",
       input: "",
       output: "",
+      datetimeFormat: "YYYY-MM-DD HH:mm:ss",
+      endDatetime: null,
       // author: "",
       addtime: "",
       ddl: "",
-      have_ddl: false,
-      is_edit: false,
+    
       tagnames: [],
       activeNames: ["1", "2", "3", "4", "5", "6"],
       level: "Easy",

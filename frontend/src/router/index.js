@@ -47,6 +47,14 @@ export default new Router({
       name: 'problem',
       component: () => import(/* webpackChunkName: "problem" */ "@/components/mainpage/problem")
     },
+
+    //题目添加
+    {
+      path: '/addproblem',
+      name: 'addproblem',
+      component: () => import(/* webpackChunkName: "problem" */ "@/components/problem/addproblem")
+    },
+
     {
       path: '/problemdetail/:problemid',
       name: 'problemdetail',
