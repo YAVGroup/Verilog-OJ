@@ -20,28 +20,61 @@ services:
         USE_PIP_MIRROR: "yes"
         USE_MYSQL: "yes"
     environment:
-      VERILOG_OJ_JUDGER_SECRET: A_SECRET_BACKEND_JUDGER_SECRET
-      VERILOG_OJ_SECRET_KEY: A_SECRET_BACKEND_SECRET_KEY
+      VERILOG_OJ_JUDGER_SECRET: ${judger_secret}
+      VERILOG_OJ_SECRET_KEY: ${secret_key}
       VERILOG_OJ_USE_MYSQL: "yes"
       VERILOG_OJ_MYSQL_DATABASE: django_db
       VERILOG_OJ_MYSQL_HOST: db
       VERILOG_OJ_MYSQL_PORT: 3306
       VERILOG_OJ_MYSQL_USER: django
-      VERILOG_OJ_MYSQL_PASSWORD: A_SECRET_MYSQL_DJANGO_PASSWORD
-      VERILOG_OJ_PUBLIC_HOST: YOUR_PUBLIC_SITE_HOST
+      VERILOG_OJ_MYSQL_PASSWORD: ${mysql_password}
+      VERILOG_OJ_PUBLIC_HOST: ${public_host}
+      VERILOG_OJ_RABBITMQ_PASSWORD: ${rabbitmq_password}
+      DOCKER_JUDGER_HOST_PATH: ${docker_judger_host_path}
 
   db:
     image: "mysql:5.7"
 
     # Notice the env below will only useful when no db file is given
     environment:
-      MYSQL_ROOT_PASSWORD: A_SECRET_MYSQL_ROOT_PASSWORD
+      MYSQL_ROOT_PASSWORD: ${mysql_root_password}
       MYSQL_DATABASE: django_db
       MYSQL_USER: django
-      MYSQL_PASSWORD: A_SECRET_MYSQL_DJANGO_PASSWORD
+      MYSQL_PASSWORD: ${mysql_password}
     volumes:
       - db-volume:/var/lib/mysql
-  # TODO: judger & mq
+
+  mqserver:
+    image: "rabbitmq:3.8-management"
+
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: ${rabbitmq_password}
+
+  judgeworker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.judger
+      args:
+        USE_PIP_MIRROR: "yes"
+        USE_MYSQL: "yes"
+    environment:
+      VERILOG_OJ_JUDGER_SECRET: ${judger_secret}
+      VERILOG_OJ_SECRET_KEY: ${secret_key}
+      VERILOG_OJ_USE_MYSQL: "yes"
+      VERILOG_OJ_MYSQL_DATABASE: django_db
+      VERILOG_OJ_MYSQL_HOST: db
+      VERILOG_OJ_MYSQL_PORT: 3306
+      VERILOG_OJ_MYSQL_USER: django
+      VERILOG_OJ_MYSQL_PASSWORD: ${mysql_password}
+      VERILOG_OJ_PUBLIC_HOST: ${public_host}
+      VERILOG_OJ_RABBITMQ_PASSWORD: ${rabbitmq_password}
+      DOCKER_JUDGER_HOST_PATH: ${docker_judger_host_path}
+
+    # Bind mount to control host docker & map a dir so host can fetch easily
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${docker_judger_host_path}:/host_dir
 
 volumes:
   db-volume:
