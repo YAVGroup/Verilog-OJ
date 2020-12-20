@@ -10,6 +10,8 @@ services:
         USE_NPM_MIRROR: "yes"
     ports:
       - "80:80"
+    depends_on:
+      - "backend"
   
   # api address on 0.0.0.0:8000
   backend:
@@ -18,6 +20,7 @@ services:
       dockerfile: Dockerfile.django
       args:
         USE_PIP_MIRROR: "yes"
+        USE_APK_MIRROR: "yes"
         USE_MYSQL: "yes"
     environment:
       VERILOG_OJ_JUDGER_SECRET: ${judger_secret}
@@ -31,6 +34,11 @@ services:
       VERILOG_OJ_PUBLIC_HOST: ${public_host}
       VERILOG_OJ_RABBITMQ_PASSWORD: ${rabbitmq_password}
       DOCKER_JUDGER_HOST_PATH: ${docker_judger_host_path}
+      DOCKER_HOST_DIR: ${docker_host_dir}
+    depends_on:
+      - "db"
+      - "mqserver"
+      - "judgeworker"  # consumer starts first
 
   db:
     image: "mysql:5.7"
@@ -57,6 +65,7 @@ services:
       dockerfile: Dockerfile.judger
       args:
         USE_PIP_MIRROR: "yes"
+        USE_APK_MIRROR: "yes"
         USE_MYSQL: "yes"
     environment:
       VERILOG_OJ_JUDGER_SECRET: ${judger_secret}
@@ -70,11 +79,14 @@ services:
       VERILOG_OJ_PUBLIC_HOST: ${public_host}
       VERILOG_OJ_RABBITMQ_PASSWORD: ${rabbitmq_password}
       DOCKER_JUDGER_HOST_PATH: ${docker_judger_host_path}
+      DOCKER_HOST_DIR: ${docker_host_dir}
+    depends_on:
+      - "mqserver"
 
     # Bind mount to control host docker & map a dir so host can fetch easily
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${docker_judger_host_path}:/host_dir
+      - ${docker_judger_host_path}:${docker_host_dir}
 
 volumes:
   db-volume:

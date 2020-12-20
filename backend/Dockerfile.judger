@@ -4,9 +4,6 @@ LABEL maintainer="libreliu@foxmail.com"
 WORKDIR /app
 COPY ./ /app
 
-# Ref on pycryptodome: https://github.com/furritos/docker-pycryptodome/blob/master/3.8-alpine/Dockerfile
-# Ref on mysqlclient: https://stackoverflow.com/questions/56048631/docker-alpine-error-loading-mysqldb-module
-
 ARG USE_PIP_MIRROR=no
 ARG USE_APK_MIRROR=no
 ARG USE_MYSQL=no
@@ -36,23 +33,6 @@ RUN (test ${USE_PIP_MIRROR} = yes \
           && pip install mysqlclient==2.0.1 \
           || echo "Skipped MySQL setup." \
        ) \
-    && pip install gunicorn==20.0.4 \
-    && apk del .build-deps \
-    && VERILOG_OJ_DEV=TRUE DOCKER_JUDGER_HOST_PATH=233 DOCKER_HOST_DIR=233 python manage.py collectstatic --noinput
+    && apk del .build-deps
 
-# MySQL Stuff
-# RUN (test ${USE_MYSQL} = yes \ 
-#        &&  \
-#         (apk add --update --no-cache mariadb-connector-c-dev \
-#             && apk add --no-cache --virtual .build-deps \
-#                 mariadb-dev \
-#                 gcc \
-#                 musl-dev \
-#             && pip install mysqlclient==2.0.1 \
-#             && apk del .build-deps \
-#         )  \
-#        ||  \
-#        (echo "Skipped MySQL setup."))
-
-# Make sure env are set before you do this
-ENTRYPOINT ["gunicorn", "--workers=4", "--log-file=-", "-b", "0.0.0.0:8000", "backend.wsgi:application"]
+ENTRYPOINT [ "celery", "-A", "judge", "worker", "-l", "INFO", "--concurrency=10" ]
