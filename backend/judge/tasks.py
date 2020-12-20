@@ -2,8 +2,8 @@ from judge.celery import app
 from celery.utils.log import get_task_logger
 import os, sys
 
-from judge.judge import judge
-
+import judge.executor.local
+import judge.executor.docker
 
 # To call:
 # - run celery first (in the same folder with manage.py)
@@ -17,7 +17,7 @@ from judge.judge import judge
 logger = get_task_logger(__name__)
 
 @app.task
-def do_judge_task(submission_id, testcase_id, submission_result_id):
+def do_judge_task(detail, judger_config):
     """
     Do judgement on submission with id given
     TODO: pass judger config struct
@@ -25,9 +25,17 @@ def do_judge_task(submission_id, testcase_id, submission_result_id):
     # todo: save result by calling POST on the model
     logger.info(
         "Called with submission_id={}, testcase_id={}, submission_result_id={}".format(
-            submission_id, 
-            testcase_id,
-            submission_result_id
+            detail['id'], 
+            detail['testcase']['id'],
+            detail['submission_result']['id']
         ))
 
-    judge(submission_id, testcase_id, submission_result_id)
+    executor = None
+    if judger_config['use_docker']:
+        executor = judge.executor.docker.DockerExecutor
+    else:
+        executor = judge.executor.local.LocalExecutor
+
+    inst = executor(detail, judger_config)
+    inst.prepare()
+    inst.run()

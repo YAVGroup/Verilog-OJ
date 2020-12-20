@@ -4,133 +4,21 @@ import subprocess
 import requests
 import traceback
 
-judge_config = {
-    'time_limit': 10 * 60 * 60,            # time limit in seconds, set to 0 if no limit
-    'entry_file': './main.sh',             # entry file
-    'final_score': './score.txt',          # the final score, in integer
-    'submit_logs': True,
-    'submit_appdata': True,
-    'appdata_path': './appdata.txt',       # app data (if got)
-    'possible_error_path': './possible_error.txt',           # The possible error collected
-    'url_host': 'http://localhost:8000',   # here trailing / will affect performance, since
-                                           # django will do 301 on this
-    'judger_secret': 'c8fc82f3d6b6150692baaad61ae77abd29ab2d0379700443394cd41eca7ad5e2'
-}
-
-def get_submission_detail(submission_id, testcase_id, submission_result_id):
-
+def move_status(status_msg, submission_detail, judger_config):
     with requests.Session() as sess:
-        # Setup default options for auth
         sess.headers.update({'X-JudgerSecret': judge_config['judger_secret']})
-
-        # Move status to JUDGING
-        r = sess.patch("{}/api/submission-results/{}/".format(judge_config['url_host'], submission_result_id), data={
-            'status': 'JUDGING'
-        })
-        print(r.content.decode("utf-8"))
+        
+        r = sess.patch(
+                "{}/api/submission-results/{}/".format(
+                    judge_config['url_host'],
+                    submission_result_id
+                ),
+                data={
+                    'status': status_msg
+                }
+            )
+        # print(r.content.decode("utf-8"))
         r.raise_for_status()
-
-        # Example response for /api/submissions/2/:
-        # {
-        #     "id": 2,
-        #     "results": [ ],
-        #     "total_grade": 0,
-        #     "judged": false,
-        #     "submit_time": "14:41:14.400926",
-        #     "problem": 1,
-        #     "user": 1,
-        #     "submit_files": [
-        #         3
-        #     ]
-        # }
-
-        s_resp = sess.get('{}/api/submissions/{}'.format(
-                judge_config['url_host'], 
-                submission_id)
-            )
-        s_resp.raise_for_status()
-        print(s_resp.text)
-        s_json = s_resp.json()
-
-        # Example response for /api/problem-testcases/1
-        # {
-        #     "id": 1,
-        #     "type": "SIM",
-        #     "grade": 5,
-        #     "problem": 1,
-        #     "testcase_files": [
-        #         4,
-        #         5,
-        #         6,
-        #         7
-        #     ]
-        # }
-
-        t_resp = sess.get('{}/api/problem-testcases/{}'.format(
-                judge_config['url_host'], 
-                testcase_id)
-            )
-        t_resp.raise_for_status()
-        print(t_resp.text)
-        t_json = t_resp.json()
-
-        # Example response for /api/problems/1
-        # {
-        #     "id": 1,
-        #     "testcases": [
-        #         {
-        #             "id": 1,
-        #             "type": "SIM",
-        #             "grade": 5,
-        #             "problem": 1,
-        #             "testcase_files": [
-        #                 4,
-        #                 5,
-        #                 6,
-        #                 7
-        #             ]
-        #         }
-        #     ],
-        #     "total_grade": 5,
-        #     "name": "A decoder test",
-        #     "create_time": "14:37:38.303324",
-        #     "deadline_time": "14:31:00",
-        #     "judge_files": [
-        #         1
-        #     ]
-        # }
-
-        p_resp = sess.get('{}/api/problems/{}'.format(
-                judge_config['url_host'], 
-                s_json['problem'])
-            )
-        p_resp.raise_for_status()
-        print(p_resp.text)
-        p_json = p_resp.json()
-
-        return {
-            'id': s_json['id'],
-            'problem': {
-                'id': s_json['problem'],
-                'problem_files': [
-                    {'uuid': str(k)} for k in p_json["judge_files"]
-                ],
-                'testcase_id': testcase_id
-            },
-            'user': {
-                'id': s_json['user'],
-                # TODO: fill this
-                'student_id': "N/A"
-            },
-            # TODO: fill like this format 'submit_time': "20101001",
-            'submit_time': s_json['submit_time'],
-            'submit_files': [
-                {'uuid': str(k)} for k in s_json["submit_files"]
-            ],
-            'testcase_files': [
-                {'uuid': str(k)} for k in t_json["testcase_files"]
-            ]
-        }
 
 def download_file(path, uuid):
     # Download file and store it in path (a dir)
@@ -149,7 +37,7 @@ def download_file(path, uuid):
     with open(os.path.join(path, filename), "wb") as f:
         f.write(r_file.content)
 
-def push_result(result, submission_id, testcase_id, submission_result_id):
+def push_result(result, submission_id, testcase_id, submission_result_id, judge_config):
     # todo: post to the result
     # result: {}
     with requests.Session() as sess:
@@ -173,7 +61,7 @@ def push_result(result, submission_id, testcase_id, submission_result_id):
             raise Exception("Bad response code")
     return True
 
-def prepare_and_run(detail):
+def prepare_and_run(detail, judge_config):
     # make a new folder in /tmp
     with tempfile.TemporaryDirectory() as tmpdirname:
         print('Created temporary directory {}'.format(tmpdirname))
@@ -268,16 +156,14 @@ def prepare_and_run(detail):
         return result
 
 
-def judge(submission_id, testcase_id, submission_result_id):
+def judge(submission_detail, judger_config):
     """
     评测某个提交。生成若干SubmissionResult，之后Submission就会被更新。
     """
-    # TODO: 对某个提交进行评测
-    # Query submission api for a json
     try:
-        detail = get_submission_detail(submission_id, testcase_id, submission_result_id)
-        result = prepare_and_run(detail)
-        push_result(result, submission_id, testcase_id, submission_result_id)
+        detail = get_submission_detail(submission_id, testcase_id, submission_result_id, judge_config)
+        result = prepare_and_run(detail, judge_config)
+        push_result(result, submission_id, testcase_id, submission_result_id, judge_config)
         return True
     except:
         print("Unexpected error while processing {}-{} (result_id={}), traceback below:\n{}".format(
