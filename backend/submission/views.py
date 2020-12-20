@@ -175,9 +175,36 @@ class SubmitView(APIView):
                     possible_failure='NA'
                 )
 
-                do_judge_task.delay(subm_id, case.id, subm_res.id)
+                do_judge_task.delay(
+                    self.build_judge_detail(prob, case, subm, subm_res),
+                    django.conf.settings.JUDGER_CONFIG
+                )
 
-            #do_judge_task(serializer.data['id'], serializer.data[''])
             return Response(serializer._data, status.HTTP_201_CREATED)
         except Exception as e:
             return Response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def build_judge_detail(self, prob, case, subm, subr):
+        return {
+            'id': subm.id,
+            'problem': {
+                'id': prob.id,
+                'judge_files': [
+                    i.id for i in prob.judge_files.all()
+                ]
+            },
+            'submit_files': [
+                i.id for i in subm.submit_files.all()
+            ],
+            'testcase': {
+                'id': case.id,
+                'testcase_files': [
+                    i.id for i in case.testcase_files.all()
+                ],
+                'mem_limit': case.mem_limit,
+                'time_limit': case.time_limit
+            },
+            'submission_result': {
+                'id': subr.id
+            }
+        }
