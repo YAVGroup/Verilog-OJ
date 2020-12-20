@@ -14,8 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.conf.urls import url,include
+from django.conf import settings
+from django.views.static import serve
 #from user.views import UserLoginView, UserLogoutView
 from rest_framework.documentation import include_docs_urls
 
@@ -29,3 +31,13 @@ urlpatterns = [
     url('api/', include('submission.urls')),
     url('api/', include('news.urls'))
 ]
+
+if not settings.DEBUG:
+    # Temporary procedure. TODO: remove this and add into nginx
+    urlpatterns += [
+        # Works for r'^oj/static-django/(?P<path>.*)$'
+        re_path(r'^' + settings.STATIC_URL[1:] + r'(?P<path>.*)$', serve, {
+            'document_root': settings.STATIC_ROOT
+        })
+    ]
+
