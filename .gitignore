@@ -17,3 +17,6 @@ backend/storage
 
 # backend migrations
 #backend/*/migrations
+
+# backend static file
+backend/static
