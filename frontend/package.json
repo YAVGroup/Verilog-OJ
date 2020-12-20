@@ -11,21 +11,24 @@
     "build-report": "vue-cli-service build --report"
   },
   "dependencies": {
+    "axios": "^0.18.1",
     "codemirror": "^5.44.0",
+    "core-js": "^3.6.5",
     "element-ui": "~2.12.0",
     "html-webpack-plugin": "^3.2.0",
     "js-cookie": "^2.2.1",
+    "luxon": "^1.25.0",
     "moment": "^2.24.0",
     "vue": "^2.6.11",
     "vue-clipboard2": "^0.3.0",
     "vue-codemirror": "^4.0.6",
+    "vue-datetime": "^1.0.0-beta.14",
     "vue-resource": "^1.5.1",
     "vue-router": "^3.0.1",
     "vuex": "^3.1.0",
     "wavedrom": "^2.6.8",
     "webpack-cli": "^3.2.1",
-    "axios": "^0.18.1",
-    "core-js": "^3.6.5"
+    "weekstart": "^1.0.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
