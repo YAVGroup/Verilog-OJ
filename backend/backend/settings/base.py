@@ -138,3 +138,6 @@ else:
 
 STATIC_URL = '/oj/static-django/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+# Path prefix, for vlab.ustc.edu.cn it's oj/; used in urls.py
+WEBPATH_PREFIX = 'oj/'
