@@ -1,4 +1,6 @@
 # Verilog-OJ
+
+[![Github Actions Test Status](https://github.com/lluckydog/Verilog-OJ/workflows/Test/badge.svg)](https://github.com/lluckydog/Verilog-OJ/actions)
 [![Build Status](https://travis-ci.org/lluckydog/Verilog-OJ.svg?branch=master)](https://travis-ci.org/lluckydog/Verilog-OJ)
 [![Coverage Status](https://coveralls.io/repos/github/lluckydog/Verilog-OJ/badge.svg?branch=master)](https://coveralls.io/github/lluckydog/Verilog-OJ?branch=master)
 

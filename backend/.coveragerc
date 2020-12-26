@@ -5,4 +5,4 @@ omit =
     */apps.py
     # This won't be used in production website
     utilities/*
-    
+relative_files = True

@@ -1,0 +1,80 @@
+name: Test
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  frontend_test:
+    name: Frontend Test
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12'
+    - name: Install dependencies
+      run: |
+        npm install .
+      working-directory: ./frontend
+    - name: Build
+      run: |
+        npm run build
+      working-directory: ./frontend
+    
+    # This globstar only works in bash
+    - name: Lint
+      run: |
+        shopt -s globstar
+        npm run lint src/**/*.vue src/**/*.js
+      working-directory: ./frontend
+  backend_test:
+    name: Backend Test
+    runs-on: ubuntu-18.04
+    env:
+      VERILOG_OJ_DEV: "TRUE"
+      VERILOG_OJ_JUDGER_SECRET: "SOMETHING"
+      VERILOG_OJ_SECRET_KEY: "SOMETHING"
+      VERILOG_OJ_USE_MYSQL: "no"
+      VERILOG_OJ_PUBLIC_HOST: "abc.example.com"
+      VERILOG_OJ_RABBITMQ_PASSWORD: "SOMETHING"
+      DOCKER_JUDGER_HOST_PATH: "/some/path"
+      DOCKER_HOST_DIR: "/some/dir"
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+    
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    
+    - name: Install dependencies
+      run: |
+        pip install -r backend/requirements.txt
+        pip install coverage coveralls
+    - name: Prepare database
+      run: |
+        python manage.py migrate
+      working-directory: ./backend
+    - name: Run test
+      run: |
+        python manage.py test
+      working-directory: ./backend
+    - name: Run coverage
+      run: |
+        coverage run --source='.' manage.py test
+        coveralls --output="lcov.info"
+      working-directory: ./backend
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: "./backend/lcov.info"
