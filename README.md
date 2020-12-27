@@ -82,7 +82,7 @@ VERILOG_OJ_DEV=TRUE celery -A judge worker -l INFO
 
 > 针对 Git commit 00ee2a51，内容可能有落后之处。
 
-1. 首先确保有 Docker（`sudo apt install docker.io`），然后换国内源，最后启动 daemon（`sudo systemctl start docker`）
+1. 首先确保有 Docker 和 Docker Compose（`sudo apt install docker.io docker-compose`），然后换国内源，最后启动 daemon（`sudo systemctl start docker`）
 2. 生产环境相关的值都统一维护在 `.env` 中了，按需编辑
 3. 将 `judger-env` 镜像打包好
    > 可以进 `./deploy` 然后 `docker build -f Dockerfile.judger-env --build-arg USE_APT_MIRROR=yes --build-arg USE_PIP_MIRROR=yes`
