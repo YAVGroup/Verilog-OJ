@@ -40,10 +40,16 @@ cd frontend
 npm install .
 
 cd ../backend
-python manage.py migrate
+
+# 设置一些必须的环境变量
+# *Must READ*
+# 如果不用 Docker 判题环境，就需要将 backend/settings/dev.py 中的 'use_docker' 修改正确
+# 否则会报缺少一些 Docker 相关的环境变量
+
+VERILOG_OJ_DEV=TRUE python manage.py migrate
 
 # 此处创建您测试环境的超级用户的用户名和密码
-python manage.py createsuperuser
+VERILOG_OJ_DEV=TRUE python manage.py createsuperuser
 ```
 
 这样就基本部署完成了。
@@ -59,7 +65,7 @@ npm run serve
 
 ```bash
 cd backend
-python manage.py runserver
+VERILOG_OJ_DEV=TRUE python manage.py runserver
 ```
 
 ### 运行判题服务器
@@ -69,7 +75,7 @@ cd backend
 # Make sure your rabbitmq have started.
 # If not, use systemctl start rabbitmq-server
 # (use systemctl enable to start on system boot)
-celery -A judge worker -l INFO
+VERILOG_OJ_DEV=TRUE celery -A judge worker -l INFO
 ```
 
 ## 生产环境部署指南
@@ -77,9 +83,11 @@ celery -A judge worker -l INFO
 > 针对 Git commit 00ee2a51，内容可能有落后之处。
 
 1. 首先确保有 Docker（`sudo apt install docker.io`），然后换国内源，最后启动 daemon（`sudo systemctl start docker`）
-2. 生产环境相关的值都统一维护在 `docker-compose.override.yml` 中了，按需编辑
-3. `docker-compose up`
-4. 第一次的时候，记得手动进 backend 容器，进行一下 `python manage.py migrate` 和 `python manage.py createsuperuser` 的操作
+2. 生产环境相关的值都统一维护在 `.env` 中了，按需编辑
+3. 将 `judger-env` 镜像打包好
+   > 可以进 `./deploy` 然后 `docker build -f Dockerfile.judger-env --build-arg USE_APT_MIRROR=yes --build-arg USE_PIP_MIRROR=yes`
+4. `docker-compose up`
+5. 第一次的时候，记得手动进 backend 容器，进行一下 `python manage.py migrate` 和 `python manage.py createsuperuser` 的操作，详情参考上面开发环境的指南
 
 ### 数据备份和回复
 
