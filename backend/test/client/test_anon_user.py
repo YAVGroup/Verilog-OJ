@@ -64,7 +64,7 @@ class AnonUserAPITester(django.test.TestCase):
 
     def test_submission_get(self):
         c = APIClient()
-        resp = c.get('/api/submissions/')
+        resp = c.get('/oj/api/submissions/')
 
         # This tests for both 200 and the content
         self.assertNotContains(resp, 'SOME_APPDATA', status_code=200)
@@ -72,14 +72,14 @@ class AnonUserAPITester(django.test.TestCase):
 
     def test_submit(self):
         c = APIClient()
-        resp = c.post('/api/submit', {'problem': '1', 'submit_files': '[]'})
+        resp = c.post('/oj/api/submit', {'problem': '1', 'submit_files': '[]'})
         # The TestCase in Django automatically disables csrf
         # ref: https://stackoverflow.com/questions/25003527/how-do-you-include-a-csrf-token-when-testing-a-post-endpoint-in-django
         self.assertNotContains(resp, 'CSRF', status_code=401) # 401 Unauthorized
         
     def test_submission_result_get(self):
         c = APIClient()
-        resp = c.get('/api/submission-results/')
+        resp = c.get('/oj/api/submission-results/')
 
         # This tests for both 200 and the content
         self.assertNotContains(resp, 'SOME_APPDATA', status_code=200)
@@ -89,7 +89,7 @@ class AnonUserAPITester(django.test.TestCase):
     
     def test_submission_result_get_detail(self):
         c = APIClient()
-        resp = c.get('/api/submission-results/1/')
+        resp = c.get('/oj/api/submission-results/1/')
 
         # This tests for both 200 and the content
         self.assertNotContains(resp, 'SOME_APPDATA', status_code=200)
@@ -99,20 +99,20 @@ class AnonUserAPITester(django.test.TestCase):
 
     def test_submission_result_modify(self):
         c = APIClient()
-        resp = c.post('/api/submission-results/',
+        resp = c.post('/oj/api/submission-results/',
             {"grade": 1, "log":"asdf", "app_data":"asdf", "submission": 1, "testcase": 1, "possible_failure": "NA"})
 
         self.assertEqual(resp.status_code, 401)
 
     def test_problem_get(self):
         c = APIClient()
-        resp = c.get('/api/problems/')
+        resp = c.get('/oj/api/problems/')
 
         self.assertEqual(resp.status_code, 200)
 
     def test_problem_get_detail(self):
         c = APIClient()
-        resp = c.get('/api/problems/1/')
+        resp = c.get('/oj/api/problems/1/')
 
         self.assertEqual(resp.status_code, 200)
 

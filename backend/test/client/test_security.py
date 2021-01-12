@@ -61,7 +61,7 @@ class SecurityAPITester(django.test.TestCase):
     def test_wrong_judger_secret(self):
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET='SOMETHING_NEVER_MATCHES')
-        resp = c.post('/api/submit', {'problem': '1', 'submit_files': '[]'})
+        resp = c.post('/oj/api/submit', {'problem': '1', 'submit_files': '[]'})
         # The TestCase in Django automatically disables csrf
         # ref: https://stackoverflow.com/questions/25003527/how-do-you-include-a-csrf-token-when-testing-a-post-endpoint-in-django
         self.assertNotContains(resp, 'CSRF', status_code=401) # 401 Unauthorized
@@ -72,7 +72,7 @@ class SecurityAPITester(django.test.TestCase):
         self.assertTrue(settings.JUDGER_IP_WHITELIST[0] == '127.0.0.10')
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        resp = c.post('/api/submit', {'problem': '1', 'submit_files': '[]'})
+        resp = c.post('/oj/api/submit', {'problem': '1', 'submit_files': '[]'})
         # The TestCase in Django automatically disables csrf
         # ref: https://stackoverflow.com/questions/25003527/how-do-you-include-a-csrf-token-when-testing-a-post-endpoint-in-django
         self.assertNotContains(resp, 'CSRF', status_code=401) # 401 Unauthorized, since no Sess/Judger have given auth

@@ -90,7 +90,7 @@ class JudgerAPITester(django.test.TestCase):
         """
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        resp = c.post('/api/submit', {'problem': 1, 'submit_files': [1]})
+        resp = c.post('/oj/api/submit', {'problem': 1, 'submit_files': [1]})
         # The TestCase in Django automatically disables csrf
         # ref: https://stackoverflow.com/questions/25003527/how-do-you-include-a-csrf-token-when-testing-a-post-endpoint-in-django
         # print(resp.content.decode("utf-8"))
@@ -102,7 +102,7 @@ class JudgerAPITester(django.test.TestCase):
         """
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        resp = c.post('/api/submission-results/',
+        resp = c.post('/oj/api/submission-results/',
             {"grade": "1",  "status": "DONE", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1", "possible_failure": "NONE"})
         #print(resp.content.decode("utf-8"))
         self.assertEqual(resp.status_code, 405)   # Method not allowed
@@ -113,7 +113,7 @@ class JudgerAPITester(django.test.TestCase):
         """
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        resp = c.put('/api/submission-results/1/',
+        resp = c.put('/oj/api/submission-results/1/',
             {"grade": "1", "status": "DONE", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1", "possible_failure": "NONE"})
         # print(resp.content.decode("utf-8"))
         self.assertEqual(resp.status_code, 200)
@@ -124,7 +124,7 @@ class JudgerAPITester(django.test.TestCase):
         """
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        resp = c.patch('/api/submission-results/1/',
+        resp = c.patch('/oj/api/submission-results/1/',
             {"status": "DONE"})
         # print(resp.content.decode("utf-8"))
         self.assertEqual(resp.status_code, 200)
@@ -135,7 +135,7 @@ class JudgerAPITester(django.test.TestCase):
 
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        resp = c.put('/api/submission-results/1/',
+        resp = c.put('/oj/api/submission-results/1/',
             {"grade": "1", "status": "DONE", "log":"asdf", "app_data":"asdf", "submission": "1", "testcase": "1", "possible_failure": "NONE"})
         # print(resp.content.decode("utf-8"))
         self.assertEqual(resp.status_code, 404)  # No longer there
@@ -143,7 +143,7 @@ class JudgerAPITester(django.test.TestCase):
     def test_submission_result_get_detail(self):
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        resp = c.get('/api/submission-results/1/')
+        resp = c.get('/oj/api/submission-results/1/')
 
         # This tests for both 200 and the content
         self.assertContains(resp, 'SOME_APPDATA', status_code=200)
@@ -154,21 +154,21 @@ class JudgerAPITester(django.test.TestCase):
     def test_problem_get_detail(self):
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        resp = c.get('/api/problems/1/')
+        resp = c.get('/oj/api/problems/1/')
 
         self.assertEqual(resp.status_code, 200)
 
     def test_testcase_get_detail(self):
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        resp = c.get('/api/problem-testcases/1/')
+        resp = c.get('/oj/api/problem-testcases/1/')
 
         self.assertEqual(resp.status_code, 200)
 
     def test_submission_get_detail(self):
         c = APIClient()
         c.credentials(HTTP_X_JUDGERSECRET=settings.JUDGER_SECRET)
-        resp = c.get('/api/submissions/1/')
+        resp = c.get('/oj/api/submissions/1/')
 
         # This tests for both 200 and the content
         self.assertEqual(resp.status_code, 200)
@@ -226,27 +226,27 @@ class JudgerAPITester(django.test.TestCase):
         # 首先是super_user，什么都能看到
         c.login(username='admin', password='123456')
         # 自己的提交
-        resp = c.get('/api/submission-results/1/')
+        resp = c.get('/oj/api/submission-results/1/')
         self.assertContains(resp, 'log', status_code=200)
         # 别人的提交
-        resp = c.get('/api/submission-results/2/')
+        resp = c.get('/oj/api/submission-results/2/')
         self.assertContains(resp, 'log', status_code=200)
 
         # 接下来是testuser，只能看见自己提交的log、app_data等
         c.login(username='testname', password='testpassword')
         # 别人的提交只能看到部分信息
-        resp = c.get('/api/submission-results/1/')
+        resp = c.get('/oj/api/submission-results/1/')
         self.assertEqual(resp.status_code, 200)
         self.assertFalse('"log"' in resp.content.decode("utf-8"))  # ZDX:这里是不是有点太简单粗暴了
         # 自己的提交能够看到全部信息
-        resp = c.get('/api/submission-results/2/')
+        resp = c.get('/oj/api/submission-results/2/')
         self.assertTrue('"log"' in resp.content.decode("utf-8"))
 
         # 测试用于生成文档的接口
-        resp = c.get('/docs/')
-        self.assertContains(resp, "/api/submission-results/", status_code=200)
+        resp = c.get('/oj/docs/')
+        self.assertContains(resp, "/oj/api/submission-results/", status_code=200)
 
-        resp = c.post('/api/submission-results/1/')
+        resp = c.post('/oj/api/submission-results/1/')
         self.assertContains(resp, "detail", status_code=403)
 
     def test_submission_get_user_test(self):
@@ -258,30 +258,30 @@ class JudgerAPITester(django.test.TestCase):
         # 首先是super_user，什么都能看到
         c.login(username='admin', password='123456')
         # 自己的提交
-        resp = c.get('/api/submissions/1/')
+        resp = c.get('/oj/api/submissions/1/')
         self.assertContains(resp, 'log', status_code=200)
         # 别人的提交
-        resp = c.get('/api/submissions/2/')
+        resp = c.get('/oj/api/submissions/2/')
         self.assertContains(resp, 'log', status_code=200)
 
         # 接下来是testuser，只能看见自己提交的log、app_data等
         c.login(username='testname', password='testpassword')
         # 别人的提交只能看到部分信息
-        resp = c.get('/api/submissions/1/')
+        resp = c.get('/oj/api/submissions/1/')
         self.assertEqual(resp.status_code, 200)
         self.assertFalse('"log"' in resp.content.decode("utf-8"))
         # 自己的提交能够看到全部信息
-        resp = c.get('/api/submissions/2/')
+        resp = c.get('/oj/api/submissions/2/')
         self.assertTrue('"log"' in resp.content.decode("utf-8"))
 
-        resp = c.post('/api/submissions/1/')
+        resp = c.post('/oj/api/submissions/1/')
         self.assertContains(resp, "detail", status_code=403)
 
         # 测试用于生成文档的接口
         c.logout()
-        resp = c.get('/docs/')
-        self.assertContains(resp, "/api/submissions/", status_code=200)
+        resp = c.get('/oj/docs/')
+        self.assertContains(resp, "/oj/api/submissions/", status_code=200)
 
         c.force_authenticate(user=None)
-        resp = c.get('/api/submissions/1/')
+        resp = c.get('/oj/api/submissions/1/')
         self.assertFalse('"log"' in resp.content.decode("utf-8"))
