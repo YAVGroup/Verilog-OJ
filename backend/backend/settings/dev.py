@@ -30,7 +30,7 @@ SECRET_KEY = 'xlb=+p_mb+z&=+4&++liz*ka_jc!ml8w#m+0jfbs0_8@4)s_w+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # ---- Judger configurations ----
 
