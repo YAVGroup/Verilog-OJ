@@ -85,7 +85,7 @@ VERILOG_OJ_DEV=TRUE celery -A judge worker -l INFO
 1. 首先确保有 Docker 和 Docker Compose（`sudo apt install docker.io docker-compose`），然后换国内源，最后启动 daemon（`sudo systemctl start docker`）
 2. 生产环境相关的值都统一维护在 `.env` 中了，按需编辑
 3. 将 `judger-env` 镜像打包好
-   > 可以进 `./deploy` 然后 `docker build -f Dockerfile.judger-env --build-arg USE_APT_MIRROR=yes --build-arg USE_PIP_MIRROR=yes`
+   > 可以进 `./deploy` 然后 `docker build . -f Dockerfile.judge-env --build-arg USE_APT_MIRROR=yes --build-arg USE_PIP_MIRROR=yes`
 4. `docker-compose up`
 5. 第一次的时候，记得手动进 backend 容器，进行一下 `python manage.py migrate` 和 `python manage.py createsuperuser` 的操作，详情参考上面开发环境的指南
 
