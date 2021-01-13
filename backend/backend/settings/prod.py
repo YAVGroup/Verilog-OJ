@@ -31,6 +31,10 @@ SECRET_KEY = os.environ['VERILOG_OJ_SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+# Hmm, used for production debugging..
+if 'VERILOG_OJ_PROD_DEBUG' in os.environ:
+    DEBUG = True
+
 if 'VERILOG_OJ_PUBLIC_HOST' not in os.environ:
     raise Exception("Verilog OJ should have VERILOG_OJ_PUBLIC_HOST passed by envvars")
 
