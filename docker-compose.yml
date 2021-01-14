@@ -40,7 +40,15 @@ services:
       - "mqserver"
       - "judgeworker"  # consumer starts first
 
+  # Fix bug on Django entering Chinese characters
+  # - The database connection settings only works with conn params
+  # - And not on anything else
+  # - Useful command: `show variables like 'character%';` in mysql
+  # ref: https://stackoverflow.com/questions/45729326/how-to-change-the-default-character-set-of-mysql-using-docker-compose
   db:
+    # 5.7 raises InnoDB limit, so VARCHAR(255) is possible
+    # - So no need to alter Django stuff, probably
+    # - http://mysql.rjweb.org/doc.php/limits#767_limit_in_innodb_indexes
     image: "mysql:5.7"
 
     # Notice the env below will only useful when no db file is given
@@ -51,6 +59,7 @@ services:
       MYSQL_PASSWORD: ${mysql_password}
     volumes:
       - db-volume:/var/lib/mysql
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
 
   mqserver:
     image: "rabbitmq:3.8-management"

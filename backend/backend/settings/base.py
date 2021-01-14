@@ -125,6 +125,9 @@ if 'VERILOG_OJ_USE_MYSQL' in os.environ:
             'PASSWORD': os.environ['VERILOG_OJ_MYSQL_PASSWORD'],
             'HOST': os.environ['VERILOG_OJ_MYSQL_HOST'],
             'PORT': os.environ['VERILOG_OJ_MYSQL_PORT'],
+            'OPTIONS': {
+                'charset': 'utf8mb4'
+            }
         }
     }
 else:
