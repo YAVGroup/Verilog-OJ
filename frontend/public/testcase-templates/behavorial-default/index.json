@@ -1,0 +1,8 @@
+{
+    "name": "Behavorial Simulation Default Template",
+    "description": "N/A",
+    "testcase_files": [
+        "main.sh",
+        "vcd_main.py"
+    ]
+}

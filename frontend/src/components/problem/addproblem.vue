@@ -64,6 +64,12 @@
             </el-col> -->
           </el-row>
 
+          <el-row>
+            <el-button @click="retrieveTemplate">
+              Test frontend retrieve
+            </el-button>
+          </el-row>
+
           <!--代码编辑-->
           <el-row>
             <el-container style="height: 500px; border: 1px solid #eee">
@@ -470,7 +476,15 @@ export default {
         });
       }
     },
-
+    retrieveTemplate: function () {
+      alert(process.env.BASE_URL);
+      this.$axios({
+        url: 'testcase-templates/index.json',
+        baseURL: process.env.BASE_URL
+      }).then(response => {
+        alert(response.data);
+      })
+    },
     submit: function () {
       if (this.addtime == "") {
         this.$message.error("非法操作！");
