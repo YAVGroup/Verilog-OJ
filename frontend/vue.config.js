@@ -10,11 +10,11 @@ module.exports = {
     // Used to forward API requests to Django
     devServer: {
         proxy: {
-            '/api': {
-                target: 'http://localhost:8000/api',
+            '/oj/api': {
+                target: 'http://localhost:8000/oj/api',
                 changeOrigin: true,
                 pathRewrite: {
-                    '^/api': '/'
+                    '^/oj/api': '/'
                 }
             }
         }
