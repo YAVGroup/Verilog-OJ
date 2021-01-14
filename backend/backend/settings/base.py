@@ -112,6 +112,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
+# used by backend urls.py, to host Django static files directly with Django
+# - serves as a walkaround
+HOST_DJANGO_STATIC = False
+
+if 'VERILOG_OJ_HOST_STATIC' in os.environ:
+    HOST_DJANGO_STATIC = True
+
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 

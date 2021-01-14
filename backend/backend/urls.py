@@ -36,7 +36,7 @@ urlpatterns = [
     ))
 ]
 
-if not settings.DEBUG:
+if settings.HOST_DJANGO_STATIC:
     # Temporary procedure. TODO: remove this and add into nginx
     urlpatterns += [
         # Works for r'^oj/static-django/(?P<path>.*)$'
