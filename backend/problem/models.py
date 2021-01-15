@@ -2,11 +2,18 @@ from django.db import models
 from user.models import User
 from file.models import File
 
+DEFAULT_USER_ID = 1
 class Problem(models.Model):
     id = models.AutoField(primary_key=True, help_text='题目ID')
     name = models.CharField(max_length=20, help_text='题目名字')
     create_time = models.DateTimeField(auto_now_add=True, help_text='题目的创建时间')
     deadline_time = models.DateTimeField(null=True, blank=True, help_text='题目的截止时间')
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        help_text='题目创建者',
+        default=DEFAULT_USER_ID
+    )
     
     level = models.IntegerField(default=1, help_text="难度等级")
     tags = models.CharField(max_length=100, help_text="题目标签", blank=True)

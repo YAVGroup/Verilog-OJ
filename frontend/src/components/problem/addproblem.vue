@@ -18,9 +18,9 @@
           </el-row>
           <el-row :gutter="18" id="ddl" >Deadline</el-row>
           <el-row :gutter="18" class="problem-descriptions" >
-              <el-radio v-model="have_ddl" label=true>have ddl</el-radio>
-              <el-radio v-model="have_ddl" label=false>no ddl</el-radio>
-              <datetime type="datetime" v-model="ddl_time"></datetime>
+              <el-radio v-model="have_ddl" :label="true">have ddl</el-radio>
+              <el-radio v-model="have_ddl" :label="false">no ddl</el-radio>
+              <datetime type="datetime" icon="el-icon-date" v-model="ddl_time" v-show="have_ddl" ></datetime>
           </el-row>
           
 
@@ -40,6 +40,18 @@
                   class="problem-description-title">Output</el-row>
           <el-row :gutter="18" class="problem-descriptions">
             <el-input  type="textarea" v-model="output"></el-input>
+          </el-row>
+
+          <el-row :gutter="18"
+                  class="problem-description-title">Level </el-row>
+          <el-row :gutter="18" class="problem-descriptions">        
+              <el-select v-model="level" placeholder="难度：">
+                <el-option key="1" label="简单" :value="1"></el-option>
+                <el-option key="2" label="普通" :value="2"></el-option>
+                <el-option key="3" label="中等" :value="3"></el-option>
+                <el-option key="4" label="困难" :value="4"></el-option>
+                <el-option key="5" label="极其困难" :value="5"></el-option>
+              </el-select>
           </el-row>
 
           <!--这里放样例波形图-->
@@ -171,7 +183,7 @@ export default {
     
       tagnames: [],
       activeNames: ["1", "2", "3", "4", "5", "6"],
-      level: "Easy",
+      level: 1,
       ddl_time: null,
       lastindex: 0,
       lastchange: 0,
@@ -462,18 +474,41 @@ export default {
       }
       else{
         this.is_edit = false;
-        return this.$axios.put(
-          "/problem/"+this.id+"/",{
-            name: this.title,
-            deadline_time: this.ddl_time,
-            description: this.dec,
-            description_input: this.input,
-            description_output: this.output,
-            app_data: this.wavefrom
-            }
-        ).catch(error => {
-          this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
-        });
+        if (this.have_ddl) {
+          return this.$axios.post(
+            "/problems/",{
+              name: this.title,
+              deadline_time: this.ddl_time,
+              description: this.des,
+              description_input: this.input,
+              description_output: this.output,
+              app_data: this.wavefrom,
+              level: this.level,
+              owner: this.username
+              }
+          ).catch(error => {
+            this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
+          });
+        }
+        else {
+            return this.$axios.post(
+              "/problems/",{
+                name: this.title,
+                description: this.des,
+                description_input: this.input,
+                description_output: this.output,
+                app_data: this.wavefrom,
+                level: this.level,
+                owner: this.username
+                }
+            ).then(response => {
+              this.$router.push({
+              name: 'problemdetail',
+              params: {problemid: response.data.id}
+          })}).catch(error => {
+              this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
+            });  
+        }
       }
     },
     retrieveTemplate: function () {
@@ -484,54 +519,6 @@ export default {
       }).then(response => {
         alert(response.data);
       })
-    },
-    submit: function () {
-      if (this.addtime == "") {
-        this.$message.error("非法操作！");
-        return;
-      }
-      if (!sessionStorage.userid) {
-        this.$message.error("请先登录！");
-        return;
-      }
-
-      if (!this.code) {
-        this.$message.error("请输入代码！");
-        return;
-      }
-      if (!this.language) {
-        this.$message.error("请选择语言！");
-        return;
-      }
-
-      this.$confirm("确定提交吗？", "提交", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        this.$message({
-          type: "success",
-          message: "提交中..."
-        });
-
-        var formData = new FormData();
-        var blob = new Blob([this.code], {type: "text/plain"});
-        formData.append('file', blob, 'code.v');
-        return this.$axios.post("/files/", formData);
-      }).then(response => {
-        const fileid = response.data.id;
-        return this.$axios.post("/submit", {
-          'problem': this.id,
-          'submit_files': [fileid],
-        });
-      }).then(response => {
-        this.$router.push({
-          name: 'submission',
-          params: {submissionid: response.data.id}
-        });
-      }).catch(error => {
-        this.$message.error("提交失败：" + JSON.stringify(error.response.data));
-      });
     },
   },
   destroyed () {
