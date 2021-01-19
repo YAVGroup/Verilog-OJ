@@ -463,7 +463,24 @@ export default {
         });
     },
 
-    problemedit: function(){
+    async upload(code, filename) {
+        var formData = new FormData();
+        var blob = new Blob([code], {type: "text/plain"});
+        formData.append('file', blob, filename);
+        return this.$axios.post("/files/", formData).then(response => {
+          return response.data.id;
+        });
+    },
+
+    async upload_testcase(code_ids,problemid) {
+        var body = {};
+        body['type'] = 'SIM';
+        body['testcase_files'] = code_ids ;
+        body['problem'] = problemid;
+        return this.$axios.post("/problem-testcases/", body);
+    },
+
+    async problemedit() {
       if(this.is_edit==false) {
         this.is_edit = true;
         return;
@@ -474,41 +491,39 @@ export default {
       }
       else{
         this.is_edit = false;
-        if (this.have_ddl) {
-          return this.$axios.post(
-            "/problems/",{
-              name: this.title,
-              deadline_time: this.ddl_time,
-              description: this.des,
-              description_input: this.input,
-              description_output: this.output,
-              app_data: this.wavefrom,
-              level: this.level,
-              owner: this.username
-              }
-          ).catch(error => {
+
+        const code_id = await this.upload(this.code_items[0].code,'code_ref.v');
+        const template_id = await this.upload(this.code_templates[0].code,'template_code.v');
+        const testbench_id = await this.upload(this.testbenches[0].code,'testbench.v');
+        const wavedump_id = await this.upload(this.testcases[0].code[0],'wavedump.py');
+        const vcd_main_id = await this.upload(this.testcases[0].code[1],'vcd_main.py');
+        const vcd_visualize_id = await this.upload(this.testcases[0].code[2],'vcd_visualize.py');
+        const main_id = await this.upload(this.testcases[0].code[3],'main.sh');
+        var body = {}
+        body['name'] = this.title;
+        body['description'] = this.des;
+        body['description_input'] = this.input;
+        body['description_output'] = this.output;
+        body['app_data'] = this.waveform;
+        body['level'] = this.level;
+        body['owner'] = this.username;
+        body['template_code_file'] = template_id;
+        body['judge_files'] = [code_id];
+        if(this.have_ddl)
+          body['deadline_time'] = this.ddl_time;
+        console.log(template_id);
+        return this.$axios.post(
+            "/problems/",body
+          ).then(response => {
+            this.upload_testcase([wavedump_id,vcd_main_id,vcd_visualize_id,main_id],
+              response.data.id
+            );
+            this.$router.push({
+            name: 'problemdetail',
+            params: {problemid: response.data.id}
+        })}).catch(error => {
             this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          });
-        }
-        else {
-            return this.$axios.post(
-              "/problems/",{
-                name: this.title,
-                description: this.des,
-                description_input: this.input,
-                description_output: this.output,
-                app_data: this.wavefrom,
-                level: this.level,
-                owner: this.username
-                }
-            ).then(response => {
-              this.$router.push({
-              name: 'problemdetail',
-              params: {problemid: response.data.id}
-          })}).catch(error => {
-              this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
-            });  
-        }
+          });  
       }
     },
     retrieveTemplate: function () {
