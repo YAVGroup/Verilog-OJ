@@ -2,6 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from .models import Problem, TestCase
 from .serializers import ProblemSerializer, TestCaseSerializer, ProblemAdvancedListSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 from user import permissions
 
 class ProblemViewSet(ModelViewSet):
@@ -9,6 +10,8 @@ class ProblemViewSet(ModelViewSet):
     获取和修改题目信息
     """
     queryset = Problem.objects.all()
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('id','owner', "level")
     #serializer_class = ProblemSerializer
 
     def get_serializer_class(self):
