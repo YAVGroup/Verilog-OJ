@@ -469,7 +469,9 @@ export default {
         formData.append('file', blob, filename);
         return this.$axios.post("/files/", formData).then(response => {
           return response.data.id;
-        });
+        }).catch(error => {
+            this.$message.error("提交错误！" + filename + "(" + JSON.stringify(error.response.data) + ")");
+          });  
     },
 
     async upload_testcase(code_ids,problemid) {
@@ -477,7 +479,9 @@ export default {
         body['type'] = 'SIM';
         body['testcase_files'] = code_ids ;
         body['problem'] = problemid;
-        return this.$axios.post("/problem-testcases/", body);
+        return this.$axios.post("/problem-testcases/", body).catch(error => {
+            this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
+          });  
     },
 
     async problemedit() {
@@ -515,7 +519,7 @@ export default {
         return this.$axios.post(
             "/problems/",body
           ).then(response => {
-            this.upload_testcase([wavedump_id,vcd_main_id,vcd_visualize_id,main_id],
+            this.upload_testcase([wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id],
               response.data.id
             );
             this.$router.push({
