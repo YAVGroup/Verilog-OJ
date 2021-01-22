@@ -50,13 +50,13 @@ export default new Router({
 
     //题目添加
     {
-      path: '/addproblem',
-      name: 'addproblem',
-      component: () => import(/* webpackChunkName: "problem" */ "@/components/problem/addproblem")
+      path: '/problem/:problemid/edit',
+      name: 'problemedit',
+      component: () => import(/* webpackChunkName: "problem" */ "@/components/problem/problemedit")
     },
 
     {
-      path: '/problemdetail/:problemid',
+      path: '/problem/:problemid',
       name: 'problemdetail',
       component: () => import(/* webpackChunkName: "problem" */ "@/components/problem/problemdetail")
     },

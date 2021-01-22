@@ -13,8 +13,6 @@
         <i class="el-icon-menu"></i>Problem</el-menu-item>
       <el-menu-item index="/statue">
         <i class="el-icon-tickets"></i>Status</el-menu-item>
-      <el-menu-item index="/addproblem">
-        <i class="el-icon-tickets"></i>Add Problem</el-menu-item>
       <!-- <el-menu-item index="/contest">
         <i class="el-icon-bell"></i>Contest</el-menu-item> -->
 
