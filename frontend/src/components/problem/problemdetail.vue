@@ -1,197 +1,147 @@
 <template>
-  <el-row :gutter="15">
-    <el-col :span="18">
-      <el-row>
-        <el-card shadow="always">
-          <!--标题、DDL-->
-          <el-row :gutter="18" id="title">
-            <el-col :span="20">
-              <el-input v-if="is_edit" v-model="title"></el-input>
-              <div v-else v-html="title" :key="title">
-              </div>
-            </el-col>
-            <el-col :span="2">
-              <el-button type="success"
-                         @click="problemedit"
-                         style="font-weight:bold;margin-left:10px;">Edit</el-button>
-            </el-col>
-          </el-row>
-          <el-row :gutter="18" id="ddl" v-show="have_ddl">Deadline</el-row>
-          <el-row :gutter="18" class="problem-descriptions" v-show="have_ddl">
-            <el-input v-if="is_edit" type="textarea" v-model="ddl_time"></el-input>
-            <div v-else v-html="ddl" :key="ddl">
-            </div>
-          </el-row>
-          
+  <div>
+    <el-row>
+      &nbsp;
+    </el-row>
+    <el-row :gutter="15">
+      <el-col :xs="0" :sm="1" :md="2" :lg="2" :xl="4" class="placeholder">
+        <!-- placeholder only -->
+        &nbsp;
+      </el-col>
+      <el-col :xs="24" :sm="22" :md="20" :lg="20" :xl="16">
+        <el-col :span="16">
+            <el-row>
+              <el-card shadow="never">
+                <!--标题、DDL-->
+                <!-- <el-row :gutter="18"> -->
+                <div id="title">
+                  <div style="display: inline-block; margin-top: 6px; margin-left: 10px;">{{ title }}</div>
+                  <div style="float: right; margin-right: 5px; ">
+                    <el-button-group>
+                      <el-button plain circle 
+                        size="medium" icon="el-icon-edit" @click="problemEdit" :disabled="!editingEnabled"></el-button>
+                      <el-button plain circle 
+                        size="medium" icon="el-icon-delete" @click="problemDelete" :disabled="!editingEnabled"></el-button>
+                    </el-button-group>
+                  </div>
+                </div>
+                <el-divider></el-divider>
+                <el-row :gutter="18" id="ddl" v-show="have_ddl">截止时间</el-row>
+                <el-row :gutter="18" class="problem-descriptions" v-show="have_ddl">
+                  {{ ddl }}
+                </el-row>
+                
 
-          <!--题目描述、输入、输出-->
-          <el-row :gutter="18"
-                  class="problem-description-title">Description</el-row>
-          <el-row :gutter="18" class="problem-descriptions">
-            <el-input v-if="is_edit" type="textarea" v-model="des"></el-input>
-            <div v-else class="problem-descriptions"
-                 v-html="des"
-                 :key="des"></div>
-          </el-row>
+                <!--题目描述、输入、输出-->
+                <el-row :gutter="18"
+                        class="problem-description-title">题目描述</el-row>
+                <el-row :gutter="18" class="problem-descriptions">
+                  <div class="problem-descriptions">{{ des }}</div>
+                </el-row>
 
-          <el-row :gutter="18"
-                  class="problem-description-title">Input</el-row>
-          <el-row :gutter="18" class="problem-descriptions">
-            <el-input v-if="is_edit" type="textarea" v-model="input"></el-input>
-            <div v-else v-html="input"></div>
-          </el-row>
-          <el-row :gutter="18"
-                  class="problem-description-title">Output</el-row>
-          <el-row :gutter="18" class="problem-descriptions">
-            <el-input v-if="is_edit" type="textarea" v-model="output"></el-input>
-            <div v-else v-html="output"></div>
-          </el-row>
+                <el-row :gutter="18"
+                        class="problem-description-title">输入格式</el-row>
+                <el-row :gutter="18" class="problem-descriptions">
+                  <div class="problem-descriptions">{{ input }}</div>
+                </el-row>
+                <el-row :gutter="18"
+                        class="problem-description-title">输出格式</el-row>
+                <el-row :gutter="18" class="problem-descriptions">
+                  <div class="problem-descriptions">{{ output }}</div>
+                </el-row>
 
-          <!--这里放样例波形图-->
-          <el-row :gutter="18"
-                  class="problem-description-title">Sample waveform</el-row>
-          <el-row :gutter="18"
-                  id="sample_waveform" class="problem-descriptions">
-            <el-input v-if="is_edit" v-model="waveform" type="textarea"></el-input>
-            <div v-else>
-              <wavedrom waveId="1"
-                        :parentText="waveform"
-                        errorMessage="Sorry, no sample waveform available"></wavedrom>
-            </div>
-          </el-row>
-        </el-card>
-      </el-row>
+                <!--这里放样例波形图-->
+                <el-row :gutter="18"
+                        class="problem-description-title">示例波形</el-row>
+                <el-row :gutter="18"
+                        id="sample_waveform" class="problem-descriptions">
+                  <wavedrom waveId="1"
+                            :parentText="waveform"
+                            errorMessage="Sorry, no sample waveform available"></wavedrom>
+                </el-row>
+              </el-card>
+            </el-row>
 
-      <el-row>
-        <el-card shadow="always">
-          <!--提交界面-->
-          <el-row :gutter="15">
-            <el-col :span="3">
-              <div id="des"
-                   style="padding: 5px 10px;">Language:</div>
-            </el-col>
-            <el-col :span="3">
-              <el-select v-model="language"
-                         placeholder="请选择"
-                         @change="changetemplate">
-                <languageselect></languageselect>
-              </el-select>
-            </el-col>
-            <el-col :span="2">
-              <el-button type="success"
-                         @click="submit"
-                         style="font-weight:bold;margin-left:10px;">Submit</el-button>
-            </el-col>
-            <el-col :span="2">
-              <el-button type="danger"
-                         @click="code = ''"
-                         style="font-weight:bold;margin-left:30px;">Reset</el-button>
-            </el-col>
-            <!-- <el-col :span="2">
-              <el-button type="info"
-                         style="font-weight:bold;margin-left:30px;">Submit Files</el-button>
-            </el-col> -->
-          </el-row>
+            <el-row>
+              <el-card shadow="never">
+                <!--提交界面-->
+                <el-row :gutter="15">
+                    <i style="padding: 5px 10px;" class="el-icon-edit"></i>
+                    <div style="display: inline-block; font-size: 20px; ">代码编辑</div>
+                    <el-button type="success"
+                              size="medium"
+                              @click="submit"
+                              style="font-weight: bold; margin-right: 10px; float: right;">提交</el-button>
+                    <el-button type="danger"
+                              size="medium"
+                              @click="code = ''"
+                              style="font-weight: bold; margin-right: 10px; float: right;">清空</el-button>
+                </el-row>
 
-          <!--代码编辑-->
+                <!--代码编辑-->
+                <el-row>
+                  <codemirror v-model="code"
+                              :options="cmOptions"></codemirror>
+                </el-row>
+              </el-card>
+            </el-row>
+        </el-col>
+        <!--侧栏-->
+        <el-col :span="8">
+          <!--question info-->
           <el-row>
-            <codemirror v-model="code"
-                        :options="cmOptions"></codemirror>
+            <el-card shadow="never">
+              <el-row>
+                <el-col :span="10">创建时间</el-col>
+                <el-col :span="14">{{ addtime }}</el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="10">创建者</el-col>
+                <el-col :span="14">{{ owner }}</el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="10">题目难度</el-col>
+                <el-col :span="14">{{ level }}</el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="10">题目标签</el-col>
+                <el-col :span="14">{{ tagnames }}</el-col>
+              </el-row>
+            </el-card>
           </el-row>
-        </el-card>
-      </el-row>
-    </el-col>
+          <!--提交记录-->
+          <el-row>
+            <el-card shadow="never">
+              <div style="box-sizing: border-box; padding-bottom: 8px; display: inline-block;" >提交记录</div>
+              <el-button size="mini" @click="submissions_refresh" style="float: right;">刷新</el-button>
+              <el-table
+                :default-sort="{prop: 'id', order: 'descending'}"
+                :data="submissions"
+                style="width: 100%"
+                :row-class-name="tableRowClassName"
+                @row-click="rowClick"
+                size="mini">
 
-    <!--侧栏-->
-    <el-col :span="6">
-      <!--question info-->
-      <el-row :gutter="15">
-        <el-card shadow="always">
-          <el-collapse v-model="activeNames">
-            <!---->
-            <!-- <el-collapse-item name="1"
-                              id="des">
-              <template slot="title">
-                <font color="deepskyblue"
-                      size="4">Creator:</font>
-              </template>
-              <div>{{author}}</div>
-            </el-collapse-item> -->
-            <!---->
-            <el-collapse-item name="2"
-                              id="des">
-              <template slot="title">
-                <font color="deepskyblue"
-                      size="4">Date:</font>
-              </template>
-              <div>{{addtime}}</div>
-            </el-collapse-item>
-            <!---->
-            <el-collapse-item name="7"
-                              id="des">
-              <template slot="title">
-                <font color="deepskyblue"
-                      size="4">Level:</font>
-              </template>
-              <el-tag size="medium"
-                      :type="problemlevel(level)"
-                      disable-transitions
-                      hit>{{ level }}</el-tag>
-            </el-collapse-item>
-            <!---->
-            <el-collapse-item name="6"
-                              id="des">
-              <template slot="title">
-                <font color="deepskyblue"
-                      size="4">Tags:</font>
-              </template>
-              <el-tag id="tags"
-                      v-for="(name,index) in tagnames"
-                      :key="index"
-                      size="medium"
-                      type="info"
-                      disable-transitions
-                      hit>{{ name }}</el-tag>
-            </el-collapse-item>
-          </el-collapse>
-        </el-card>
-      </el-row>
-      <!--prostatistics-->
-      <!-- <el-row :gutter="15">
-        <prostatistice ref="prosta"></prostatistice>
-      </el-row> -->
-      <!--提交记录-->
-      <el-row :gutter="15">
-        <el-card>
-          <h3>提交记录</h3>
-          <el-table
-            :default-sort="{prop: 'id', order: 'descending'}"
-            :data="submissions"
-            style="width: 100%"
-            :row-class-name="tableRowClassName"
-            @row-click="rowClick"
-            size="mini">
+                <el-table-column prop="id" label="ID" :width="40"></el-table-column>
+                <el-table-column prop="id" label="用户" :width="60"></el-table-column>
 
-            <el-table-column prop="id" label="ID" :width="70"></el-table-column>
+                <el-table-column prop="result" label="状态">
+                  <template slot-scope="scope">
+                    <el-tag size="mini" :type="statuetype(scope.row.result)" disable-transitions hit>
+                      {{ scope.row.result }}
+                      <i class="el-icon-loading" v-show="statuejudge(scope.row.result)"></i>
+                    </el-tag>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-card>
+          </el-row>
+        </el-col>
+      </el-col>
 
-            <el-table-column prop="result" label="Status" :width="180">
-              <template slot-scope="scope">
-                <el-tag size="mini" :type="statuetype(scope.row.result)" disable-transitions hit>
-                  {{ scope.row.result }}
-                  <i class="el-icon-loading" v-show="statuejudge(scope.row.result)"></i>
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column prop="submittime" align="right">
-              <template slot="header">
-                <el-button size="mini" @click="submissions_refresh" type="primary">刷新</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
-      </el-row>
-    </el-col>
-  </el-row>
+    </el-row>
+  </div>
+
 </template>
 
 <style scope>
@@ -201,10 +151,8 @@
 </style>
 <script>
 import moment from "moment";
-import qs from "qs";
 import { codemirror } from "vue-codemirror";
 // import statusmini from "@/components/utils/statusmini";
-import languageselect from "@/components/utils/languageselect";
 // import prostatistice from "@/components/utils/prostatistice";
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
@@ -220,14 +168,13 @@ export default {
     codemirror,
     // statusmini,
     // prostatistice,
-    languageselect,
     wavedrom
   },
   data () {
     return {
       cmOptions: {
         tabSize: 4,
-        mode:"verilog",
+        mode: "verilog",
         theme: "base16-light",
         lineNumbers: true
       },
@@ -235,43 +182,25 @@ export default {
       des: "",
       input: "",
       output: "",
-      // author: "",
+      owner: "",
       addtime: "",
       ddl: "",
       have_ddl: false,
-      is_edit: false,
       tagnames: [],
-      activeNames: ["1", "2", "3", "4", "5", "6"],
-      level: "Easy",
+      level: "",
       ddl_time: "",
-
+      id: null,
 
       code: "",
-      language: "Verilog",
-      // template_code: "",
       submissions: [],
 
-      waveform: "",
-
-      // codetemplate: {},
-
-      // ac: 100,
-      // mle: 100,
-      // tle: 100,
-      // rte: 100,
-      // pe: 100,
-      // ce: 100,
-      // wa: 100,
-      // se: 100,
-      judgetype: "primary",
-      loadingshow: false,
-      // submitid: -1
+      waveform: ""
     };
   },
   created () {
     this.id = this.$route.params.problemid;
     if (!this.id) {
-      this.$message.error("参数错误" + "(" + this.ID + ")");
+      this.$message.error("参数错误" + "(" + this.id + ")");
       return;
     }
     this.$axios
@@ -281,7 +210,7 @@ export default {
         this.input = response.data.description_input;
         this.output = response.data.description_output;
         this.waveform = response.data.app_data;
-        // this.author = response.data.author;
+        this.owner = response.data.owner;
         this.addtime = response.data.create_time =
           moment(response.data.create_time).format("YYYY-MM-DD HH:mm:ss");
 
@@ -293,70 +222,7 @@ export default {
           })
         }
 
-        // var li = response.data.template.split("*****")
-        // for (var i = 1; i < li.length; i += 2) {
-        //   this.codetemplate[li[i]] = li[i + 1]
-        // }
-        // this.code = this.codetemplate[this.language]
-
-        // this.$axios
-        //   .get("/problemdata/" + this.ID + "/")
-        //   .then(response => {
-        if (response.data["level"] == "1") response.data["level"] = "Easy";
-        if (response.data["level"] == "2")
-          response.data["level"] = "Medium";
-        if (response.data["level"] == "3") response.data["level"] = "Hard";
-        if (response.data["level"] == "4")
-          response.data["level"] = "VeryHard";
-        if (response.data["level"] == "5")
-          response.data["level"] = "ExtremelyHard";
-        // response.data.level = "Easy";
-
-        if (response.data["tags"] == null) response.data["tags"] = ["无"];
-        else response.data["tags"] = response.data["tags"].split("|");
-        // response.data.tag = ["无"];
-
-        // if (response.data.submission == 0) {
-        //   this.ac = 0;
-        //   this.mle = 0;
-        //   this.tle = 0;
-        //   this.rte = 0;
-        //   this.pe = 0;
-        //   this.ce = 0;
-        //   this.wa = 0;
-        //   this.se = 0;
-        // } else {
-        //   this.ac = parseFloat(
-        //     ((response.data.ac * 100) / response.data.submission).toFixed(2)
-        //   );
-        //   this.mle = parseFloat(
-        //     ((response.data.mle * 100) / response.data.submission).toFixed(
-        //       2
-        //     )
-        //   );
-        //   this.tle = parseFloat(
-        //     ((response.data.tle * 100) / response.data.submission).toFixed(
-        //       2
-        //     )
-        //   );
-        //   this.rte = parseFloat(
-        //     ((response.data.rte * 100) / response.data.submission).toFixed(
-        //       2
-        //     )
-        //   );
-        //   this.pe = parseFloat(
-        //     ((response.data.pe * 100) / response.data.submission).toFixed(2)
-        //   );
-        //   this.ce = parseFloat(
-        //     ((response.data.ce * 100) / response.data.submission).toFixed(2)
-        //   );
-        //   this.wa = parseFloat(
-        //     ((response.data.wa * 100) / response.data.submission).toFixed(2)
-        //   );
-        //   this.se = parseFloat(
-        //     ((response.data.se * 100) / response.data.submission).toFixed(2)
-        //   );
-        // }
+        this.tagnames = response.data["tags"].split("|");
 
         if (response.data.deadline_time == null) {
           this.ddl = "";
@@ -365,39 +231,19 @@ export default {
           this.ddl_time = response.data.deadline_time;
           let ddlTime = moment(response.data.deadline_time);
           this.ddl = ddlTime.format("YYYY-MM-DD hh:mm:ss") + " (" + ddlTime.endOf('day').fromNow() + ")";
-          //this.ddl = response.data.deadline_time;
           this.have_ddl = true;
         }
 
         this.title = response.data.name;
         this.level = response.data.level;
-        this.tagnames = response.data.tags;
         this.submissions = response.data.submissions;
         this.submissions_refresh();
-
-        this.$refs.prosta.setdata(this.$data);
-
       })
       .catch(error => {
         this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
       });
   },
   methods: {
-    /*
-    changetemplate (lang) {
-      var t = this.codetemplate[lang]
-      if (t) {
-        this.$confirm("确定切换语言吗？", "切换后当前代码不会保存！", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
-
-          this.code = this.codetemplate[lang]
-        })
-      }
-    },
-  */
     onCopy (e) {
       this.$message.success("复制成功！");
     },
@@ -473,30 +319,35 @@ export default {
         });
     },
 
-    problemedit: function(){
-      if(this.is_edit==false) {
-        this.is_edit = true;
-        return;
-      }
-      else if(!sessionStorage.userid){
-        this.$message.error("请先登录！");
-        return;
-      }
-      else{
-        this.is_edit = false;
-        return this.$axios.patch(
-          "/problems/"+this.id+"/",{
-            name: this.title,
-            deadline_time: this.ddl_time,
-            description: this.dec,
-            description_input: this.input,
-            description_output: this.output,
-            app_data: this.wavefrom
-            }
-        ).catch(error => {
-          this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
-        });
-      }
+    problemEdit: function () {
+      this.$router.push({
+        name: "problemedit",
+        params: { problemid: this.id }
+      });
+      // if (!sessionStorage.userid) {
+      //   this.$message.error("请先登录！");
+      //   return;
+      // } else {
+      //   this.is_edit = false;
+      //   return this.$axios.patch(
+      //     "/problems/"+this.id+"/",{
+      //       name: this.title,
+      //       deadline_time: this.ddl_time,
+      //       description: this.dec,
+      //       description_input: this.input,
+      //       description_output: this.output,
+      //       app_data: this.wavefrom
+      //       }
+      //   ).catch(error => {
+      //     this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
+      //   });
+      // }
+    },
+    problemDelete: function () {
+      // if (!sessionStorage.userid) {
+      //   return;
+      // }
+      this.$message.error("Not implemented");
     },
 
     submit: function () {
@@ -511,10 +362,6 @@ export default {
 
       if (!this.code) {
         this.$message.error("请输入代码！");
-        return;
-      }
-      if (!this.language) {
-        this.$message.error("请选择语言！");
         return;
       }
 
@@ -548,6 +395,12 @@ export default {
       });
     },
   },
+  computed: {
+    editingEnabled: function () {
+      // TODO: retrieve from Vuex state manager
+      return true;
+    },
+  },
   destroyed () {
   }
 };
@@ -563,8 +416,9 @@ export default {
 }
 #title {
   color: dimgrey;
-  left: 10px;
+  left: 15px;
   font-size: 20px;
+  vertical-align: middle;
 }
 #ddl {
   color: tomato;

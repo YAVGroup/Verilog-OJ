@@ -250,7 +250,7 @@ export default {
         this.se = parseFloat(((row.se * 100) / row.submission).toFixed(2));
       }
       this.title = row.title;
-      this.$refs.prosta.setdata(this.$data);
+      // this.$refs.prosta.setdata(this.$data);
     },
     problemclick: function (row, column, cell, event) {
       this.$router.push({

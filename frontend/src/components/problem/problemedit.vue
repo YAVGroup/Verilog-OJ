@@ -148,7 +148,6 @@ import moment from "moment";
 import qs from "qs";
 import { codemirror } from "vue-codemirror";
 // import statusmini from "@/components/utils/statusmini";
-import languageselect from "@/components/utils/languageselect";
 // import prostatistice from "@/components/utils/prostatistice";
 import { Datetime } from 'vue-datetime'
 import 'vue-datetime/dist/vue-datetime.css'
