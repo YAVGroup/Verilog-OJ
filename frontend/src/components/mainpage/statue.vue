@@ -165,12 +165,8 @@
 
 <script>
 import moment from "moment";
-import languageselect from "@/components/utils/languageselect";
 export default {
   name: "statue",
-  components: {
-    languageselect
-  },
   methods: {
     rowClick (row, col, e) {
       if (col.label == "Problem") {
