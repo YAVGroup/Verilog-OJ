@@ -10,14 +10,14 @@
                          @click="problemedit"
                          style="font-weight:bold;margin-left:10px;">Submit</el-button>
             </el-col>
-            <el-col :span="2">
+            <!-- <el-col :span="2">
               <el-button type="danger"
                          @click="is_change=false"
                          style="font-weight:bold;margin-left:30px;" v-if="is_change">Cancel</el-button>
               <el-button v-else type="danger"
                          @click="is_change=true"
                          style="font-weight:bold;margin-left:30px;">Edit</el-button>
-            </el-col>
+            </el-col> -->
           </el-row>
           <el-row :gutter="18" 
             class="problem-description-title" v-if="is_change">select problem</el-row>
@@ -31,6 +31,11 @@
                   :value="item.value">
                 </el-option>
               </el-select>
+              <el-col :span="2">
+                <el-button type="success"
+                          @click="problemedit"
+                          style="font-weight:bold;margin-left:10px;">Submit</el-button>
+            </el-col>
             </el-row>
           <el-row :gutter="18" id="ddl" >Title</el-row>
           <el-row :gutter="18" id="title">
@@ -120,21 +125,22 @@
                         <el-menu-item @click="code_select(code_template.code,'verilog',1,index)">code_template.v</el-menu-item>
                       </li>
                     </el-menu-item-group>
-                    <el-menu-item-group title="仿真文件">
+                    <!-- <el-menu-item-group title="仿真文件">
                       <li v-for="(testbench,index) in testbenches" :key="testbench.code">
                         <el-menu-item @click="code_select(testbench.code,'verilog',2,index)" >testbench.v</el-menu-item>
                       </li>
-                    </el-menu-item-group>
+                    </el-menu-item-group> -->
                   </el-submenu>
                   <el-submenu index="2">
                     <template slot="title"><i class="el-icon-menu"></i>判题文件</template>
                     <li v-for="(testcase,index) in testcases" :key="testcase.code">
                     <el-menu-item-group>
                       <template slot="title">判题脚本{{index}}</template>
-                      <el-menu-item @click="code_select(testcase.code[0],'python',3,index)" >wavedump.py</el-menu-item>
-                      <el-menu-item @click="code_select(testcase.code[1],'python',4,index)" >vcd_main.py</el-menu-item>
-                      <el-menu-item @click="code_select(testcase.code[2],'python',5,index)" >vcd_visualize.py</el-menu-item>
-                      <el-menu-item @click="code_select(testcase.code[3],'shell',6,index)"  >main.sh</el-menu-item>
+                      <el-menu-item @click="code_select(testcase.code[0],'python',2,index)" >wavedump.py</el-menu-item>
+                      <el-menu-item @click="code_select(testcase.code[1],'python',3,index)" >vcd_main.py</el-menu-item>
+                      <el-menu-item @click="code_select(testcase.code[2],'verilog',4,index)" >testbench.v</el-menu-item>
+                      <el-menu-item @click="code_select(testcase.code[3],'python',5,index)" >vcd_visualize.py</el-menu-item>
+                      <el-menu-item @click="code_select(testcase.code[4],'shell',6,index)"  >main.sh</el-menu-item>
                     </el-menu-item-group>
                     </li>
 
@@ -219,11 +225,10 @@ export default {
       code_templates : [
         { code: "" }
       ],
-      testbenches:  [
-        { code: "" }
-      ],
+
+      //对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.v,main.sh
       testcases: [
-        { code:["","","",""] }
+        { code:["","","","",""] }
       ],
 
       // language: "Verilog",
@@ -255,18 +260,89 @@ export default {
     };
   },
   created () {
-      this.content =  this.code_items[0].code;
+      
+      this.$axios.get("/problems/"+ this.$route.params.problemid +"/?id="+ this.$route.params.problemid + 
+        "&owner=" + sessionStorage.userid).then(response => {
+        var problem = response.data;
+        console.log(problem);
+        this.title = problem["name"];
+        if(problem["deadline_time"]==null) {
+          this.have_ddl = false;
+          this.ddl_time = null;
+        } else {
+          this.have_ddl = true;
+          this.ddl_time = problem["deadline_time"];
+        }
+        this.level = problem["level"];
+        this.des = problem["description"];
+        this.input = problem["description_input"];
+        this.output = problem["description_output"];
+        this.waveform = problem["app_data"];
+        //对应需要单独获取对应的testfile文件
+        var testcases = problem["testcases"][0]["testcase_files"];
 
-      this.$axios.get("/problems/?owner=" + sessionStorage.userid)
-      .then(response => {
-          var problems = response.data;
-          for (var i=0;i<problems.length;i=i+1) {
-            this.options.push({
-              "value": problems[i]["id"],
-              "label": problems[i]["id"]+" "+problems[i]["name"],
+        //对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.v,main.sh
+        if (testcases !=null ) {
+           //循环会导致奇怪的错误
+            this.$axios.get("/files/" + testcases[0] + "/")
+              .then(response => {
+                // console.log(response.data);
+                this.testcases[0].code[0] = response.data;
             })
-          }
-        });
+            this.$axios.get("/files/" + testcases[1] + "/")
+              .then(response => {
+                // console.log(response.data);
+                this.testcases[0].code[1] = response.data;
+            })
+            this.$axios.get("/files/" + testcases[2] + "/")
+              .then(response => {
+                // console.log(response.data);
+                this.testcases[0].code[2] = response.data;
+            })
+            this.$axios.get("/files/" + testcases[3] + "/")
+              .then(response => {
+                // console.log(response.data);
+                this.testcases[0].code[3] = response.data;
+            })
+            this.$axios.get("/files/" + testcases[4] + "/")
+              .then(response => {
+                // console.log(response.data);
+                this.testcases[0].code[4] = response.data;
+            })
+        }
+
+        var  template = problem["template_code_file"];
+
+        if (template != null) {
+          this.$axios.get("/files/" + template + "/")
+          .then(response => {
+            this.code_templates[0].code = response.data;
+          })
+        }
+
+        var judge = problem["judge_files"][0];
+
+        if (judge!=null) {
+          this.$axios.get("/files/" + judge + "/")
+              .then(response => {
+            this.code_items[0].code = response.data;
+          })
+        }
+
+      }).catch(error => {
+            this.$message.error("发生错误！" + "(" + JSON.stringify(error.response.data) + ")");
+          }); 
+      this.content =  this.code_items[0].code;
+      // this.$axios.get("/problems/?owner=" + sessionStorage.userid)
+      // .then(response => {
+        //   var problems = response.data;
+        //   for (var i=0;i<problems.length;i=i+1) {
+        //     this.options.push({
+        //       "value": problems[i]["id"],
+        //       "label": problems[i]["id"]+" "+problems[i]["name"],
+        //     })
+        //   }
+        // });
 
   },
   methods: {
@@ -302,19 +378,19 @@ export default {
           this.code_templates[this.lastindex].code = this.content;
           break;
         case 2:
-          this.testbenches[this.lastindex].code = this.content;
-          break;
-        case 3:
           this.testcases[this.lastindex].code[0] = this.content;
           break;
-        case 4:
+        case 3:
           this.testcases[this.lastindex].code[1] = this.content;
           break;
-        case 5:
+        case 4:
           this.testcases[this.lastindex].code[2] = this.content;
           break;
-        case 6:
+        case 5:
           this.testcases[this.lastindex].code[3] = this.content;
+          break;
+        case 6:
+          this.testcases[this.lastindex].code[4] = this.content;
           break;
       }
 
@@ -426,11 +502,11 @@ export default {
 
         const code_id = await this.upload(this.code_items[0].code,'code_ref.v');
         const template_id = await this.upload(this.code_templates[0].code,'template_code.v');
-        const testbench_id = await this.upload(this.testbenches[0].code,'testbench.v');
         const wavedump_id = await this.upload(this.testcases[0].code[0],'wavedump.py');
         const vcd_main_id = await this.upload(this.testcases[0].code[1],'vcd_main.py');
-        const vcd_visualize_id = await this.upload(this.testcases[0].code[2],'vcd_visualize.py');
-        const main_id = await this.upload(this.testcases[0].code[3],'main.sh');
+        const testbench_id = await this.upload(this.testcases[0].code[2],'testbench.v');
+        const vcd_visualize_id = await this.upload(this.testcases[0].code[3],'vcd_visualize.py');
+        const main_id = await this.upload(this.testcases[0].code[4],'main.sh');
         var body = {}
         body['name'] = this.title;
         body['description'] = this.des;
