@@ -56,6 +56,12 @@ export default new Router({
     },
 
     {
+      path: '/problem/addproblem',
+      name: 'addproblem',
+      component: () => import(/* webpackChunkName: "problem" */ "@/components/problem/problemedit")
+    },
+
+    {
       path: '/problem/:problemid',
       name: 'problemdetail',
       component: () => import(/* webpackChunkName: "problem" */ "@/components/problem/problemdetail")

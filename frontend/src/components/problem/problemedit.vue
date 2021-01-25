@@ -19,7 +19,7 @@
                          style="font-weight:bold;margin-left:30px;">Edit</el-button>
             </el-col> -->
           </el-row>
-          <el-row :gutter="18" 
+          <!-- <el-row :gutter="18" 
             class="problem-description-title" v-if="is_change">select problem</el-row>
           <el-row :gutter="18" 
             class="problem-description-title" v-if="is_change">
@@ -31,12 +31,7 @@
                   :value="item.value">
                 </el-option>
               </el-select>
-              <el-col :span="2">
-                <el-button type="success"
-                          @click="problemedit"
-                          style="font-weight:bold;margin-left:10px;">Submit</el-button>
-            </el-col>
-            </el-row>
+            </el-row> -->
           <el-row :gutter="18" id="ddl" >Title</el-row>
           <el-row :gutter="18" id="title">
             <el-col :span="20">
@@ -260,89 +255,89 @@ export default {
     };
   },
   created () {
-      
-      this.$axios.get("/problems/"+ this.$route.params.problemid +"/?id="+ this.$route.params.problemid + 
-        "&owner=" + sessionStorage.userid).then(response => {
-        var problem = response.data;
-        console.log(problem);
-        this.title = problem["name"];
-        if(problem["deadline_time"]==null) {
-          this.have_ddl = false;
-          this.ddl_time = null;
-        } else {
-          this.have_ddl = true;
-          this.ddl_time = problem["deadline_time"];
-        }
-        this.level = problem["level"];
-        this.des = problem["description"];
-        this.input = problem["description_input"];
-        this.output = problem["description_output"];
-        this.waveform = problem["app_data"];
-        //对应需要单独获取对应的testfile文件
-        var testcases = problem["testcases"][0]["testcase_files"];
+      if (this.$route.params.problemid!=null) {
+        this.is_change = true;
+      }
 
-        //对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.v,main.sh
-        if (testcases !=null ) {
-           //循环会导致奇怪的错误
-            this.$axios.get("/files/" + testcases[0] + "/")
-              .then(response => {
-                // console.log(response.data);
-                this.testcases[0].code[0] = response.data;
+      if(this.is_change) { //edit模式
+        this.$axios.get("/problems/"+ this.$route.params.problemid +"/?id="+ this.$route.params.problemid + 
+          "&owner=" + sessionStorage.userid).then(response => {
+          var problem = response.data;
+          // console.log(problem);
+          this.title = problem["name"];
+          if(problem["deadline_time"]==null) {
+            this.have_ddl = false;
+            this.ddl_time = null;
+          } else {
+            this.have_ddl = true;
+            this.ddl_time = problem["deadline_time"];
+          }
+          this.level = problem["level"];
+          this.des = problem["description"];
+          this.input = problem["description_input"];
+          this.output = problem["description_output"];
+          this.waveform = problem["app_data"];
+          //对应需要单独获取对应的testfile文件
+          var testcases = problem["testcases"][0]["testcase_files"];
+
+          //对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.v,main.sh
+          if (testcases !=null ) {
+            //循环会导致奇怪的错误
+            for(var i=0;i<testcases.length;i++) {
+              this.$axios.get("/files/" + testcases[i] + "/")
+                .then(response => {
+                  // console.log(response.data);
+                  var temp = response.headers["content-disposition"];
+                  // response['Content-Disposition'] = 'attachment; filename="%s"'
+              
+                  var filename = temp.slice(22,temp.length-1);
+                  console.log(filename)
+                  switch(filename) {//对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.py,main.sh
+                    case "wavedump.py": 
+                      this.testcases[0].code[0] = response.data;
+                      break;
+                    case "vcd_main.py":
+                      this.testcases[0].code[1] = response.data;
+                      break;
+                    case "testbench.v":
+                      this.testcases[0].code[2] = response.data;
+                      break;
+                    case "vcd_visualize.py":
+                      this.testcases[0].code[3] = response.data;
+                      break;
+                    case "main.sh":
+                      this.testcases[0].code[4] = response.data;
+                      break;
+                  }
+              })
+            }
+          }
+
+          var  template = problem["template_code_file"];
+
+          if (template != null) {
+            this.$axios.get("/files/" + template + "/")
+            .then(response => {
+              this.code_templates[0].code = response.data;
             })
-            this.$axios.get("/files/" + testcases[1] + "/")
-              .then(response => {
-                // console.log(response.data);
-                this.testcases[0].code[1] = response.data;
+          }
+
+          var judge = problem["judge_files"][0];
+
+          if (judge!=null) {
+            this.$axios.get("/files/" + judge + "/")
+                .then(response => {
+              this.code_items[0].code = response.data;
             })
-            this.$axios.get("/files/" + testcases[2] + "/")
-              .then(response => {
-                // console.log(response.data);
-                this.testcases[0].code[2] = response.data;
-            })
-            this.$axios.get("/files/" + testcases[3] + "/")
-              .then(response => {
-                // console.log(response.data);
-                this.testcases[0].code[3] = response.data;
-            })
-            this.$axios.get("/files/" + testcases[4] + "/")
-              .then(response => {
-                // console.log(response.data);
-                this.testcases[0].code[4] = response.data;
-            })
-        }
+          }
 
-        var  template = problem["template_code_file"];
-
-        if (template != null) {
-          this.$axios.get("/files/" + template + "/")
-          .then(response => {
-            this.code_templates[0].code = response.data;
-          })
-        }
-
-        var judge = problem["judge_files"][0];
-
-        if (judge!=null) {
-          this.$axios.get("/files/" + judge + "/")
-              .then(response => {
-            this.code_items[0].code = response.data;
-          })
-        }
-
-      }).catch(error => {
-            this.$message.error("发生错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          }); 
-      this.content =  this.code_items[0].code;
-      // this.$axios.get("/problems/?owner=" + sessionStorage.userid)
-      // .then(response => {
-        //   var problems = response.data;
-        //   for (var i=0;i<problems.length;i=i+1) {
-        //     this.options.push({
-        //       "value": problems[i]["id"],
-        //       "label": problems[i]["id"]+" "+problems[i]["name"],
-        //     })
-        //   }
-        // });
+        }).catch(error => {
+              this.$message.error("发生错误！" + "(" + JSON.stringify(error.response.data) + ")");
+            }); 
+        this.content =  this.code_items[0].code;
+      } else {
+        console.log("add problem");
+      }
 
   },
   methods: {
@@ -498,6 +493,29 @@ export default {
         return;
       }
       else{
+        switch(this.lastchange) {
+          case 0:
+            this.code_items[this.lastindex].code = this.content;
+            break;
+          case 1:
+            this.code_templates[this.lastindex].code = this.content;
+            break;
+          case 2:
+            this.testcases[this.lastindex].code[0] = this.content;
+            break;
+          case 3:
+            this.testcases[this.lastindex].code[1] = this.content;
+            break;
+          case 4:
+            this.testcases[this.lastindex].code[2] = this.content;
+            break;
+          case 5:
+            this.testcases[this.lastindex].code[3] = this.content;
+            break;
+          case 6:
+            this.testcases[this.lastindex].code[4] = this.content;
+            break;
+      }
         this.is_edit = false;
 
         const code_id = await this.upload(this.code_items[0].code,'code_ref.v');
@@ -520,7 +538,26 @@ export default {
         if(this.have_ddl)
           body['deadline_time'] = this.ddl_time;
         console.log(template_id);
-        return this.$axios.post(
+        if (this.is_change) {
+          this.$axios.patch(
+            "/problems/" + this.$route.params.problemid + "/", body
+          )
+          var testcase_body = {};
+          testcase_body['type'] = 'SIM';
+          testcase_body['testcase_files'] = [wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id];
+          testcase_body['problem'] = this.$route.params.problemid;
+          this.$axios.patch("/problem-testcases/"+ this.$route.params.problemid + "/", testcase_body).catch(error => {
+              this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
+            });
+            return   this.$router.push({
+              name: 'problemdetail',
+              params: {problemid: this.$route.params.problemid}
+              }).catch(error => {
+              this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
+          });  
+
+        }
+        else return this.$axios.post(
             "/problems/",body
           ).then(response => {
             this.upload_testcase([wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id],
