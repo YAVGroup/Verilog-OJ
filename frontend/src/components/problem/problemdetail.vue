@@ -344,10 +344,26 @@ export default {
       // }
     },
     problemDelete: function () {
-      // if (!sessionStorage.userid) {
-      //   return;
-      // }
-      this.$message.error("Not implemented");
+      // if (!sessionStorage.useri
+      if (!sessionStorage.userid) {
+        this.$message.error("请先登录！");
+        return;
+      }
+      if(sessionStorage.userid!=this.owner) {
+        this.$message.error("不是题目创建者，没有对应权限");
+        return;
+      }
+      this.$axios.delete(
+          "/problems/" +
+            this.id + "/"
+        ).then(response =>{
+          this.$router.push({
+          name: 'problem'
+        });
+        }).catch(error => {
+        this.$message.error("提交失败：" + JSON.stringify(error.response.data));
+      });
+      
     },
 
     submit: function () {
