@@ -97,12 +97,38 @@
                          style="font-weight:bold;margin-left:30px;">Submit Files</el-button>
             </el-col> -->
           </el-row>
-
+          <el-row :gutter="18" class="problem-descriptions">        
+              <el-select v-model="retrievefile" placeholder="难度：">
+                <el-option key="0" label="wavedump.py" :value="0"></el-option>
+                <el-option key="1" label="vcd_main.py" :value="1"></el-option>
+                <el-option key="2" label="vcd_visualize.py" :value="2"></el-option>
+                <el-option key="3" label="main.sh" :value="3"></el-option>
+              </el-select>
+          </el-row>
           <el-row>
-            <el-button @click="retrieveTemplate">
+            <el-button @click="retrieveTemplate" type="success">
               Test frontend retrieve
             </el-button>
           </el-row>
+          <el-row>
+            <el-dialog
+                title="提示"
+                :visible.sync="dialogVisible"
+                width="30%"
+                :before-close="handleClose">    
+
+                <div slot="title" class="header-title">
+                    <span> {{ retrieve_title }}</span>
+                </div>
+                <!-- <el-input  type="textarea" v-model="retrieve_code"></el-input> -->
+                <codemirror v-model="retrieve_code"
+                        :options="cmOptions"></codemirror>
+                <span slot="footer" class="dialog-footer">
+                  <el-button @click="dialogVisible = false">取 消</el-button>
+                  <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+                </span>
+              </el-dialog>
+            </el-row>
 
           <!--代码编辑-->
           <el-row>
@@ -205,6 +231,8 @@ export default {
       is_change: false,
       options:[],
       problem_id:0,
+      retrieve_title: "",
+      retrieve_code: "",
 
       tagnames: [],
       activeNames: ["1", "2", "3", "4", "5", "6"],
@@ -212,6 +240,8 @@ export default {
       ddl_time: null,
       lastindex: 0,
       lastchange: 0,
+      retrievefile: 0,
+      dialogVisible: false,
 
       content: "",
       code_items : [
@@ -572,12 +602,45 @@ export default {
       }
     },
     retrieveTemplate: function () {
-      alert(process.env.BASE_URL);
+      var url = "testcase-templates/"
+      switch(this.retrievefile) {
+        case 0:
+          url += "wavedump.py";
+          this.retrieve_title = "wavedump.py";
+          break;
+        case 1:
+          url += "vcd_main.py";
+          this.retrieve_title = "vcd_main.py";
+          break;
+        case 2:
+          url += "vcd_visualize.py";
+          this.retrieve_title = "vcd_visualize.py"; 
+          break;
+        case 3:
+          url += "main.sh";
+          this.retrieve_title = "main.sh";
+          break;
+        default:
+          url += "error.txt";
+          this.retrieve_title = "error.txt";
+          break;
+      }
       this.$axios({
-        url: 'testcase-templates/index.json',
+        // url: 'testcase-templates/index.json',
+        url: url,
         baseURL: process.env.BASE_URL
       }).then(response => {
-        alert(response.data);
+        this.retrieve_code = response.data;
+        this.dialogVisible = true;
+        // this.$alert(response.data, title, {
+        //   confirmButtonText: '确定',
+        //   callback: action => {
+        //     this.$message({
+        //       type: 'text',
+        //       message: `action: ${ action }`
+        //     });
+        //   }
+        // });
       })
     },
     problemchange() {
