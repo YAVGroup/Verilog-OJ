@@ -53,14 +53,13 @@ export default {
             message: "登录成功！",
             type: "success"
           });
-          sessionStorage.setItem("username", this.form.username);
-          if (response.data.last_name == "" && response.data.first_name == "")
-            sessionStorage.setItem("name", this.form.username);
-          else
-            sessionStorage.setItem("name", response.data.last_name+response.data.first_name);
-          sessionStorage.setItem("userid", response.data.id);
-          sessionStorage.setItem("isadmin", response.data.is_superuser);
-          this.$router.go(0);
+          this.$store.commit({
+            type: 'logIn',
+            userID: response.data.id,
+            username: response.data.username,
+            isSuperUser: response.data.is_superuser
+          })
+          this.dialogLoginVisible = false;
         })
         .catch(error => {
           if (error.response != undefined)

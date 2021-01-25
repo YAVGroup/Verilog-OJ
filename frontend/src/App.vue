@@ -19,24 +19,24 @@
       <el-button round
                  id="button"
                  @click="registeropen"
-                 v-show="loginshow">Register</el-button>
+                 v-show="!loggedIn">Register</el-button>
       <el-button round
                  id="button"
                  @click="loginopen"
-                 v-show="loginshow">Login</el-button>
+                 v-show="!loggedIn">Login</el-button>
 
       <el-dropdown id="user"
-                   v-show="!loginshow"
+                   v-show="loggedIn"
                    @command="handleCommand"
                    :show-timeout="100"
                    :split-button="true">
-        <span class="el-dropdown-link">Welcome {{name}}</span>
+        <span class="el-dropdown-link">Welcome, {{ username }}</span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="home">Home</el-dropdown-item>
           <!-- <el-dropdown-item command="submittion">Submittion</el-dropdown-item> -->
           <el-dropdown-item command="setting">Setting</el-dropdown-item>
           <!-- <el-dropdown-item command="classes" divided>Class</el-dropdown-item> -->
-          <el-dropdown-item command="admin" divided v-show="isadmin">Admin</el-dropdown-item>
+          <el-dropdown-item command="admin" divided v-show="isSuperUser">Admin</el-dropdown-item>
           <el-dropdown-item command="logout" divided>Logout</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -71,6 +71,7 @@
 
 <script>
 import Cookies from 'js-cookie';
+import { mapState } from 'vuex';
 
 export default {
   name: "App",
@@ -81,16 +82,15 @@ export default {
   data () {
     return {
       activeIndex: "1",
-      school: "USTC",
-      loginshow: sessionStorage.userid == "",
-      username: sessionStorage.username,
-      name: sessionStorage.name,
-      isadmin: false
+      school: "USTC"
     };
   },
-  mounted () {
-    this.isadmin = sessionStorage.isadmin == "true";
-  },
+  computed: mapState([
+    'loggedIn',
+    'userID',
+    'username',
+    'isSuperUser'
+  ]),
   methods: {
     loginopen () {
       this.$refs.logindialog.open();
@@ -104,16 +104,13 @@ export default {
         this.$axios
           .get("/user/logout/")
           .then(response => {
+            this.$store.commit({
+              type: 'logOut'
+            });
             this.$message({
               message: "登出成功！",
               type: "success"
             });
-            // sessionStorage.setItem("username", "");
-            // sessionStorage.setItem("name", "");
-            // sessionStorage.setItem("userid", "");
-            // sessionStorage.setItem("isadmin", "");
-            Cookies.remove('userid');
-            this.$router.go(0);
           })
           .catch(error => {
             this.$message.error(
@@ -124,13 +121,13 @@ export default {
       if (command == "home") {
         this.$router.push({
           name: "user",
-          params: { userid: sessionStorage.userid }
+          params: { userid: this.userid }
         });
       }
       if (command == "setting") {
         this.$router.push({
           name: "setting",
-          params: { username: sessionStorage.username }
+          params: { username: this.username }
         });
       }
       // if (command == "submittion") {

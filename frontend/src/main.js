@@ -31,37 +31,54 @@ Vue.prototype.$axios = axios;
 
 const store = new Vuex.Store({
   state: {
-    loginip:"后台获取",
-    logininfo:"后台获取"
+    // -- account relatex --
+    loggedIn: false,
+    userID: 0,
+    username: "",
+    isSuperUser: false
   },
+  mutations: {
+    logIn (state, payload) {
+      state.loggedIn = true;
+      state.userID = payload.userID;
+      state.username = payload.username;
+      state.isSuperUser = payload.isSuperUser;
+    },
+    logOut (state) {
+      state.loggedIn = false;
+      state.userID = 0;
+      state.username = "";
+      state.isSuperUser = false;
+    }
+  }
 })
 
 // 根据cookie里设置的userid，获取用户信息；但这个是异步的，可能需要刷新一下页面
-const userid = Cookies.get('userid');
-if (userid == undefined) {
-  sessionStorage.setItem("userid", "");
-  sessionStorage.setItem("username", "");
-  sessionStorage.setItem("name", "");
-  sessionStorage.setItem("is_admin", false);
-} else {
-  if(sessionStorage.getItem("userid") == undefined || sessionStorage.getItem("userid") == ""){
-    sessionStorage.setItem("userid", userid);
-    axios.get("/users/" + userid + "/").then(response => {
-      sessionStorage.setItem("username", response.data.username);
-      var name = response.data.last_name+response.data.first_name;
-      if(name == "")
-        name = response.data.username;
-      sessionStorage.setItem("name", name);
-      sessionStorage.setItem("isadmin", response.data.is_superuser);
-    })
-  }
-}
+// const userid = Cookies.get('userid');
+// if (userid == undefined) {
+//   sessionStorage.setItem("userid", "");
+//   sessionStorage.setItem("username", "");
+//   sessionStorage.setItem("name", "");
+//   sessionStorage.setItem("is_admin", false);
+// } else {
+//   if(sessionStorage.getItem("userid") == undefined || sessionStorage.getItem("userid") == ""){
+//     sessionStorage.setItem("userid", userid);
+//     axios.get("/users/" + userid + "/").then(response => {
+//       sessionStorage.setItem("username", response.data.username);
+//       var name = response.data.last_name+response.data.first_name;
+//       if(name == "")
+//         name = response.data.username;
+//       sessionStorage.setItem("name", name);
+//       sessionStorage.setItem("isadmin", response.data.is_superuser);
+//     })
+//   }
+// }
 
 new Vue({
   el: '#app',
   router,
   components: { App },
-  store,
+  store: store,
   template: '<App/>',
   render: h => h(App),
   created() {
