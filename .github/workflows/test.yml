@@ -72,8 +72,9 @@ jobs:
         coveralls --output="lcov.info"
       working-directory: ./backend
 
-    - name: Coveralls
-      uses: coverallsapp/github-action@master
+    - name: Upload Coverage
+      run: |
+        COVERALLS_REPO_TOKEN=$COVERALLS_TOKEN coveralls
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: "./backend/lcov.info"
+        COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+      working-directory: ./backend
