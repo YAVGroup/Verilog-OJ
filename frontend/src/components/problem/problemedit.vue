@@ -107,10 +107,10 @@
           </el-row>
           <el-row>
             <el-button @click="retrieveTemplate" type="success">
-              Test frontend retrieve
+              模板获取
             </el-button>
           </el-row>
-          <el-row>
+          <!-- <el-row>
             <el-dialog
                 title="提示"
                 :visible.sync="dialogVisible"
@@ -120,15 +120,15 @@
                 <div slot="title" class="header-title">
                     <span> {{ retrieve_title }}</span>
                 </div>
-                <!-- <el-input  type="textarea" v-model="retrieve_code"></el-input> -->
-                <codemirror v-model="retrieve_code"
+                 <el-input  type="textarea" v-model="retrieve_code"></el-input> -->
+                <!-- <codemirror v-model="retrieve_code"
                         :options="cmOptions"></codemirror>
                 <span slot="footer" class="dialog-footer">
                   <el-button @click="dialogVisible = false">取 消</el-button>
                   <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
                 </span>
               </el-dialog>
-            </el-row>
+            </el-row> --> 
 
           <!--代码编辑-->
           <el-row>
@@ -630,8 +630,24 @@ export default {
         url: url,
         baseURL: process.env.BASE_URL
       }).then(response => {
-        this.retrieve_code = response.data;
-        this.dialogVisible = true;
+        switch(this.retrieve_title) {
+              case "wavedump.py": 
+                this.testcases[0].code[0] = response.data;
+                break;
+              case "vcd_main.py":
+                this.testcases[0].code[1] = response.data;
+                break;
+              case "testbench.v":
+                this.testcases[0].code[2] = response.data;
+                break;
+              case "vcd_visualize.py":
+                this.testcases[0].code[3] = response.data;
+                break;
+              case "main.sh":
+                this.testcases[0].code[4] = response.data;
+                break;
+        }
+            
         // this.$alert(response.data, title, {
         //   confirmButtonText: '确定',
         //   callback: action => {
