@@ -56,7 +56,7 @@ export default new Router({
     },
 
     {
-      path: '/problem/addproblem',
+      path: '/problem/add',
       name: 'addproblem',
       component: () => import(/* webpackChunkName: "problem" */ "@/components/problem/problemedit")
     },
