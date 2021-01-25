@@ -75,6 +75,6 @@ jobs:
     - name: Upload Coverage
       run: |
         COVERALLS_REPO_TOKEN=$COVERALLS_TOKEN coveralls
-      with:
+      env:
         COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       working-directory: ./backend
