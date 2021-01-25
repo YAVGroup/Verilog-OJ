@@ -121,7 +121,7 @@ export default {
       if (command == "home") {
         this.$router.push({
           name: "user",
-          params: { userid: this.userid }
+          params: { userid: this.userID }
         });
       }
       if (command == "setting") {

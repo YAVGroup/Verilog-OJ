@@ -26,6 +26,7 @@
     "vue-resource": "^1.5.1",
     "vue-router": "^3.0.1",
     "vuex": "^3.1.0",
+    "vuex-persistedstate": "^3.2.0",
     "wavedrom": "^2.6.8",
     "webpack-cli": "^3.2.1",
     "weekstart": "^1.0.1"
