@@ -81,7 +81,17 @@
                   class="problem-description-title">Sample waveform</el-row>
           <el-row :gutter="18"
                   id="sample_waveform" class="problem-descriptions">
-            <el-input  v-model="waveform" type="textarea"></el-input>
+            <el-input  v-model="waveform" type="textarea" v-if="waveedit"></el-input>
+            <wavedrom v-else waveId="1"
+                            :parentText="waveform"
+                            errorMessage="Sorry, no sample waveform available"></wavedrom>
+          </el-row>
+          <el-row :gutter="18"
+                  class="problem-description-title">
+            <el-button @click="waveedit=!waveedit" type="success">
+              <div v-if="waveedit">view</div>
+              <div v-else>edit</div>
+            </el-button>
           </el-row>
         </el-card>
       </el-row>
@@ -199,6 +209,7 @@ import { codemirror } from "vue-codemirror";
 // import statusmini from "@/components/utils/statusmini";
 // import prostatistice from "@/components/utils/prostatistice";
 import { Datetime } from 'vue-datetime'
+import wavedrom from "@/components/utils/wavedrom";
 import 'vue-datetime/dist/vue-datetime.css'
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
@@ -214,7 +225,8 @@ export default {
     codemirror,
     // statusmini,
     // prostatistice,
-    datetime: Datetime
+    datetime: Datetime,
+    wavedrom
   },
   data () {
     return {
@@ -233,6 +245,7 @@ export default {
       problem_id:0,
       retrieve_title: "",
       retrieve_code: "",
+      waveedit: true,
 
       tagnames: [],
       activeNames: ["1", "2", "3", "4", "5", "6"],
