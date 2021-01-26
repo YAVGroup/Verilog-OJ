@@ -11,7 +11,7 @@
     "build-report": "vue-cli-service build --report"
   },
   "dependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "codemirror": "^5.44.0",
     "core-js": "^3.6.5",
     "element-ui": "~2.12.0",
