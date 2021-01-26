@@ -1,1 +1,2 @@
 pyDigitalWaveTools==0.8
+pyverilog==1.3.0

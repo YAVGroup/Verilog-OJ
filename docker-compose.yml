@@ -78,7 +78,7 @@ services:
       dockerfile: Dockerfile.judger
       args:
         USE_PIP_MIRROR: "yes"
-        USE_APK_MIRROR: "yes"
+        USE_APT_MIRROR: "yes"
         USE_MYSQL: "yes"
     environment:
       VERILOG_OJ_JUDGER_SECRET: ${judger_secret}

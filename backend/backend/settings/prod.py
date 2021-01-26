@@ -44,6 +44,7 @@ if 'VERILOG_OJ_PUBLIC_HOST' not in os.environ:
 ALLOWED_HOSTS = list(set([
     '127.0.0.1',
     'localhost',
+    'backend',      # reference by hostname, used by judgeworker
     os.environ['VERILOG_OJ_PUBLIC_HOST']
 ]) | set(JUDGER_IP_WHITELIST))
 
