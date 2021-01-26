@@ -211,6 +211,9 @@ import { codemirror } from "vue-codemirror";
 import { Datetime } from 'vue-datetime'
 import wavedrom from "@/components/utils/wavedrom";
 import 'vue-datetime/dist/vue-datetime.css'
+
+import { mapState } from 'vuex';
+
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
 require("codemirror/theme/base16-dark.css");
@@ -297,6 +300,12 @@ export default {
       // submitid: -1
     };
   },
+  computed: mapState([
+    'loggedIn',
+    'userID',
+    'username',
+    'isSuperUser'
+  ]),
   created () {
       if (this.$route.params.problemid!=null) {
         this.is_change = true;
@@ -304,7 +313,7 @@ export default {
 
       if(this.is_change) { //edit模式
         this.$axios.get("/problems/"+ this.$route.params.problemid +"/?id="+ this.$route.params.problemid + 
-          "&owner=" + sessionStorage.userid).then(response => {
+          "&owner=" + this.userID).then(response => {
           var problem = response.data;
           // console.log(problem);
           this.title = problem["name"];
@@ -491,7 +500,7 @@ export default {
       this.$axios
         .get(
           "/submissions/?user=" +
-            this.username +
+            this.userID +
             "&problem=" +
             this.problem
         )
@@ -531,7 +540,7 @@ export default {
         this.is_edit = true;
         return;
       }
-      else if(!sessionStorage.userid){
+      else if(!this.loggedIn){
         this.$message.error("请先登录！");
         return;
       }
@@ -575,7 +584,7 @@ export default {
         body['description_output'] = this.output;
         body['app_data'] = this.waveform;
         body['level'] = this.level;
-        body['owner'] = this.username;
+        body['owner'] = this.userID;
         body['template_code_file'] = template_id;
         body['judge_files'] = [code_id];
         if(this.have_ddl)

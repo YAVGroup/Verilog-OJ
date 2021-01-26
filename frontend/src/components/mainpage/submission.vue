@@ -107,6 +107,7 @@ require("codemirror/theme/base16-light.css");
 require("codemirror/mode/verilog/verilog");
 //import languageselect from "@/components/utils/languageselect";
 import wavedrom from "@/components/utils/wavedrom";
+import { mapState } from 'vuex';
 
 export default {
   name: "submission",
@@ -125,7 +126,7 @@ export default {
     },
 
     downloadFile (codeid, content) {
-      if(sessionStorage.userid!=this.userid) {
+      if (this.userID != this.subm_userid) {
         this.$message.error("只允许下载自己的文件");
       }
       else {
@@ -171,7 +172,7 @@ export default {
         this.num_testcase = this.results.length;
         this.related_testcases = response.data.problem_belong.testcases;
         this.submit_time = new Date(response.data.submit_time);
-        this.userid = response.data.user;
+        this.subm_userid = response.data.user;
 
         let passed = 0;
         for (let i = 0; i < this.results.length; i++) {
@@ -222,7 +223,6 @@ export default {
         viewportMargin: Infinity,
         lineWrapping: true
       },
-      isadmin: false,
       code: "",
 
       submissionid: null,
@@ -234,7 +234,7 @@ export default {
       passed_testcase: 0,
       submit_time: new Date(),
       related_testcases: [],
-      userid:"",
+      subm_userid: "",
 
       autoRefresh: false,
     }
@@ -243,12 +243,17 @@ export default {
     submitTimePretty : function () {
       let tm = this.submit_time;
       return this.prettyDate(tm.toISOString());
-    }
+    },
+    ...mapState([
+      'loggedIn',
+      'userID',
+      'username',
+      'isSuperUser'
+    ])
   },
   destroyed () {
   },
   created () {
-    this.isadmin = sessionStorage.isadmin;
     this.submissionid = this.$route.params.submissionid;
     this.updateStatus();
     if (this.needRefresh()) {

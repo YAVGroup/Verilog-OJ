@@ -10,7 +10,7 @@
         <el-col :span="12">
           <el-input v-model="form.username"
                     autocomplete="off"
-                    placeholder="不少于3个字符的用户名，必填"></el-input>
+                    placeholder="不少于 3 个字符的用户名"></el-input>
         </el-col>
       </el-row>
       <el-row :gutter="10">
@@ -21,7 +21,7 @@
           <el-input type="password"
                     v-model="form.password"
                     autocomplete="off"
-                    placeholder="不少于6个字符的密码，必填"></el-input>
+                    placeholder="不少于 6 个字符的密码"></el-input>
         </el-col>
       </el-row>
       <el-row :gutter="10">
@@ -32,7 +32,7 @@
           <el-input type="password"
                     v-model="form.confirm"
                     autocomplete="off"
-                    placeholder="请重复密码，必填"></el-input>
+                    placeholder="请重复密码"></el-input>
         </el-col>
       </el-row>
       <el-row :gutter="10">
@@ -42,7 +42,7 @@
         <el-col :span="12">
           <el-input v-model="form.last_name"
                     autocomplete="off"
-                    placeholder="请填写真实姓名，必填"></el-input>
+                    placeholder="姓氏，选填"></el-input>
         </el-col>
       </el-row>
       <el-row :gutter="10">
@@ -52,7 +52,7 @@
         <el-col :span="12">
           <el-input v-model="form.first_name"
                     autocomplete="off"
-                    placeholder="请填写真实姓名，必填"></el-input>
+                    placeholder="名字，选填"></el-input>
         </el-col>
       </el-row>
       <el-row :gutter="10">
@@ -62,7 +62,7 @@
         <el-col :span="12">
           <el-input v-model="form.email"
                     autocomplete="off"
-                    placeholder="请填写真实邮箱"></el-input>
+                    placeholder="用于通知邮件发送"></el-input>
         </el-col>
       </el-row>
     </el-form>
@@ -96,13 +96,6 @@ export default {
       this.dialogRegisterVisible = true;
     },
     registerClick () {
-      // if (
-      //   !this.form.last_name ||
-      //   !this.form.first_name
-      // ) {
-      //   this.$message.error("字段不能为空！");
-      //   return;
-      // }
       if (this.form.password != this.form.confirm) {
         this.$message.error("两次密码不一致！");
         return;
@@ -111,10 +104,6 @@ export default {
         this.$message.error("用户名太短！");
         return;
       }
-      /*if (this.form.name.length < 2) {
-        this.$message.error("昵称太短！");
-        return;
-      }*/
       if (this.form.password.length < 6) {
         this.$message.error("密码太短！");
         return;
@@ -144,20 +133,6 @@ export default {
             type: "success"
           });
           this.dialogRegisterVisible = false;
-
-          // 注册成功后顺便给他登录一下
-          this.$axios.post("/user/login/", {
-            username: this.form.username,
-            password: this.form.password
-          }).then(response => {
-            sessionStorage.setItem("username", response.data.username);
-            if (response.data.last_name == "" && response.data.first_name == "")
-              sessionStorage.setItem("name", response.data.username);
-            else
-              sessionStorage.setItem("name", response.data.last_name+response.data.first_name);
-            sessionStorage.setItem("userid", response.data.id);
-            this.$router.go(0);
-          })
         })
         .catch(error => {
           this.$message.error(

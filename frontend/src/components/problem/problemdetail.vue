@@ -19,9 +19,9 @@
                   <div style="float: right; margin-right: 5px; ">
                     <el-button-group>
                       <el-button plain circle 
-                        size="medium" icon="el-icon-edit" @click="problemEdit" :disabled="!editingEnabled"></el-button>
+                        size="medium" icon="el-icon-edit" @click="problemEdit" :disabled="!(loggedIn && userID == owner)"></el-button>
                       <el-button plain circle 
-                        size="medium" icon="el-icon-delete" @click="problemDelete" :disabled="!editingEnabled"></el-button>
+                        size="medium" icon="el-icon-delete" @click="problemDelete" :disabled="!(loggedIn && userID == owner)"></el-button>
                     </el-button-group>
                   </div>
                 </div>
@@ -68,14 +68,34 @@
                 <el-row :gutter="15">
                     <i style="padding: 5px 10px;" class="el-icon-edit"></i>
                     <div style="display: inline-block; font-size: 20px; ">代码编辑</div>
-                    <el-button type="success"
-                              size="medium"
-                              @click="submit"
-                              style="font-weight: bold; margin-right: 10px; float: right;">提交</el-button>
-                    <el-button type="danger"
-                              size="medium"
-                              @click="code = ''"
-                              style="font-weight: bold; margin-right: 10px; float: right;">清空</el-button>
+
+                    <div v-if="!loggedIn" style="display: inline-block; float: right;">
+                      <el-tooltip class="item" effect="dark" content="登陆以进行提交" placement="top">
+                        <!-- https://github.com/ElemeFE/element/issues/8557 -->
+                        <div style="font-weight: bold; margin-right: 10px; float: right;">
+                          <el-button type="success"
+                                    size="medium"
+                                    @click="submit"
+                                    disabled
+                                    >提交</el-button>
+                        </div>
+                      </el-tooltip>
+                      <el-button type="danger"
+                                size="medium"
+                                @click="code = ''"
+                                style="font-weight: bold; margin-right: 10px; float: right;">清空</el-button>
+                    </div>
+                    <div style="display: inline-block; float: right;" v-else>
+                      <el-button type="success"
+                                size="medium"
+                                @click="submit"
+                                style="font-weight: bold; margin-right: 10px; float: right;">提交</el-button>
+                      <el-button type="danger"
+                                size="medium"
+                                @click="code = ''"
+                                style="font-weight: bold; margin-right: 10px; float: right;">清空</el-button>
+                    </div>
+
                 </el-row>
 
                 <!--代码编辑-->
@@ -113,13 +133,16 @@
           <el-row>
             <el-card shadow="never">
               <div style="box-sizing: border-box; padding-bottom: 8px; display: inline-block;" >提交记录</div>
-              <el-button size="mini" @click="submissions_refresh" style="float: right;">刷新</el-button>
+              <el-button size="mini" @click="submissions_refresh" style="float: right;" :disabled="!loggedIn">刷新</el-button>
               <el-table
                 :default-sort="{prop: 'id', order: 'descending'}"
                 :data="submissions"
                 style="width: 100%"
                 :row-class-name="tableRowClassName"
                 @row-click="rowClick"
+                v-loading="!loggedIn"
+                element-loading-text="登陆以查看本题提交记录"
+                element-loading-spinner="el-icon-info"
                 size="mini">
 
                 <el-table-column prop="problem" label="题目" :width="60"></el-table-column>
@@ -161,6 +184,7 @@ require("codemirror/theme/base16-dark.css");
 require("codemirror/mode/verilog/verilog");
 
 import wavedrom from "@/components/utils/wavedrom";
+import { mapState } from 'vuex';
 
 export default {
   name: "problemdetail",
@@ -302,10 +326,14 @@ export default {
     },
 
     submissions_refresh(){
+      if (!this.loggedIn) {
+        this.$message.error("请登陆后查看自己的提交！");
+        return;
+      }
       this.$axios
         .get(
           "/submissions/?user=" +
-            sessionStorage.userid +
+            this.userID +
             "&problem=" +
             this.id
         )
@@ -324,54 +352,47 @@ export default {
         name: "problemedit",
         params: { problemid: this.id }
       });
-      // if (!sessionStorage.userid) {
-      //   this.$message.error("请先登录！");
-      //   return;
-      // } else {
-      //   this.is_edit = false;
-      //   return this.$axios.patch(
-      //     "/problems/"+this.id+"/",{
-      //       name: this.title,
-      //       deadline_time: this.ddl_time,
-      //       description: this.dec,
-      //       description_input: this.input,
-      //       description_output: this.output,
-      //       app_data: this.wavefrom
-      //       }
-      //   ).catch(error => {
-      //     this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
-      //   });
-      // }
     },
     problemDelete: function () {
-      // if (!sessionStorage.useri
-      if (!sessionStorage.userid) {
+      if (!this.loggedIn) {
         this.$message.error("请先登录！");
         return;
       }
-      if(sessionStorage.userid!=this.owner) {
+
+      if(this.userID != this.owner) {
         this.$message.error("不是题目创建者，没有对应权限");
         return;
       }
-      this.$axios.delete(
-          "/problems/" +
-            this.id + "/"
-        ).then(response =>{
-          this.$router.push({
-          name: 'problem'
-        });
-        }).catch(error => {
-        this.$message.error("提交失败：" + JSON.stringify(error.response.data));
+
+      this.$confirm('此操作将永久删除该题目, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$axios.delete(
+            "/problems/" +
+              this.id + "/"
+          ).then(response => {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+            this.$router.push({
+              name: 'problem'
+            });
+          }).catch(error => {
+            this.$message.error("删除失败：" + JSON.stringify(error.response.data));
+          });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });          
       });
-      
     },
 
     submit: function () {
-      if (this.addtime == "") {
-        this.$message.error("非法操作！");
-        return;
-      }
-      if (!sessionStorage.userid) {
+      if (!this.loggedIn) {
         this.$message.error("请先登录！");
         return;
       }
@@ -412,10 +433,12 @@ export default {
     },
   },
   computed: {
-    editingEnabled: function () {
-      // TODO: retrieve from Vuex state manager
-      return true;
-    },
+    ...mapState([
+      'loggedIn',
+      'userID',
+      'username',
+      'isSuperUser'
+    ])
   },
   destroyed () {
   }

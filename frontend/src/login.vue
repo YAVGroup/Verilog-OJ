@@ -43,30 +43,26 @@ export default {
       this.dialogLoginVisible = true;
     },
     loginClick() {
-      this.$axios
-        .post("/user/login/", {
-          username: this.form.username,
-          password: this.form.password
-        })
-        .then(response => {
+      this.$store.dispatch('logIn', {
+        username: this.form.username,
+        password: this.form.password,
+        // Note on JS newbie:
+        // () => {} don't provide their own this binding
+        // while function () {} provides
+        success_cb: () => {
           this.$message({
             message: "登录成功！",
             type: "success"
           });
-          this.$store.commit({
-            type: 'logIn',
-            userID: response.data.id,
-            username: response.data.username,
-            isSuperUser: response.data.is_superuser
-          })
           this.dialogLoginVisible = false;
-        })
-        .catch(error => {
+        },
+        fail_cb: (error) => {
           if (error.response != undefined)
             this.$message.error("登录失败：" + JSON.stringify(error.response.data));
           else
             this.$message.error("抱歉，似乎出了点问题");
-        });
+        }
+      })
     }
   }
 };
