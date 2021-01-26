@@ -53,7 +53,7 @@ JUDGER_CONFIG = {
     'submit_appdata': True,
     'appdata_path': './appdata.txt',       # app data (if got)
     'possible_error_path': './possible_error.txt',           # The possible error collected
-    'url_host': 'http://backend:8000',     # here trailing / will affect performance, since
+    'url_host': 'http://backend:8000/oj',  # here trailing / will affect performance, since
                                            # django will do 301 on this
     'judger_secret': JUDGER_SECRET,
     'use_docker': True,                    # True if run in docker, False otherwise
