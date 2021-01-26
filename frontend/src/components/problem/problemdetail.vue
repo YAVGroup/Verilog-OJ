@@ -122,16 +122,16 @@
                 @row-click="rowClick"
                 size="mini">
 
-                <el-table-column prop="id" label="ID" :width="40"></el-table-column>
+                <el-table-column prop="problem" label="题目" :width="60"></el-table-column>
                 <el-table-column prop="id" label="用户" :width="60"></el-table-column>
 
                 <el-table-column prop="result" label="状态">
-                  <template slot-scope="scope">
+                  <!-- <template slot-scope="scope">
                     <el-tag size="mini" :type="statuetype(scope.row.result)" disable-transitions hit>
                       {{ scope.row.result }}
                       <i class="el-icon-loading" v-show="statuejudge(scope.row.result)"></i>
                     </el-tag>
-                  </template>
+                  </template> -->
                 </el-table-column>
               </el-table>
             </el-card>
@@ -305,9 +305,9 @@ export default {
       this.$axios
         .get(
           "/submissions/?user=" +
-            this.username +
+            sessionStorage.userid +
             "&problem=" +
-            this.problem
+            this.id
         )
         .then(response => {
           for (var i = 0; i < response.data.length; i++) {
