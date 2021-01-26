@@ -165,6 +165,8 @@
 
 <script>
 import moment from "moment";
+import { mapState } from "vuex";
+
 export default {
   name: "statue",
   methods: {
@@ -364,6 +366,12 @@ export default {
       }
     };
   },
+  computed: mapState([
+    'loggedIn',
+    'userID',
+    'username',
+    'isSuperUser'
+  ]),
   destroyed () {
     clearInterval(this.$store.state.timer);
   },

@@ -61,7 +61,6 @@ export default {
   data () {
     return {
       type: 1,
-      isadmin: false,
       canshow: false,
       loading: true
     };
@@ -70,12 +69,6 @@ export default {
 
   },
   created () {
-    this.isadmin = sessionStorage.isadmin;
-    if (!this.isadmin) {
-      this.$message.error("非法访问！");
-      this.canshow = false;
-      return;
-    }
     this.canshow = true;
   },
   mounted () {

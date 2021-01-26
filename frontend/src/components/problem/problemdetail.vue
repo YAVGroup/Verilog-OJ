@@ -117,7 +117,9 @@
               </el-row>
               <el-row>
                 <el-col :span="10">创建者</el-col>
-                <el-col :span="14">{{ owner }}</el-col>
+                <el-col :span="14">
+                  <userhyperlink :userID="owner"></userhyperlink>
+                </el-col>
               </el-row>
               <el-row>
                 <el-col :span="10">题目难度</el-col>
@@ -133,7 +135,7 @@
           <el-row>
             <el-card shadow="never">
               <div style="box-sizing: border-box; padding-bottom: 8px; display: inline-block;" >提交记录</div>
-              <el-button size="mini" @click="submissions_refresh" style="float: right;" :disabled="!loggedIn">刷新</el-button>
+              <el-button size="mini" @click="submissionsRefresh" style="float: right;" :disabled="!loggedIn">刷新</el-button>
               <el-table
                 :default-sort="{prop: 'id', order: 'descending'}"
                 :data="submissions"
@@ -184,7 +186,10 @@ require("codemirror/theme/base16-dark.css");
 require("codemirror/mode/verilog/verilog");
 
 import wavedrom from "@/components/utils/wavedrom";
+import userhyperlink from "@/components/utils/userhyperlink";
+
 import { mapState } from 'vuex';
+import Userhyperlink from '../utils/userhyperlink.vue';
 
 export default {
   name: "problemdetail",
@@ -192,7 +197,8 @@ export default {
     codemirror,
     // statusmini,
     // prostatistice,
-    wavedrom
+    wavedrom,
+    userhyperlink
   },
   data () {
     return {
@@ -261,7 +267,9 @@ export default {
         this.title = response.data.name;
         this.level = response.data.level;
         this.submissions = response.data.submissions;
-        this.submissions_refresh();
+
+        if (this.loggedIn)
+          this.submissionsRefresh();
       })
       .catch(error => {
         this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
@@ -325,7 +333,7 @@ export default {
       })
     },
 
-    submissions_refresh(){
+    submissionsRefresh(){
       if (!this.loggedIn) {
         this.$message.error("请登陆后查看自己的提交！");
         return;
