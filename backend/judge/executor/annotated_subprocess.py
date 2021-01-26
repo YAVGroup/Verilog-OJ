@@ -81,7 +81,7 @@ class Popen(subprocess.Popen):
             threads.append(t)
 
             t = threading.Thread(
-                target=addtime, args=(self.err_r, buffer, buffer_mutex, '[ERR %H:%M:%S]'))
+                target=addtime, args=(self.err_r, buffer, buffer_mutex, '[ERR %H:%M:%S] '))
             t.start()
             threads.append(t)
 
