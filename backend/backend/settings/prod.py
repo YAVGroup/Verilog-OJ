@@ -1,5 +1,7 @@
 from .base import *
 
+import socket
+
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -18,7 +20,8 @@ JUDGER_SECRET = os.environ['VERILOG_OJ_JUDGER_SECRET']
 
 # Only IP in this range is allowed to be a valid judger in authentication
 JUDGER_IP_WHITELIST = [
-    '127.0.0.1'
+    '127.0.0.1',
+    socket.gethostbyname("judgeworker")
 ]
 
 
@@ -38,11 +41,11 @@ if 'VERILOG_OJ_PROD_DEBUG' in os.environ:
 if 'VERILOG_OJ_PUBLIC_HOST' not in os.environ:
     raise Exception("Verilog OJ should have VERILOG_OJ_PUBLIC_HOST passed by envvars")
 
-ALLOWED_HOSTS = [
+ALLOWED_HOSTS = list(set([
     '127.0.0.1',
     'localhost',
     os.environ['VERILOG_OJ_PUBLIC_HOST']
-]
+]) | set(JUDGER_IP_WHITELIST))
 
 # ---- Judger configurations ----
 
