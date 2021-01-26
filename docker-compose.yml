@@ -37,6 +37,8 @@ services:
       VERILOG_OJ_RABBITMQ_PASSWORD: ${rabbitmq_password}
       DOCKER_JUDGER_HOST_PATH: ${docker_judger_host_path}
       DOCKER_HOST_DIR: ${docker_host_dir}
+    volumes:
+      - files-volume:/app/storage
     depends_on:
       - "db"
       - "mqserver"
@@ -101,4 +103,6 @@ services:
 
 volumes:
   db-volume:
+    driver: local
+  files-volume:
     driver: local
