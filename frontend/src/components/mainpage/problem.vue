@@ -64,6 +64,9 @@
                            :width="70"></el-table-column>
         </el-table>
         <!--下方选页-->
+        <el-row>
+          &nbsp;
+        </el-row>
         <center>
           <el-pagination @size-change="handleSizeChange"
                          @current-change="handleCurrentChange"
