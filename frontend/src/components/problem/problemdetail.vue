@@ -147,8 +147,8 @@
                 element-loading-spinner="el-icon-info"
                 size="mini">
 
-                <el-table-column prop="problem" label="题目" :width="60"></el-table-column>
-                <el-table-column prop="id" label="用户" :width="60"></el-table-column>
+                <el-table-column prop="id" label="ID" :width="60"></el-table-column>
+                <el-table-column prop="pretty_time" label="日期" :width="60"></el-table-column>
 
                 <el-table-column prop="result" label="状态">
                   <!-- <template slot-scope="scope">
@@ -189,7 +189,7 @@ import wavedrom from "@/components/utils/wavedrom";
 import userhyperlink from "@/components/utils/userhyperlink";
 
 import { mapState } from 'vuex';
-import Userhyperlink from '../utils/userhyperlink.vue';
+import { prettyDate } from "@/utils/timeUtil";
 
 export default {
   name: "problemdetail",
@@ -266,7 +266,6 @@ export default {
 
         this.title = response.data.name;
         this.level = response.data.level;
-        this.submissions = response.data.submissions;
 
         if (this.loggedIn)
           this.submissionsRefresh();
@@ -347,9 +346,7 @@ export default {
         )
         .then(response => {
           for (var i = 0; i < response.data.length; i++) {
-            response.data[i]["submittime"] = moment(
-              response.data[i]["submit_time"]
-            ).format("YYYY-MM-DD");
+            response.data[i]["pretty_time"] = prettyDate(response.data[i]["submit_time"]);
           }
           this.submissions = response.data;
         });
