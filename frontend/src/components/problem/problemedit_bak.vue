@@ -116,11 +116,21 @@
               </el-select>
           </el-row>
           <el-row>
-            <el-button @click="retrieveTemplate" type="success">
+            <el-button @click="dialogVisible=true" type="success"
+             style="font-weight: bold; margin-left: 10px; float: left;">
               模板获取
             </el-button>
+            <el-button @click="addtestcase" type="success"
+              style="font-weight: bold; margin-left: 10px; float: left;">
+              判题脚本添加
+            </el-button>
+            <el-button @click="deltestcase" type="danger"
+              style="font-weight: bold; margin-left: 10px; float: left;">
+              判题脚本删除
+            </el-button>
+
           </el-row>
-          <!-- <el-row>
+          <el-row>
             <el-dialog
                 title="提示"
                 :visible.sync="dialogVisible"
@@ -131,14 +141,14 @@
                     <span> {{ retrieve_title }}</span>
                 </div>
                  <el-input  type="textarea" v-model="retrieve_code"></el-input> -->
-                <!-- <codemirror v-model="retrieve_code"
+                <codemirror v-model="retrieve_code"
                         :options="cmOptions"></codemirror>
                 <span slot="footer" class="dialog-footer">
                   <el-button @click="dialogVisible = false">取 消</el-button>
                   <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
                 </span>
               </el-dialog>
-            </el-row> --> 
+            </el-row> 
 
           <!--代码编辑-->
           <el-row>
@@ -211,9 +221,6 @@ import { codemirror } from "vue-codemirror";
 import { Datetime } from 'vue-datetime'
 import wavedrom from "@/components/utils/wavedrom";
 import 'vue-datetime/dist/vue-datetime.css'
-
-import { mapState } from 'vuex';
-
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
 require("codemirror/theme/base16-dark.css");
@@ -300,12 +307,6 @@ export default {
       // submitid: -1
     };
   },
-  computed: mapState([
-    'loggedIn',
-    'userID',
-    'username',
-    'isSuperUser'
-  ]),
   created () {
       if (this.$route.params.problemid!=null) {
         this.is_change = true;
@@ -313,7 +314,7 @@ export default {
 
       if(this.is_change) { //edit模式
         this.$axios.get("/problems/"+ this.$route.params.problemid +"/?id="+ this.$route.params.problemid + 
-          "&owner=" + this.userID).then(response => {
+          "&owner=" + sessionStorage.userid).then(response => {
           var problem = response.data;
           // console.log(problem);
           this.title = problem["name"];
@@ -446,6 +447,7 @@ export default {
       this.content = message;
       this.cmOptions["mode"] = language;
     },
+    
 
     problemlevel: function (type) {
       if (type == "Easy") return "info";
@@ -500,7 +502,7 @@ export default {
       this.$axios
         .get(
           "/submissions/?user=" +
-            this.userID +
+            this.username +
             "&problem=" +
             this.problem
         )
@@ -535,18 +537,19 @@ export default {
           });  
     },
 
-    async deltestcase(problemid) {
-      return this.$axios.get("/problem-testcases/?problem=" + problemid + "/" ).then(response => {
-        var res = response.data;
-        for (var i=0;i < res.length;i=i+1) {
-            console.log(res[i]);
-            this.$axios.delete("problem-testcases/"+
-              res[i].id+"/"
-            );
-        }
-            }).catch(error => {
-            this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
+    async gettestcase(problemid) {
+      return this.$axios.get("/problem-testcases/?problem=" + problemid + "/" ).catch(error => {
+            this.$message.error("题目错误！" + "(" + JSON.stringify(error.response.data) + ")");
           });  
+    },
+
+    addtestcase(){
+      //对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.v,main.sh
+      this.testcases.push({ code:["","","","",""] })
+    },
+
+    deltestcase() {
+
     },
 
     async problemedit() {
@@ -554,14 +557,14 @@ export default {
         this.is_edit = true;
         return;
       }
-      else if(!this.loggedIn){
+      else if(!sessionStorage.userid){
         this.$message.error("请先登录！");
         return;
       }
       else{
         switch(this.lastchange) {
           case 0:
-            this.code_items[this.lastindex].code = this.content;
+            this.code_itestcasestems[this.lastindex].code = this.content;
             break;
           case 1:
             this.code_templates[this.lastindex].code = this.content;
@@ -583,14 +586,26 @@ export default {
             break;
       }
         this.is_edit = false;
-
+        
+        var wavedump_list = [];
+        var vcdmain_list = [];
+        var vcdvisualize_list = [];
+        var testbench_list = [];
+        var main_list = [];
+        for(var i=0;i<this.testcases.length;i=i+1) {
+          const wavedump_id = await this.upload(this.testcases[0].code[0],'wavedump.py');
+          const vcd_main_id = await this.upload(this.testcases[0].code[1],'vcd_main.py');
+          const testbench_id = await this.upload(this.testcases[0].code[2],'testbench.v');
+          const vcd_visualize_id = await this.upload(this.testcases[0].code[3],'vcd_visualize.py');
+          const main_id = await this.upload(this.testcases[0].code[4],'main.sh');
+          wavedump_list.push(wavedump_id);
+          vcdmain_list.push(vcd_main_id);
+          vcdvisualize_list.push(vcd_visualize_id);
+          main_list.push(main_id);
+          testbench_list.push(testbench_id);
+        }
         const code_id = await this.upload(this.code_items[0].code,'code_ref.v');
         const template_id = await this.upload(this.code_templates[0].code,'template_code.v');
-        const wavedump_id = await this.upload(this.testcases[0].code[0],'wavedump.py');
-        const vcd_main_id = await this.upload(this.testcases[0].code[1],'vcd_main.py');
-        const testbench_id = await this.upload(this.testcases[0].code[2],'testbench.v');
-        const vcd_visualize_id = await this.upload(this.testcases[0].code[3],'vcd_visualize.py');
-        const main_id = await this.upload(this.testcases[0].code[4],'main.sh');
         var body = {}
         body['name'] = this.title;
         body['description'] = this.des;
@@ -598,34 +613,34 @@ export default {
         body['description_output'] = this.output;
         body['app_data'] = this.waveform;
         body['level'] = this.level;
-        body['owner'] = this.userID;
+        body['owner'] = this.username;
         body['template_code_file'] = template_id;
         body['judge_files'] = [code_id];
         if(this.have_ddl)
           body['deadline_time'] = this.ddl_time;
-        // console.log(template_id);
+        console.log(template_id);
         if (this.is_change) {
-
-          await this.deltestcase(this.$route.params.problemid);
           this.$axios.patch(
             "/problems/" + this.$route.params.problemid + "/", body
           )
+          var testcase_list = await this.gettestcase(this.testcases[0].code[0],'wavedump.py');
 
-          // for(var j=0;j<testcase_list.length;j=j+1) {
-          //   this.$axios.delete("/problem-testcases/"+testcase_list[j].id+"/").catch(error=>{
-          //     this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          //   });
-          // }
-          // var testcase_body = {};
-          // testcase_body['type'] = 'SIM';
-          // testcase_body['testcase_files'] = [wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id];
-          // testcase_body['problem'] = this.$route.params.problemid;
-          // this.$axios.patch("/problem-testcases/"+ this.$route.params.problemid + "/", testcase_body).catch(error => {
-          //     this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          //   });
-          this.upload_testcase([wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id],
-              this.$route.params.problemid
-            );
+          for(var j=0;j<testcase_list.length;j=j+1) {
+            this.$axios.delete("/problem-testcases/"+testcase_list[j].id+"/").catch(error=>{
+              this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
+            });
+          }
+
+          for(var k=0;k<wavedump_list.length;k=k+1) {
+            const wavedump_id = wavedump_list[k];
+            const vcd_main_id = vcdmain_list[k];
+            const vcd_visualize_id = vcdvisualize_list[k];
+            const main_id = main_list[k];
+            const testbench_id = testbench_list[k]; 
+            this.upload_testcase([wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id],
+                this.$route.params.problemid
+              );
+          }
             return   this.$router.push({
               name: 'problemdetail',
               params: {problemid: this.$route.params.problemid}
@@ -637,9 +652,16 @@ export default {
         else return this.$axios.post(
             "/problems/",body
           ).then(response => {
-            this.upload_testcase([wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id],
-              response.data.id
-            );
+            for(var i=0;i<wavedump_list.length;i=i+1) {
+              const wavedump_id = wavedump_list[i];
+              const vcd_main_id = vcdmain_list[i];
+              const vcd_visualize_id = vcdvisualize_list[i];
+              const main_id = main_list[i];
+              const testbench_id = testbench_list[i]; 
+              this.upload_testcase([wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id],
+                  response.data.id
+                );
+            }
             this.$router.push({
             name: 'problemdetail',
             params: {problemid: response.data.id}
