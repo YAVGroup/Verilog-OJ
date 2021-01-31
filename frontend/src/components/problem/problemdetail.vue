@@ -127,7 +127,9 @@
               </el-row>
               <el-row>
                 <el-col :span="10">题目标签</el-col>
-                <el-col :span="14">{{ tagnames }}</el-col>
+                <el-col :span="14">
+                  <taglist :tags="tags" />
+                </el-col>
               </el-row>
             </el-card>
           </el-row>
@@ -187,6 +189,7 @@ require("codemirror/mode/verilog/verilog");
 
 import wavedrom from "@/components/utils/wavedrom";
 import userhyperlink from "@/components/utils/userhyperlink";
+import taglist from "@/components/utils/taglist";
 
 import { mapState } from 'vuex';
 import { prettyDate } from "@/utils/timeUtil";
@@ -198,7 +201,8 @@ export default {
     // statusmini,
     // prostatistice,
     wavedrom,
-    userhyperlink
+    userhyperlink,
+    taglist
   },
   data () {
     return {
@@ -216,7 +220,7 @@ export default {
       addtime: "",
       ddl: "",
       have_ddl: false,
-      tagnames: [],
+      tags: "",
       level: "",
       ddl_time: "",
       id: null,
@@ -252,7 +256,7 @@ export default {
           })
         }
 
-        this.tagnames = response.data["tags"].split("|");
+        this.tags = response.data["tags"];
 
         if (response.data.deadline_time == null) {
           this.ddl = "";
