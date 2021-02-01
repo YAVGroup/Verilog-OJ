@@ -1,197 +1,215 @@
 <template>
   <el-row :gutter="15">
-    <el-col :span="18">
+    <el-col :xs="0" :sm="1" :md="2" :lg="2" :xl="4" class="placeholder">
+      <!-- placeholder only -->
+      &nbsp;
+    </el-col>
+    <el-col :xs="24" :sm="22" :md="20" :lg="20" :xl="16">
+      <!-- Welcome message -->
       <el-row>
-        <el-card shadow="always">
-          <!--标题、DDL-->
-          <el-row gutter="18">
-            <el-col :span="2">
-              <el-button type="success"
-                         @click="problemedit"
-                         style="font-weight:bold;margin-left:10px;">Submit</el-button>
-            </el-col>
-            <!-- <el-col :span="2">
-              <el-button type="danger"
-                         @click="is_change=false"
-                         style="font-weight:bold;margin-left:30px;" v-if="is_change">Cancel</el-button>
-              <el-button v-else type="danger"
-                         @click="is_change=true"
-                         style="font-weight:bold;margin-left:30px;">Edit</el-button>
-            </el-col> -->
+        <el-card shadow="never">
+          <el-row>
+            <h3 style="display: inline-block; margin: 3px 0px;">欢迎您向 Verilog OJ 贡献题目！</h3>
           </el-row>
-          <!-- <el-row :gutter="18" 
-            class="problem-description-title" v-if="is_change">select problem</el-row>
-          <el-row :gutter="18" 
-            class="problem-description-title" v-if="is_change">
-              <el-select v-model="problem_id" placeholder="题目：">
-                <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
-              </el-select>
-            </el-row> -->
-          <el-row :gutter="18" id="ddl" >Title</el-row>
-          <el-row :gutter="18" id="title">
-            <el-col :span="20">
-              <el-input v-model="title"></el-input>
-            </el-col>
-          </el-row>
-          <el-row :gutter="18" id="ddl" >Deadline</el-row>
-          <el-row :gutter="18" class="problem-descriptions" >
-              <el-radio v-model="have_ddl" :label="true">have ddl</el-radio>
-              <el-radio v-model="have_ddl" :label="false">no ddl</el-radio>
-              <datetime type="datetime" icon="el-icon-date" v-model="ddl_time" v-show="have_ddl" ></datetime>
-          </el-row>
-          
-
-          <!--题目描述、输入、输出-->
-          <el-row :gutter="18"
-                  class="problem-description-title">Description</el-row>
-          <el-row :gutter="18" class="problem-descriptions">
-            <el-input  type="textarea" v-model="des"></el-input>
-          </el-row>
-
-          <el-row :gutter="18"
-                  class="problem-description-title">Input</el-row>
-          <el-row :gutter="18" class="problem-descriptions">
-            <el-input  type="textarea" v-model="input"></el-input>
-          </el-row>
-          <el-row :gutter="18"
-                  class="problem-description-title">Output</el-row>
-          <el-row :gutter="18" class="problem-descriptions">
-            <el-input  type="textarea" v-model="output"></el-input>
-          </el-row>
-
-          <el-row :gutter="18"
-                  class="problem-description-title">Level </el-row>
-          <el-row :gutter="18" class="problem-descriptions">        
-              <el-select v-model="level" placeholder="难度：">
-                <el-option key="1" label="简单" :value="1"></el-option>
-                <el-option key="2" label="普通" :value="2"></el-option>
-                <el-option key="3" label="中等" :value="3"></el-option>
-                <el-option key="4" label="困难" :value="4"></el-option>
-                <el-option key="5" label="极其困难" :value="5"></el-option>
-              </el-select>
-          </el-row>
-
-          <!--这里放样例波形图-->
-          <el-row :gutter="18"
-                  class="problem-description-title">Sample waveform</el-row>
-          <el-row :gutter="18"
-                  id="sample_waveform" class="problem-descriptions">
-            <el-input  v-model="waveform" type="textarea" v-if="waveedit"></el-input>
-            <wavedrom v-else waveId="1"
-                            :parentText="waveform"
-                            errorMessage="Sorry, no sample waveform available"></wavedrom>
-          </el-row>
-          <el-row :gutter="18"
-                  class="problem-description-title">
-            <el-button @click="waveedit=!waveedit" type="success">
-              <div v-if="waveedit">view</div>
-              <div v-else>edit</div>
-            </el-button>
+          <el-row>
+            <div>
+              Verilog OJ 测试期间需要大家的反馈和配合。我们为新手上路的各位准备了常用的模板，帮助大家完成简单题目的创建。
+            </div>
+            <div>
+              更多信息您可以查看
+              <a href="https://github.com/YAVGroup/Verilog-OJ/blob/master/doc/operation/Problem_add_HOWTO.md">Verilog OJ 出题指南</a>。
+            </div>
           </el-row>
         </el-card>
       </el-row>
 
       <el-row>
-        <el-card shadow="always">
-          <!--提交界面-->
-          <el-row :gutter="15">
-
-
-            <!-- <el-col :span="2">
-              <el-button type="info"
-                         style="font-weight:bold;margin-left:30px;">Submit Files</el-button>
-            </el-col> -->
-          </el-row>
-          <el-row :gutter="18" class="problem-descriptions">        
-              <el-select v-model="retrievefile" placeholder="难度：">
-                <el-option key="0" label="wavedump.py" :value="0"></el-option>
-                <el-option key="1" label="vcd_main.py" :value="1"></el-option>
-                <el-option key="2" label="vcd_visualize.py" :value="2"></el-option>
-                <el-option key="3" label="main.sh" :value="3"></el-option>
-              </el-select>
-          </el-row>
-          <el-row>
-            <el-button @click="retrieveTemplate" type="success">
-              模板获取
-            </el-button>
-          </el-row>
-          <!-- <el-row>
-            <el-dialog
-                title="提示"
-                :visible.sync="dialogVisible"
-                width="30%"
-                :before-close="handleClose">    
-
-                <div slot="title" class="header-title">
-                    <span> {{ retrieve_title }}</span>
-                </div>
-                 <el-input  type="textarea" v-model="retrieve_code"></el-input> -->
-                <!-- <codemirror v-model="retrieve_code"
-                        :options="cmOptions"></codemirror>
-                <span slot="footer" class="dialog-footer">
-                  <el-button @click="dialogVisible = false">取 消</el-button>
-                  <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-                </span>
-              </el-dialog>
-            </el-row> --> 
-
-          <!--代码编辑-->
-          <el-row>
-            <el-container style="height: 500px; border: 1px solid #eee">
-              <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-                <el-menu :default-openeds="['1', '3']">
-                  <el-submenu index="1">
-                    <template slot="title"><i class="el-icon-message"></i>代码文件</template>
-                    <el-menu-item-group>
-                      <template slot="title">模板文件</template>
-                      <li v-for="(code_item, index) in code_items" :key="code_item.code">
-                        <el-menu-item @click="code_select(code_item.code,'verilog',0,index)">code.v </el-menu-item>
-                      </li>
-                      <li v-for="(code_template, index) in code_templates" :key="code_template.code">
-                        <el-menu-item @click="code_select(code_template.code,'verilog',1,index)">code_template.v</el-menu-item>
-                      </li>
-                    </el-menu-item-group>
-                    <!-- <el-menu-item-group title="仿真文件">
-                      <li v-for="(testbench,index) in testbenches" :key="testbench.code">
-                        <el-menu-item @click="code_select(testbench.code,'verilog',2,index)" >testbench.v</el-menu-item>
-                      </li>
-                    </el-menu-item-group> -->
-                  </el-submenu>
-                  <el-submenu index="2">
-                    <template slot="title"><i class="el-icon-menu"></i>判题文件</template>
-                    <li v-for="(testcase,index) in testcases" :key="testcase.code">
-                    <el-menu-item-group>
-                      <template slot="title">判题脚本{{index}}</template>
-                      <el-menu-item @click="code_select(testcase.code[0],'python',2,index)" >wavedump.py</el-menu-item>
-                      <el-menu-item @click="code_select(testcase.code[1],'python',3,index)" >vcd_main.py</el-menu-item>
-                      <el-menu-item @click="code_select(testcase.code[2],'verilog',4,index)" >testbench.v</el-menu-item>
-                      <el-menu-item @click="code_select(testcase.code[3],'python',5,index)" >vcd_visualize.py</el-menu-item>
-                      <el-menu-item @click="code_select(testcase.code[4],'shell',6,index)"  >main.sh</el-menu-item>
-                    </el-menu-item-group>
-                    </li>
-
-                  </el-submenu>
-
-                </el-menu>
-              </el-aside>
+        <el-card shadow="never">
+          <el-tabs tab-position="top">
+            <el-tab-pane label="基本信息">
+              <!--标题、DDL-->
+              <!-- <el-row :gutter="18" 
+                class="problem-description-title" v-if="is_change">select problem</el-row>
+              <el-row :gutter="18" 
+                class="problem-description-title" v-if="is_change">
+                  <el-select v-model="problem_id" placeholder="题目：">
+                    <el-option
+                      v-for="item in options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                </el-row> -->
+              <el-row :gutter="18" id="ddl" >Title</el-row>
+              <el-row :gutter="18" id="title">
+                <el-col :span="20">
+                  <el-input v-model="title"></el-input>
+                </el-col>
+              </el-row>
+              <el-row :gutter="18" id="ddl" >Deadline</el-row>
+              <el-row :gutter="18" class="problem-descriptions" >
+                  <el-radio v-model="have_ddl" :label="true">have ddl</el-radio>
+                  <el-radio v-model="have_ddl" :label="false">no ddl</el-radio>
+                  <datetime type="datetime" icon="el-icon-date" v-model="ddl_time" v-show="have_ddl" ></datetime>
+              </el-row>
               
-              <el-container>             
-                <el-main id="container_main">
-                  <!-- <el-input v-model="code" size=big tpye="textarea"></el-input> -->
-                  <codemirror v-model="content"
-                        :options="cmOptions"></codemirror>
-                </el-main>
-              </el-container>
-            </el-container>
 
-          </el-row>
+              <!--题目描述、输入、输出-->
+              <el-row :gutter="18"
+                      class="problem-description-title">Description</el-row>
+              <el-row :gutter="18" class="problem-descriptions">
+                <el-input  type="textarea" v-model="des"></el-input>
+              </el-row>
+
+              <el-row :gutter="18"
+                      class="problem-description-title">Input</el-row>
+              <el-row :gutter="18" class="problem-descriptions">
+                <el-input  type="textarea" v-model="input"></el-input>
+              </el-row>
+              <el-row :gutter="18"
+                      class="problem-description-title">Output</el-row>
+              <el-row :gutter="18" class="problem-descriptions">
+                <el-input  type="textarea" v-model="output"></el-input>
+              </el-row>
+
+              <el-row :gutter="18"
+                      class="problem-description-title">Level </el-row>
+              <el-row :gutter="18" class="problem-descriptions">        
+                  <el-select v-model="level" placeholder="难度：">
+                    <el-option key="1" label="简单" :value="1"></el-option>
+                    <el-option key="2" label="普通" :value="2"></el-option>
+                    <el-option key="3" label="中等" :value="3"></el-option>
+                    <el-option key="4" label="困难" :value="4"></el-option>
+                    <el-option key="5" label="极其困难" :value="5"></el-option>
+                  </el-select>
+              </el-row>
+
+              <!--这里放样例波形图-->
+              <el-row :gutter="18"
+                      class="problem-description-title">Sample waveform</el-row>
+              <el-row :gutter="18"
+                      id="sample_waveform" class="problem-descriptions">
+                <el-input  v-model="waveform" type="textarea" v-if="waveedit"></el-input>
+                <wavedrom v-else waveId="1"
+                                :parentText="waveform"
+                                errorMessage="Sorry, no sample waveform available"></wavedrom>
+              </el-row>
+              <el-row :gutter="18"
+                      class="problem-description-title">
+                <el-button @click="waveedit=!waveedit" type="success">
+                  <div v-if="waveedit">view</div>
+                  <div v-else>edit</div>
+                </el-button>
+              </el-row>
+            </el-tab-pane>
+            <el-tab-pane label="标签设置">
+              
+            </el-tab-pane>
+            <el-tab-pane label="文件编辑">
+              <!--提交界面-->
+              <el-row :gutter="15">
+
+
+                <!-- <el-col :span="2">
+                  <el-button type="info"
+                            style="font-weight:bold;margin-left:30px;">Submit Files</el-button>
+                </el-col> -->
+              </el-row>
+              <el-row :gutter="18" class="problem-descriptions">        
+                  <el-select v-model="retrievefile" placeholder="难度：">
+                    <el-option key="0" label="wavedump.py" :value="0"></el-option>
+                    <el-option key="1" label="vcd_main.py" :value="1"></el-option>
+                    <el-option key="2" label="vcd_visualize.py" :value="2"></el-option>
+                    <el-option key="3" label="main.sh" :value="3"></el-option>
+                  </el-select>
+              </el-row>
+              <el-row>
+                <el-button @click="retrieveTemplate" type="success">
+                  模板获取
+                </el-button>
+              </el-row>
+              <!-- <el-row>
+                <el-dialog
+                    title="提示"
+                    :visible.sync="dialogVisible"
+                    width="30%"
+                    :before-close="handleClose">    
+
+                    <div slot="title" class="header-title">
+                        <span> {{ retrieve_title }}</span>
+                    </div>
+                    <el-input  type="textarea" v-model="retrieve_code"></el-input> -->
+                    <!-- <codemirror v-model="retrieve_code"
+                            :options="cmOptions"></codemirror>
+                    <span slot="footer" class="dialog-footer">
+                      <el-button @click="dialogVisible = false">取 消</el-button>
+                      <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+                    </span>
+                  </el-dialog>
+                </el-row> --> 
+
+              <!--代码编辑-->
+              <el-row>
+                <el-container style="height: 500px; border: 1px solid #eee">
+                  <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+                    <el-menu :default-openeds="['1', '3']">
+                      <el-submenu index="1">
+                        <template slot="title"><i class="el-icon-message"></i>代码文件</template>
+                        <el-menu-item-group>
+                          <template slot="title">模板文件</template>
+                          <li v-for="(code_item, index) in code_items" :key="code_item.code">
+                            <el-menu-item @click="code_select(code_item.code,'verilog',0,index)">code.v </el-menu-item>
+                          </li>
+                          <li v-for="(code_template, index) in code_templates" :key="code_template.code">
+                            <el-menu-item @click="code_select(code_template.code,'verilog',1,index)">code_template.v</el-menu-item>
+                          </li>
+                        </el-menu-item-group>
+                        <!-- <el-menu-item-group title="仿真文件">
+                          <li v-for="(testbench,index) in testbenches" :key="testbench.code">
+                            <el-menu-item @click="code_select(testbench.code,'verilog',2,index)" >testbench.v</el-menu-item>
+                          </li>
+                        </el-menu-item-group> -->
+                      </el-submenu>
+                      <el-submenu index="2">
+                        <template slot="title"><i class="el-icon-menu"></i>判题文件</template>
+                        <li v-for="(testcase,index) in testcases" :key="testcase.code">
+                        <el-menu-item-group>
+                          <template slot="title">判题脚本{{index}}</template>
+                          <el-menu-item @click="code_select(testcase.code[0],'python',2,index)" >wavedump.py</el-menu-item>
+                          <el-menu-item @click="code_select(testcase.code[1],'python',3,index)" >vcd_main.py</el-menu-item>
+                          <el-menu-item @click="code_select(testcase.code[2],'verilog',4,index)" >testbench.v</el-menu-item>
+                          <el-menu-item @click="code_select(testcase.code[3],'python',5,index)" >vcd_visualize.py</el-menu-item>
+                          <el-menu-item @click="code_select(testcase.code[4],'shell',6,index)"  >main.sh</el-menu-item>
+                        </el-menu-item-group>
+                        </li>
+
+                      </el-submenu>
+
+                    </el-menu>
+                  </el-aside>
+                  
+                  <el-container>             
+                    <el-main id="container_main">
+                      <!-- <el-input v-model="code" size=big tpye="textarea"></el-input> -->
+                      <codemirror v-model="content"
+                            :options="cmOptions"></codemirror>
+                    </el-main>
+                  </el-container>
+                </el-container>
+
+              </el-row>
+            </el-tab-pane>
+          </el-tabs>
+          <!-- 这里的操作比较 dirty，是直接用 absolute 定位扔到那个位置，这里要注意叠放次序保证按钮在上（就是先写 el-tabs 后写 el-button），否则会按不到 -->
+          <!-- Ref: https://segmentfault.com/q/1010000020057405 -->
+          <el-button type="success"
+                    size="medium"
+                    @click="problemedit"
+                    style="font-weight: bold; position: absolute; right: 25px; top: 17px;">提交</el-button>
         </el-card>
       </el-row>
+
     </el-col>
 
 
@@ -773,4 +791,28 @@ export default {
   height: auto;
   max-width: 75%;
 }
+
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+.active, .collapsible:hover {
+  background-color: #555;
+}
+
+.content {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
+
 </style>
