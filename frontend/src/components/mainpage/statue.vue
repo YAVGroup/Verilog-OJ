@@ -296,8 +296,8 @@ export default {
       this.$axios
         .get(url)
         .then(response => {
-          for (var i = 0; i < response.data.length; i++) {
-            response.data.results[i].submittime = moment(response.data[i].submit_time).format("YYYY-MM-DD HH:mm:ss");
+          for (var i = 0; i < response.data.results.length; i++) {
+            response.data.results[i].submittime = moment(response.data.results[i].submit_time).format("YYYY-MM-DD HH:mm:ss");
             response.data.results[i].language = "Verilog";
           }
           this.tableData = response.data.results;
