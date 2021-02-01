@@ -78,7 +78,7 @@
     </el-dialog>
 
     <el-switch style="float: right; margin: 10px;"
-               v-model="showall"
+               v-model="showMeOnly"
                active-text="仅自己"
                inactive-text="所有人"
                @change="statuechange"></el-switch>
@@ -197,13 +197,10 @@ export default {
     searchstatus () {
       this.currentpage = 1;
       this.searchdialogVisible = false;
-      this.setusername(this.searchform.user);
       this.getstatusdata();
     },
     resetsearch () {
       this.currentpage = 1;
-      this.searchform.user = "";
-      this.setusername(this.searchform.user);
       this.searchform.problem = "";
       this.searchform.language = "";
       this.searchform.result = "";
@@ -280,15 +277,22 @@ export default {
       if (!this.username) this.username = "";
 
       if (this.username == sessionStorage.username && sessionStorage.username)
-        this.showall = true;
-      else this.showall = false;
+        this.showMeOnly = true;
+      else this.showMeOnly = false;
       this.getstatusdata();
+    },
+
+    getQueryUserName: function() {
+      if (this.showMeOnly) {
+        return this.userID;
+      }
+      return "";
     },
 
     getstatusdata () {
       this.loading = true;
       var url = "/submissions/?user=" +
-        this.username +
+        this.getQueryUserName() +
         "&limit=" +
         this.pagesize +
         "&offset=" +
@@ -314,19 +318,13 @@ export default {
           this.loading = false;
         });
     },
-
-    setusername (name) {   //实际为userid
-      this.$route.query.username = "";
-      this.username = name;
-    },
+    
     statuechange (val) {
       if (val == true) {
-        if (!sessionStorage.userid) {
-          this.showall = false;
+        if (!this.loggedIn) {
+          this.showMeOnly = false;
           this.$message.error("请先登录！");
-        } else this.setusername(sessionStorage.userid);
-      } else {
-        this.setusername("");
+        }
       }
       this.getstatusdata();
     },
@@ -353,9 +351,8 @@ export default {
       currentpage: 1,
       pagesize: 30,
       totalstatus: 10,
-      username: "",
       contest: "0",
-      showall: false,
+      showMeOnly: false,
       searchdialogVisible: false,
       loading: false,
       searchform: {
