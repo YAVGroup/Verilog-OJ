@@ -1,7 +1,7 @@
 <template>
   <div id="app"
        style="top:0px;left:0px;">
-    <el-menu :default-active="activeIndex"
+    <el-menu :default-active="this.$route.path"
              mode="horizontal"
              v-bind:router="true"
              id="nav">
@@ -81,7 +81,6 @@ export default {
   },
   data () {
     return {
-      activeIndex: "1",
       school: "USTC"
     };
   },
@@ -107,6 +106,9 @@ export default {
             this.$store.commit({
               type: 'logOut'
             });
+            if (this.$route.path != '/') {
+              this.$router.push("/");
+            }
             this.$message({
               message: "登出成功！",
               type: "success"

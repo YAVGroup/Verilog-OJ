@@ -207,18 +207,14 @@ export default {
       this.creattimer();
     },
     handleSizeChange (val) {
-      if (!this.username) this.username = this.$route.query.username;
       this.contest = this.$route.params.contestID;
       if (!this.contest) this.contest = "0";
-      if (!this.username) this.username = "";
       this.pagesize = val;
       this.getstatusdata();
     },
     handleCurrentChange (val) {
-      if (!this.username) this.username = this.$route.query.username;
       this.contest = this.$route.params.contestID;
       if (!this.contest) this.contest = "0";
-      if (!this.username) this.username = "";
       this.currentpage = val;
       this.getstatusdata();
     },
@@ -271,14 +267,8 @@ export default {
       return false;
     },
     timer: function () {
-      if (!this.username) this.username = this.$route.query.username;
       this.contest = this.$route.params.contestID;
       if (!this.contest) this.contest = "0";
-      if (!this.username) this.username = "";
-
-      if (this.username == sessionStorage.username && sessionStorage.username)
-        this.showMeOnly = true;
-      else this.showMeOnly = false;
       this.getstatusdata();
     },
 
