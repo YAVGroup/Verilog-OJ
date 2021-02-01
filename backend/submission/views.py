@@ -6,6 +6,7 @@ from rest_framework.schemas import AutoSchema
 from rest_framework.compat import coreapi, coreschema
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
+from rest_framework.pagination import LimitOffsetPagination
 from judge.tasks import do_judge_task
 
 from rest_framework.viewsets import GenericViewSet
@@ -31,6 +32,7 @@ class SubmissionViewSet(ReadOnlyModelViewSet):
     queryset = Submission.objects.all()
     #serializer_class = SubmissionSerializer
     # TODO: 提交信息的查看权限问题
+    pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     permission_classes = (GetOnlyPermission,)
     filter_fields = ('id','user', "problem", "submit_time")
