@@ -122,7 +122,7 @@
       </el-table-column>
       <el-table-column prop="result"
                        label="状态"
-                       :width="200">
+                       :width="240">
         <template slot-scope="scope">
           <el-tag size="medium"
                   :type="statuetype(scope.row.result)"
@@ -274,12 +274,16 @@ export default {
 
     getstatusdata () {
       this.loading = true;
-      var url = "/submissions/?user=" +
-        this.queryUserName +
-        "&limit=" +
-        this.pagesize +
-        "&offset=" +
-        (this.currentpage - 1) * this.pagesize;
+      let url = "/submissions/?limit=" + this.pagesize + "&offset=" + (this.currentpage - 1) * this.pagesize;
+      if (this.queryUserName) {
+        url += "&user=" + this.queryUserName;
+      }
+      // var url = "/submissions/?user=" +
+      //   this.queryUserName +
+      //   "&limit=" +
+      //   this.pagesize +
+      //   "&offset=" +
+      //   (this.currentpage - 1) * this.pagesize;
         // "&problemtitle=" +
         // this.searchform.problem +
         // "&language=" +
@@ -293,11 +297,11 @@ export default {
         .get(url)
         .then(response => {
           for (var i = 0; i < response.data.length; i++) {
-            response.data[i].submittime = moment(response.data[i].submit_time).format("YYYY-MM-DD HH:mm:ss");
-            response.data[i].language = "Verilog";
+            response.data.results[i].submittime = moment(response.data[i].submit_time).format("YYYY-MM-DD HH:mm:ss");
+            response.data.results[i].language = "Verilog";
           }
-          this.tableData = response.data;
-          this.totalstatus = response.data.length;
+          this.tableData = response.data.results;
+          this.totalstatus = response.data.count;
           this.loading = false;
         });
     },
