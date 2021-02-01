@@ -81,7 +81,7 @@
                v-model="showMeOnly"
                active-text="仅自己"
                inactive-text="所有人"
-               @change="statuechange"></el-switch>
+               :disabled="!this.loggedIn"></el-switch>
     <el-button plain
                @click="resetsearch"
                style="float: right;margin-top:6px;margin-right:10px;"
@@ -266,23 +266,16 @@ export default {
       if (type == "System Error") return false;
       return false;
     },
-    timer: function () {
-      this.contest = this.$route.params.contestID;
-      if (!this.contest) this.contest = "0";
-      this.getstatusdata();
-    },
-
-    getQueryUserName: function() {
-      if (this.showMeOnly) {
-        return this.userID;
-      }
-      return "";
-    },
+    // timer: function () {
+    //   this.contest = this.$route.params.contestID;
+    //   if (!this.contest) this.contest = "0";
+    //   this.getstatusdata();
+    // },
 
     getstatusdata () {
       this.loading = true;
       var url = "/submissions/?user=" +
-        this.getQueryUserName() +
+        this.queryUserName +
         "&limit=" +
         this.pagesize +
         "&offset=" +
@@ -309,21 +302,21 @@ export default {
         });
     },
     
-    statuechange (val) {
-      if (val == true) {
-        if (!this.loggedIn) {
-          this.showMeOnly = false;
-          this.$message.error("请先登录！");
-        }
-      }
-      this.getstatusdata();
-    },
-    creattimer () {
-      clearInterval(this.$store.state.timer);
-      this.timer();
-      // this.$store.state.timer = setInterval(this.timer, 500); 
-      // 取消自动刷新
-    },
+    // statuechange (val) {
+    //   if (val == true) {
+    //     if (!this.loggedIn) {
+    //       this.showMeOnly = false;
+    //       this.$message.error("请先登录！");
+    //     }
+    //   }
+    //   this.getstatusdata();
+    // },
+    // creattimer () {
+    //   clearInterval(this.$store.state.timer);
+    //   this.timer();
+    //   // this.$store.state.timer = setInterval(this.timer, 500); 
+    //   // 取消自动刷新
+    // },
   },
   data () {
     return {
@@ -343,6 +336,7 @@ export default {
       totalstatus: 10,
       contest: "0",
       showMeOnly: false,
+      queryUserName: "",
       searchdialogVisible: false,
       loading: false,
       searchform: {
@@ -353,19 +347,40 @@ export default {
       }
     };
   },
-  computed: mapState([
-    'loggedIn',
-    'userID',
-    'username',
-    'isSuperUser'
-  ]),
-  destroyed () {
-    clearInterval(this.$store.state.timer);
+  computed:{
+    ...mapState([
+      'loggedIn',
+      'userID',
+      'username',
+      'isSuperUser'
+    ])
   },
+  watch: {
+    loggedIn: function() {
+      if (!this.loggedIn) {
+        this.showMeOnly = false;
+        this.queryUserName = "";
+      }
+    },
+    showMeOnly: function() {
+      if (this.showMeOnly) {
+        this.queryUserName = this.userID;
+      } else {
+        this.queryUserName = "";
+      }
+    },
+    queryUserName: function() {
+      this.getstatusdata();
+    }
+  },
+  // destroyed () {
+  //   clearInterval(this.$store.state.timer);
+  // },
   created () {
+    this.getstatusdata();
     //创建一个全局定时器，定时刷新状态
-    this.isadmin = sessionStorage.isadmin;
-    this.timer();
+    // this.isadmin = sessionStorage.isadmin;
+    // this.timer();
     // this.$store.state.timer = setInterval(this.timer, 500);
     // 取消自动刷新
   }

@@ -106,9 +106,6 @@ export default {
             this.$store.commit({
               type: 'logOut'
             });
-            if (this.$route.path != '/') {
-              this.$router.push("/");
-            }
             this.$message({
               message: "登出成功！",
               type: "success"
