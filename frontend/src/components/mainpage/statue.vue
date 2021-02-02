@@ -9,9 +9,9 @@
       <el-col
         :xs="{ span: 12, pull: 0 }"
         :sm="{ span: 7, pull: 0 }"
-        :md="{ span: 6, pull: 2 }"
+        :md="{ span: 6, pull: 0 }"
         :lg="{ span: 5, pull: 3 }"
-        :xl="{ span: 3, pull: 4 }"
+        :xl="{ span: 3, pull: 6 }"
       >
         <el-switch
           v-model="showMeOnly"
@@ -29,7 +29,7 @@
       </el-col>
     </el-row>
     <el-row type="flex" justify="center">
-      <el-col :xs="24" :sm="24" :md="20" :lg="18" :xl="16">
+      <el-col :xs="24" :sm="24" :md="24" :lg="18" :xl="12">
         <el-table
           :default-sort="{ prop: 'id', order: 'descending' }"
           :data="tableData"
