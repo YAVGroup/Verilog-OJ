@@ -152,7 +152,7 @@ export default {
       this.searchform.problem = "";
       this.searchform.language = "";
       this.searchform.result = "";
-      this.creattimer();
+      this.getstatusdata();
     },
 
     handleSizeChange(val) {
