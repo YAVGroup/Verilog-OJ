@@ -28,7 +28,13 @@
             </el-row>
           </el-card>
         </el-row>
-        <el-row>
+        <el-row v-if="!loggedIn">
+          <el-alert type="success" show-icon title="登录以显示波形和测试结果！"></el-alert>
+        </el-row>
+        <el-row v-else-if="!hasPermission">
+          <el-alert type="warning" show-icon title="您只能查看自己的波形和测试结果！"></el-alert>
+        </el-row>
+        <el-row v-else>
           <!-- 测试点结果 -->
           <el-collapse>
             <el-collapse-item :key="index" v-for="(result, index) in results">
@@ -54,7 +60,13 @@
             </el-collapse-item>
           </el-collapse>
         </el-row>
-      <el-row>
+        <el-row v-if="!loggedIn">
+          <el-alert type="success" show-icon title="登录以显示代码！"></el-alert>
+        </el-row>
+        <el-row v-else-if="!hasPermission">
+          <el-alert type="warning" show-icon title="您只能查看和下载自己的代码！"></el-alert>
+        </el-row>
+        <el-row v-else>
         <!-- 代码显示 -->
         <el-alert title="Code："
                   type="info"
@@ -126,21 +138,16 @@ export default {
     },
 
     downloadFile (codeid, content) {
-      if (this.userID != this.subm_userid) {
-        this.$message.error("只允许下载自己的文件");
-      }
-      else {
-        var aLink = document.createElement("a");
-        var blob = new Blob([content], { type: "data:text/plain" });
-        var downloadElement = document.createElement("a");
-        var href = window.URL.createObjectURL(blob); //创建下载的链接
-        downloadElement.href = href;
-        downloadElement.download = codeid + '.' + this.curlang; //下载后文件名
-        document.body.appendChild(downloadElement);
-        downloadElement.click(); //点击下载
-        document.body.removeChild(downloadElement); //下载完成移除元素
-        window.URL.revokeObjectURL(href); //释放掉blob对象
-      }
+      var aLink = document.createElement("a");
+      var blob = new Blob([content], { type: "data:text/plain" });
+      var downloadElement = document.createElement("a");
+      var href = window.URL.createObjectURL(blob); //创建下载的链接
+      downloadElement.href = href;
+      downloadElement.download = codeid + '.' + this.curlang; //下载后文件名
+      document.body.appendChild(downloadElement);
+      downloadElement.click(); //点击下载
+      document.body.removeChild(downloadElement); //下载完成移除元素
+      window.URL.revokeObjectURL(href); //释放掉blob对象
     },
     prettyDate (time) {
       let date = new Date((time || "").replace(/-/g,"/").replace(/[TZ]/g," ")),
@@ -183,20 +190,19 @@ export default {
         }
         this.passed_testcase = passed;
 
-        // TODO: support for multiple files
-        return this.$axios.get('/files/' + response.data.submit_files[0] + '/');
-      }).then(response => {
-        // console.log(response.data);
-        this.code = response.data;
-      }).catch(error => {
-        console.log(error);
-      }).then(() => {
-        let needRefresh = this.needRefresh();
-        if (!needRefresh && this.autoRefresh) {
+        if (this.loggedIn && this.hasPermission) {
+          // TODO: support for multiple files
+          this.$axios.get('/files/' + response.data.submit_files[0] + '/').then(response => {
+            // console.log(response.data);
+            this.code = response.data;
+          }).catch();
+        }
+      }).catch().then(() => {
+        if (!this.needRefresh && this.autoRefresh) {
           this.autoRefresh = false;
           clearInterval(this.timer);
         }
-        if (needRefresh && !this.autoRefresh) {
+        if (this.needRefresh && !this.autoRefresh) {
           this.autoRefresh = true;
           this.timer = setInterval(this.updateStatus, 2000);
         }
@@ -209,13 +215,6 @@ export default {
         return "门级仿真";
       } else {
         return type;
-      }
-    },
-    needRefresh () {
-      if (this.status.substr(0, 8) != "Accepted" && this.status.substr(0, 5) != "ERROR") {
-        return true;
-      } else {
-        return false;
       }
     }
   },
@@ -256,11 +255,18 @@ export default {
       'userID',
       'username',
       'isSuperUser'
-    ])
+    ]),
+    needRefresh: function() {
+      return this.results[0].status != "DONE";
+    },
+    hasPermission: function() {
+      return this.subm_userid == this.userID;
+    }
   },
   destroyed () {
   },
   created () {
+    // console.log(this.needRefresh);
     this.submissionid = this.$route.params.submissionid;
     this.updateStatus();
   },
