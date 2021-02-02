@@ -120,7 +120,7 @@ export default {
   name: "statue",
   methods: {
     rowClick(row, col, e) {
-      if (col.label == "Problem") {
+      if (col.label == "题名") {
         if (this.contest != "0") return;
         this.$router.push({
           name: "problemdetail",
@@ -128,7 +128,7 @@ export default {
         });
         return;
       }
-      if (col.label == "User") {
+      if (col.label == "用户") {
         this.$router.push({
           name: "user",
           params: { userid: row.user_belong.id }
