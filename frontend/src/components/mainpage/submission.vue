@@ -188,12 +188,19 @@ export default {
       }).then(response => {
         // console.log(response.data);
         this.code = response.data;
-
-        if ((!this.needRefresh()) && this.autoRefresh) {
+      }).catch(error => {
+        console.log(error);
+      }).then(() => {
+        let needRefresh = this.needRefresh();
+        if (!needRefresh && this.autoRefresh) {
           this.autoRefresh = false;
           clearInterval(this.timer);
         }
-      })
+        if (needRefresh && !this.autoRefresh) {
+          this.autoRefresh = true;
+          this.timer = setInterval(this.updateStatus, 2000);
+        }
+      });
     },
     prettyType (type) {
       if (type == 'SIM') {
@@ -256,10 +263,6 @@ export default {
   created () {
     this.submissionid = this.$route.params.submissionid;
     this.updateStatus();
-    if (this.needRefresh()) {
-      this.autoRefresh = true;
-      this.timer = setInterval(this.updateStatus, 2000);
-    }
   },
   beforeDestroy () {
     if (this.autoRefresh) {
