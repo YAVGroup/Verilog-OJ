@@ -1,110 +1,33 @@
 <template>
   <div>
-    <!-- <el-row>
-      &nbsp;
-    </el-row> -->
-    <!-- <el-row>
-      <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6" class="placeholder"> -->
-        <!-- placeholder only -->
-        <!-- &nbsp;
-      </el-col>
-    </el-row> -->
-    <!-- <el-row>
-      <el-col :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
-        <el-dialog :visible.sync="searchdialogVisible">
-          <el-form
-            :model="searchform"
-            label-position="right"
-            @keyup.native.enter="searchstatus"
-          >
-            <el-form-item label="User:">
-              <el-input
-                v-model="searchform.user"
-                placeholder="User..."
-              ></el-input>
-            </el-form-item>
-            <el-form-item label="Problem Number：">
-              <el-input
-                v-model="searchform.problem"
-                placeholder="Problem Number...or ABCDE"
-              ></el-input>
-            </el-form-item>
-            <el-form-item label="Language：">
-              <el-select v-model="searchform.language" placeholder="Choose...">
-                <languageselect></languageselect>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="Result：">
-              <el-select v-model="searchform.result" placeholder="Choose...">
-                <el-option key="0" label="Accepted" value="0"></el-option>
-                <el-option key="1" label="Wrong Answer" value="-3"></el-option>
-                <el-option key="2" label="Waiting" value="-6"></el-option>
-                <el-option
-                  key="3"
-                  label="Presentation Error"
-                  value="-5"
-                ></el-option>
-                <el-option key="4" label="Compile Error" value="-4"></el-option>
-                <el-option key="5" label="Pending" value="-1"></el-option>
-                <el-option key="6" label="Judging" value="-2"></el-option>
-                <el-option
-                  key="7"
-                  label="Time Limit Exceeded 1"
-                  value="1"
-                ></el-option>
-                <el-option
-                  key="8"
-                  label="Time Limit Exceeded 2"
-                  value="2"
-                ></el-option>
-                <el-option
-                  key="9"
-                  label="Memory Limit Exceeded"
-                  value="3"
-                ></el-option>
-                <el-option key="10" label="Runtime Error" value="4"></el-option>
-                <el-option key="11" label="System Error" value="5"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-form>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click="searchdialogVisible = false">Cancel</el-button>
-            <el-button type="primary" @click="searchstatus">OK</el-button>
-          </div>
-        </el-dialog>
-      </el-col>
-    </el-row> -->
-
-    <el-row>
-      <el-col>
+    <el-row
+      type="flex"
+      justify="end"
+      align="middle"
+      style="text-align: right; margin-bottom: 5px; margin-top: 15px;"
+    >
+      <el-col
+        :xs="{ span: 12, pull: 0 }"
+        :sm="{ span: 7, pull: 0 }"
+        :md="{ span: 6, pull: 2 }"
+        :lg="{ span: 5, pull: 3 }"
+        :xl="{ span: 3, pull: 4 }"
+      >
         <el-switch
-          style="float: right; margin: 10px;"
           v-model="showMeOnly"
           active-text="仅自己"
           inactive-text="所有人"
           :disabled="!this.loggedIn"
         ></el-switch>
         <el-button
+          style="margin-left: 15px;"
           plain
           @click="resetsearch"
-          style="float: right;margin-top:6px;margin-right:10px;"
           size="mini"
           >刷新</el-button
         >
       </el-col>
     </el-row>
-    <!-- <el-button type="primary"
-               @click="searchdialogVisible = true"
-               style="float: right;margin-top:6px;margin-right:15px;"
-               size="mini">Filter</el-button> -->
-
-    <!-- <el-pagination @size-change="handleSizeChange"
-                   @current-change="handleCurrentChange"
-                   :current-page="currentpage"
-                   :page-sizes="[10, 20, 30, 50]"
-                   :page-size="pagesize"
-                   layout="total, sizes, prev, pager, next, jumper"
-                   :total="totalstatus"></el-pagination> -->
     <el-row type="flex" justify="center">
       <el-col :xs="24" :sm="24" :md="20" :lg="18" :xl="16">
         <el-table
@@ -114,13 +37,21 @@
           @row-click="rowClick"
           v-loading="loading"
         >
-          <el-table-column prop="id" label="ID" :min-width="50"></el-table-column>
+          <el-table-column
+            prop="id"
+            label="ID"
+            :min-width="50"
+          ></el-table-column>
           <el-table-column
             prop="user_belong.username"
             label="用户"
             :min-width="150"
           ></el-table-column>
-          <el-table-column prop="problem_belong.name" label="题名" :min-width="240">
+          <el-table-column
+            prop="problem_belong.name"
+            label="题名"
+            :min-width="240"
+          >
             <template slot-scope="scope">
               <font color="#409EFF">
                 <b style="cursor:pointer;">{{
@@ -197,7 +128,6 @@ export default {
         });
         return;
       }
-
       if (col.label == "User") {
         this.$router.push({
           name: "user",
@@ -205,17 +135,18 @@ export default {
         });
         return;
       }
-
       this.$router.push({
         name: "submission",
         params: { submissionid: row.id }
       });
     },
+
     searchstatus() {
       this.currentpage = 1;
       this.searchdialogVisible = false;
       this.getstatusdata();
     },
+
     resetsearch() {
       this.currentpage = 1;
       this.searchform.problem = "";
@@ -223,18 +154,21 @@ export default {
       this.searchform.result = "";
       this.creattimer();
     },
+
     handleSizeChange(val) {
       this.contest = this.$route.params.contestID;
       if (!this.contest) this.contest = "0";
       this.pagesize = val;
       this.getstatusdata();
     },
+
     handleCurrentChange(val) {
       this.contest = this.$route.params.contestID;
       if (!this.contest) this.contest = "0";
       this.currentpage = val;
       this.getstatusdata();
     },
+
     ratingcolor({ row, rowIndex }) {
       var back = "";
       if (row.result == "Accepted")
@@ -268,6 +202,7 @@ export default {
 
       return "danger";
     },
+
     statuejudge: function(type) {
       if (type == "Pending") return true;
       if (type == "Judging") return true;
@@ -283,11 +218,6 @@ export default {
       if (type == "System Error") return false;
       return false;
     },
-    // timer: function () {
-    //   this.contest = this.$route.params.contestID;
-    //   if (!this.contest) this.contest = "0";
-    //   this.getstatusdata();
-    // },
 
     getstatusdata() {
       this.loading = true;
@@ -299,21 +229,6 @@ export default {
       if (this.queryUserName) {
         url += "&user=" + this.queryUserName;
       }
-      // var url = "/submissions/?user=" +
-      //   this.queryUserName +
-      //   "&limit=" +
-      //   this.pagesize +
-      //   "&offset=" +
-      //   (this.currentpage - 1) * this.pagesize;
-      // "&problemtitle=" +
-      // this.searchform.problem +
-      // "&language=" +
-      // this.searchform.language +
-      // "&result=" +
-      // this.searchform.result +
-      // "&contest=" +
-      // this.contest;
-
       this.$axios.get(url).then(response => {
         for (var i = 0; i < response.data.results.length; i++) {
           response.data.results[i].submittime = moment(
@@ -326,22 +241,6 @@ export default {
         this.loading = false;
       });
     }
-
-    // statuechange (val) {
-    //   if (val == true) {
-    //     if (!this.loggedIn) {
-    //       this.showMeOnly = false;
-    //       this.$message.error("请先登录！");
-    //     }
-    //   }
-    //   this.getstatusdata();
-    // },
-    // creattimer () {
-    //   clearInterval(this.$store.state.timer);
-    //   this.timer();
-    //   // this.$store.state.timer = setInterval(this.timer, 500);
-    //   // 取消自动刷新
-    // },
   },
   data() {
     return {
@@ -393,16 +292,8 @@ export default {
       this.getstatusdata();
     }
   },
-  // destroyed () {
-  //   clearInterval(this.$store.state.timer);
-  // },
   created() {
     this.getstatusdata();
-    //创建一个全局定时器，定时刷新状态
-    // this.isadmin = sessionStorage.isadmin;
-    // this.timer();
-    // this.$store.state.timer = setInterval(this.timer, 500);
-    // 取消自动刷新
   }
 };
 </script>
