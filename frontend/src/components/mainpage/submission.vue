@@ -29,7 +29,7 @@
           </el-card>
         </el-row>
         <el-row v-if="!loggedIn">
-          <el-alert type="success" show-icon title="登录以显示波形和测试结果！"></el-alert>
+          <el-alert type="info" show-icon title="登录以查看波形和测试结果！"></el-alert>
         </el-row>
         <el-row v-else-if="!hasPermission">
           <el-alert type="warning" show-icon title="您只能查看自己的波形和测试结果！"></el-alert>
@@ -61,7 +61,7 @@
           </el-collapse>
         </el-row>
         <el-row v-if="!loggedIn">
-          <el-alert type="success" show-icon title="登录以显示代码！"></el-alert>
+          <el-alert type="info" show-icon title="登录以查看代码！"></el-alert>
         </el-row>
         <el-row v-else-if="!hasPermission">
           <el-alert type="warning" show-icon title="您只能查看和下载自己的代码！"></el-alert>
