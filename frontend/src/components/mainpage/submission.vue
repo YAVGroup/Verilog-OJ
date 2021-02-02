@@ -260,7 +260,7 @@ export default {
       return this.results[0].status != "DONE";
     },
     hasPermission: function() {
-      return this.subm_userid == this.userID;
+      return this.subm_userid == this.userID || this.isSuperUser;
     }
   },
   destroyed () {
