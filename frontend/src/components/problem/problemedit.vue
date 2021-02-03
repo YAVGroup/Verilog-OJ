@@ -331,6 +331,20 @@ export default {
         this.is_change = true;
       }
 
+                //获取模板
+      var url = "testcase-templates/behavorial-default/index.json";
+      this.$axios({
+        // url: 'testcase-templates/index.json',
+        url: url,
+        baseURL: process.env.BASE_URL
+      }).then(response => {
+        var testcases = response.data.testcase_files;
+        console.log(testcases);
+        for(var j=0;j<testcases.length;j++) {
+          this.options.push({"value":testcases[j],"label":testcases[j]});
+        }
+      });
+
       if(this.is_change) { //edit模式
         this.$axios.get("/problems/"+ this.$route.params.problemid +"/?id="+ this.$route.params.problemid + 
           "&owner=" + this.userID).then(response => {
@@ -384,20 +398,6 @@ export default {
               })
             }
           }
-
-          //获取模板
-        var url = "testcase-templates/behavorial-default/index.json";
-        this.$axios({
-        // url: 'testcase-templates/index.json',
-          url: url,
-          baseURL: process.env.BASE_URL
-        }).then(response => {
-          var testcases = response.data.testcase_files;
-          console.log(testcases);
-          for(var j=0;j<testcases.length;j++) {
-            this.options.push({"value":testcases[j],"label":testcases[j]});
-          }
-        });
 
           var  template = problem["template_code_file"];
 
