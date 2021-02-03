@@ -130,26 +130,32 @@
                 <el-button @click="retrieveTemplate" type="success">
                   模板获取
                 </el-button>
+                <el-button @click="addtestcase" type="success">
+                  判题脚本添加
+                </el-button>
+                <el-button @click="deletetestcase" type="danger">
+                  判题脚本删除
+                </el-button>
               </el-row>
-              <!-- <el-row>
+              <el-row>
                 <el-dialog
                     title="提示"
                     :visible.sync="dialogVisible"
-                    width="30%"
+                    width="100%"
                     :before-close="handleClose">    
 
                     <div slot="title" class="header-title">
                         <span> {{ retrieve_title }}</span>
                     </div>
-                    <el-input  type="textarea" v-model="retrieve_code"></el-input> -->
-                    <!-- <codemirror v-model="retrieve_code"
+                    <!-- <el-input  type="textarea" v-model="retrieve_code"></el-input> -->
+                    <codemirror v-model="retrieve_code"
                             :options="cmOptions"></codemirror>
                     <span slot="footer" class="dialog-footer">
                       <el-button @click="dialogVisible = false">取 消</el-button>
                       <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
                     </span>
                   </el-dialog>
-                </el-row> --> 
+                </el-row> 
 
               <!--代码编辑-->
               <el-row>
@@ -332,23 +338,29 @@ export default {
       }
 
                 //获取模板
-      var url = "testcase-templates/behavorial-default/index.json";
+      let url = "testcase-templates/index.json";
       this.$axios({
         // url: 'testcase-templates/index.json',
         url: url,
         baseURL: process.env.BASE_URL
       }).then(response => {
-        var testcases = response.data.testcase_files;
-        console.log(testcases);
-        for(var j=0;j<testcases.length;j++) {
-          this.options.push({"value":testcases[j],"label":testcases[j]});
-        }
+        let url = "testcase-templates/"+response.data[0]+"/index.json";
+        this.$axios({
+          url:url,
+          baseURL: process.env.BASE_URL
+        }).then(response => {
+          let testcases = response.data.testcase_files;
+        // console.log(testcases);
+          for(let j=0;j<testcases.length;j++) {
+            this.options.push({"value":testcases[j],"label":testcases[j]});
+          }
+        })
       });
 
       if(this.is_change) { //edit模式
         this.$axios.get("/problems/"+ this.$route.params.problemid +"/?id="+ this.$route.params.problemid + 
           "&owner=" + this.userID).then(response => {
-          var problem = response.data;
+          let problem = response.data;
           // console.log(problem);
           this.title = problem["name"];
           if(problem["deadline_time"]==null) {
@@ -364,41 +376,21 @@ export default {
           this.output = problem["description_output"];
           this.waveform = problem["app_data"];
           //对应需要单独获取对应的testfile文件
-          var testcases = problem["testcases"][0]["testcase_files"];
+          //可能对应多个testcases
+          // console.log("created testcases length");
+          // console.log(problem["testcases"].length);
+          for(let j=0;j<problem["testcases"].length;j=j+1) {
+            let testcases = problem["testcases"][j]["testcase_files"];
+            if(j!=0) {
+              this.testcases.push({ code:["","","","",""] });
+            }
+
+            this.settestcase(testcases,j);
 
           //对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.v,main.sh
-          if (testcases !=null ) {
-            //循环会导致奇怪的错误
-            for(var i=0;i<testcases.length;i++) {
-              this.$axios.get("/files/" + testcases[i] + "/")
-                .then(response => {
-                  // console.log(response.data);
-                  var temp = response.headers["content-disposition"];
-                  // response['Content-Disposition'] = 'attachment; filename="%s"'
-              
-                  var filename = temp.slice(22,temp.length-1);
-                  // console.log(filename)
-                  switch(filename) {//对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.py,main.sh
-                    case "wavedump.py": 
-                      this.testcases[0].code[0] = response.data;
-                      break;
-                    case "vcd_main.py":
-                      this.testcases[0].code[1] = response.data;
-                      break;
-                    case "testbench.v":
-                      this.testcases[0].code[2] = response.data;
-                      break;
-                    case "vcd_visualize.py":
-                      this.testcases[0].code[3] = response.data;
-                      break;
-                    case "main.sh":
-                      this.testcases[0].code[4] = response.data;
-                      break;
-                  }
-              })
-            }
           }
 
+          // console.log(this.testcases);
           var  template = problem["template_code_file"];
 
           if (template != null) {
@@ -408,23 +400,30 @@ export default {
             })
           }
 
-          var judge = problem["judge_files"][0];
+          var judge = problem["judge_files"];
+
+          this.code_items = [];
 
           if (judge!=null) {
-            this.$axios.get("/files/" + judge + "/")
+            judge.forEach(async(item) => {
+              await this.$axios.get("/files/" + item + "/")
                 .then(response => {
-              this.code_items[0].code = response.data;
+              this.code_items.push({"code":response.data});
+              this.content =  this.code_items[0].code;
+              console.log(this.content);
+              })
             })
           }
 
         }).catch(error => {
               this.$message.error("发生错误！" + "(" + JSON.stringify(error.response.data) + ")");
             }); 
-        this.content =  this.code_items[0].code;
+
       } else {
         console.log("add problem");
       }
-
+      this.lastchange = 0;
+      this.lastindex = 0;
   },
   methods: {
     /*
@@ -442,6 +441,40 @@ export default {
       }
     },
   */
+    settestcase(testcases,index) {
+      if (testcases !=null ) {
+              //循环会导致奇怪的错误
+            for(var i=0;i<testcases.length;i++) {
+              this.$axios.get("/files/" + testcases[i] + "/")
+                .then(response => {
+                    // console.log(response.data);
+                  var temp = response.headers["content-disposition"];
+                    // response['Content-Disposition'] = 'attachment; filename="%s"'
+                
+                  var filename = temp.slice(22,temp.length-1);
+                    // console.log(filename)
+                  switch(filename) {//对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.py,main.sh
+                    case "wavedump.py": 
+                      this.testcases[index].code[0] = response.data;
+                      break;
+                    case "vcd_main.py":
+                      this.testcases[index].code[1] = response.data;
+                      break;
+                    case "testbench.v":
+                      this.testcases[index].code[2] = response.data;
+                      break;
+                    case "vcd_visualize.py":
+                      this.testcases[index].code[3] = response.data;
+                      break;
+                    case "main.sh":
+                      this.testcases[index].code[4] = response.data;
+                      break;
+                  }
+              })
+            }
+          }
+    },
+
     onCopy (e) {
       this.$message.success("复制成功！");
     },
@@ -569,8 +602,19 @@ export default {
           });  
     },
 
+    async upload_testcases(testcase,problem) {
+        const wavedump_id = await this.upload(testcase.code[0],'wavedump.py');
+        const vcd_main_id = await this.upload(testcase.code[1],'vcd_main.py');
+        const testbench_id = await this.upload(testcase.code[2],'testbench.v');
+        const vcd_visualize_id = await this.upload(testcase.code[3],'vcd_visualize.py');
+        const main_id = await this.upload(testcase.code[4],'main.sh');
+
+        return this.upload_testcase([wavedump_id,vcd_main_id,testbench_id,vcd_visualize_id,main_id]
+          ,problem);
+    },
+
     async deltestcase(problemid) {
-      return this.$axios.get("/problem-testcases/?problem=" + problemid + "/" ).then(response => {
+      return this.$axios.get("/problem-testcases/?problem=" + problemid).then(response => {
         var res = response.data;
         for (var i=0;i < res.length;i=i+1) {
             console.log(res[i]);
@@ -620,11 +664,7 @@ export default {
 
         const code_id = await this.upload(this.code_items[0].code,'code_ref.v');
         const template_id = await this.upload(this.code_templates[0].code,'template_code.v');
-        const wavedump_id = await this.upload(this.testcases[0].code[0],'wavedump.py');
-        const vcd_main_id = await this.upload(this.testcases[0].code[1],'vcd_main.py');
-        const testbench_id = await this.upload(this.testcases[0].code[2],'testbench.v');
-        const vcd_visualize_id = await this.upload(this.testcases[0].code[3],'vcd_visualize.py');
-        const main_id = await this.upload(this.testcases[0].code[4],'main.sh');
+
         var body = {}
         body['name'] = this.title;
         body['description'] = this.des;
@@ -657,23 +697,22 @@ export default {
           // this.$axios.patch("/problem-testcases/"+ this.$route.params.problemid + "/", testcase_body).catch(error => {
           //     this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
           //   });
-          this.upload_testcase([wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id],
-              this.$route.params.problemid
-            );
-            return   this.$router.push({
-              name: 'problemdetail',
-              params: {problemid: this.$route.params.problemid}
-              }).catch(error => {
-              this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
+          this.testcases.forEach(async(item) => {
+            await this.upload_testcases(item,this.$route.params.problemid)
+          })
+          return   this.$router.push({
+            name: 'problemdetail',
+            params: {problemid: this.$route.params.problemid}
+            }).catch(error => {
+            this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
           });  
-
         }
         else return this.$axios.post(
             "/problems/",body
           ).then(response => {
-            this.upload_testcase([wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id],
-              response.data.id
-            );
+            this.testcases.forEach(async(item) => {
+              await this.upload_testcases(item,response.data.id)
+            })
             this.$router.push({
             name: 'problemdetail',
             params: {problemid: response.data.id}
@@ -682,6 +721,7 @@ export default {
           });  
       }
     },
+    
     retrieveTemplate: function () {
       var url = "testcase-templates/"+this.retrievefile;
       this.$axios({
@@ -689,39 +729,54 @@ export default {
         url: url,
         baseURL: process.env.BASE_URL
       }).then(response => {
-        switch(this.retrievefile) {
-              case "wavedump.py": 
-                this.testcases[0].code[0] = response.data;
-                break;
-              case "vcd_main.py":
-                this.testcases[0].code[1] = response.data;
-                break;
-              case "testbench.v":
-                this.testcases[0].code[2] = response.data;
-                break;
-              case "vcd_visualize.py":
-                this.testcases[0].code[3] = response.data;
-                break;
-              case "main.sh":
-                this.testcases[0].code[4] = response.data;
-                break;
-        }
-            
-        // this.$alert(response.data, title, {
-        //   confirmButtonText: '确定',
-        //   callback: action => {
-        //     this.$message({
-        //       type: 'text',
-        //       message: `action: ${ action }`
-        //     });
-        //   }
-        // });
+        this.retrieve_title = this.retrievefile;
+        this.retrieve_code = response.data;
+        this.dialogVisible = true;
+// switch(this.retrievefile) {
+        //       case "wavedump.py": 
+        //         this.testcases[0].code[0] = response.data;
+        //         break;
+        //       case "vcd_main.py":
+        //         this.testcases[0].code[1] = response.data;
+        //         break;
+        //       case "testbench.v":
+        //         this.testcases[0].code[2] = response.data;
+        //         break;
+        //       case "vcd_visualize.py":
+        //         this.testcases[0].code[3] = response.data;
+        //         break;
+        //       case "main.sh":
+        //         this.testcases[0].code[4] = response.data;
+        //         break;
+        // }
       })
     },
+    addtestcase(){
+      //对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.v,main.sh
+      this.testcases.push({ code:["","","","",""] })
+    },
+
+    deletetestcase() {
+      this.$confirm("确定要删除测试脚本嘛", "删除", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.$message({
+          type: "success",
+          message: "删除最后一个测试脚本"
+        });
+      })
+      this.testcases.pop();
+
+    },
+
     problemchange() {
       this.is_change = true;
       this.$axios
     },
+
+
   },
   destroyed () {
   }
