@@ -2,7 +2,9 @@
     "name": "Behavorial Simulation Default Template",
     "description": "N/A",
     "testcase_files": [
-        "main.sh",
-        "vcd_main.py"
+        "wavedump.py",
+        "vcd_main.py",
+        "vcd_visualize.py",
+        "main.sh"
     ]
 }

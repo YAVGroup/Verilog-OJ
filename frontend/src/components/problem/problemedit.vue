@@ -117,11 +117,13 @@
                 </el-col> -->
               </el-row>
               <el-row :gutter="18" class="problem-descriptions">        
-                  <el-select v-model="retrievefile" placeholder="难度：">
-                    <el-option key="0" label="wavedump.py" :value="0"></el-option>
-                    <el-option key="1" label="vcd_main.py" :value="1"></el-option>
-                    <el-option key="2" label="vcd_visualize.py" :value="2"></el-option>
-                    <el-option key="3" label="main.sh" :value="3"></el-option>
+                  <el-select v-model="retrievefile" placeholder="模板文件：">
+                    <el-option
+                      v-for="item in options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
                   </el-select>
               </el-row>
               <el-row>
@@ -274,7 +276,7 @@ export default {
       ddl_time: null,
       lastindex: 0,
       lastchange: 0,
-      retrievefile: 0,
+      retrievefile: "wavedump.py",
       dialogVisible: false,
 
       content: "",
@@ -382,6 +384,20 @@ export default {
               })
             }
           }
+
+          //获取模板
+        var url = "testcase-templates/behavorial-default/index.json";
+        this.$axios({
+        // url: 'testcase-templates/index.json',
+          url: url,
+          baseURL: process.env.BASE_URL
+        }).then(response => {
+          var testcases = response.data.testcase_files;
+          console.log(testcases);
+          for(var j=0;j<testcases.length;j++) {
+            this.options.push({"value":testcases[j],"label":testcases[j]});
+          }
+        });
 
           var  template = problem["template_code_file"];
 
@@ -667,35 +683,13 @@ export default {
       }
     },
     retrieveTemplate: function () {
-      var url = "testcase-templates/"
-      switch(this.retrievefile) {
-        case 0:
-          url += "wavedump.py";
-          this.retrieve_title = "wavedump.py";
-          break;
-        case 1:
-          url += "vcd_main.py";
-          this.retrieve_title = "vcd_main.py";
-          break;
-        case 2:
-          url += "vcd_visualize.py";
-          this.retrieve_title = "vcd_visualize.py"; 
-          break;
-        case 3:
-          url += "main.sh";
-          this.retrieve_title = "main.sh";
-          break;
-        default:
-          url += "error.txt";
-          this.retrieve_title = "error.txt";
-          break;
-      }
+      var url = "testcase-templates/"+this.retrievefile;
       this.$axios({
         // url: 'testcase-templates/index.json',
         url: url,
         baseURL: process.env.BASE_URL
       }).then(response => {
-        switch(this.retrieve_title) {
+        switch(this.retrievefile) {
               case "wavedump.py": 
                 this.testcases[0].code[0] = response.data;
                 break;
