@@ -11,7 +11,7 @@ class ProblemViewSet(ModelViewSet):
     """
     queryset = Problem.objects.all()
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('id','owner', "level")
+    filter_fields = ('id','owner', 'level')
     #serializer_class = ProblemSerializer
 
     def get_serializer_class(self):
@@ -37,3 +37,5 @@ class TestCaseViewSet(ModelViewSet):
     queryset = TestCase.objects.all()
     serializer_class = TestCaseSerializer
     permission_classes = (permissions.GetOnlyPermission,)
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('id','problem','type')
