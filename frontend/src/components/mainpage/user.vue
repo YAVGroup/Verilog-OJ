@@ -49,7 +49,6 @@ export default {
   name: "user",
   data() {
     return {
-      userid: "",
       username: "",
       name: "",
       student_id: "",
@@ -60,6 +59,16 @@ export default {
       color: ""
     };
   },
+  computed: {
+    userid: function() {
+      return this.$route.params.userid;
+    }
+  },
+  watch: {
+    userid: function() {
+      this.updateUserInfo();
+    }
+  },
   methods: {
     problemclick(id) {
       console.log("problemclick " + id);
@@ -67,36 +76,38 @@ export default {
         name: "problemdetail",
         params: { problemid: id }
       });
+    },
+    updateUserInfo: function() {
+      // if (this.userid) {
+        this.$axios.get("/users/" + this.userid + "/").then(response => {
+          this.username = response.data.username;
+          if (response.data.last_name == "" && response.data.first_name == "")
+            this.name = this.username;
+          else
+            this.name = response.data.last_name + response.data.first_name;
+          this.email = response.data.email;
+          if(response.data.student_id == null)
+            this.student_id = "";
+          else
+            this.student_id = response.data.student_id;
+
+          this.ac_problems = response.data.ac_problems;
+          this.ac = this.ac_problems.length;
+          this.submitted = response.data.submitted_problems.length;
+          this.score = response.data.total_score;
+
+          if (response.data.is_superuser)
+            this.color = "color: red; font-weight: bold;"
+          else
+            this.color = "color: black; font-weight: bold";
+        }).catch(error => {
+          this.$message.error("服务器错误：" + JSON.stringify(error.response.data));
+        });
+      // }
     }
   },
-  created() {
-    this.userid = this.$route.params.userid;
-    if (this.userid) {
-      this.$axios.get("/users/" + this.userid + "/").then(response => {
-        this.username = response.data.username;
-        if (response.data.last_name == "" && response.data.first_name == "")
-          this.name = this.username;
-        else
-          this.name = response.data.last_name + response.data.first_name;
-        this.email = response.data.email;
-        if(response.data.student_id == null)
-          this.student_id = "";
-        else
-          this.student_id = response.data.student_id;
-
-        this.ac_problems = response.data.ac_problems;
-        this.ac = this.ac_problems.length;
-        this.submitted = response.data.submitted_problems.length;
-        this.score = response.data.total_score;
-
-        if (response.data.is_superuser)
-          this.color = "color: red; font-weight: bold;"
-        else
-          this.color = "color: black; font-weight: bold";
-      }).catch(error => {
-        this.$message.error("服务器错误：" + JSON.stringify(error.response.data));
-      });
-    }
+  created: function () {
+    this.updateUserInfo();
   }
 };
 </script>
