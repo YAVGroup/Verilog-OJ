@@ -27,9 +27,10 @@
 
       <el-dropdown id="user"
                    v-show="loggedIn"
+                   @click="showHome"
                    @command="handleCommand"
                    :show-timeout="100"
-                   :split-button="true">
+                   split-button>
         <span class="el-dropdown-link">Welcome, {{ username }}</span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="home">Home</el-dropdown-item>
@@ -97,7 +98,12 @@ export default {
     registeropen () {
       this.$refs.registerdialog.open();
     },
-
+    showHome: function() {
+      this.$router.push({
+        name: "user",
+        params: { userid: this.userID }
+      });
+    },
     handleCommand (command) {
       if (command == "logout") {
         this.$axios
@@ -118,10 +124,7 @@ export default {
           });
       }
       if (command == "home") {
-        this.$router.push({
-          name: "user",
-          params: { userid: this.userID }
-        });
+        this.showHome();
       }
       if (command == "setting") {
         this.$router.push({
