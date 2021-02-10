@@ -20,11 +20,13 @@ RUN (test ${USE_APT_MIRROR} = yes \
     && apt-get install -y tzdata \
     && dpkg-reconfigure --frontend noninteractive tzdata \
     && apt-get install -y yosys python3 iverilog python3-pip \
+    && apt-get install git \
     && (test ${USE_PIP_MIRROR} = yes \
         && \
         (pip3 config set global.index-url https://mirrors.aliyun.com/pypi/simple/) \
         || \
         (echo "pip mirror config untouched.");) \
+    && pip3 install git+https://github.com/libreliu/pyDigitalWaveTools \
     && pip3 install -r requirements-judger.txt
 
 # Add /app/testcase/main.sh by script manually, in case the sh filename changes
