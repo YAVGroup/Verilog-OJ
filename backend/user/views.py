@@ -1,3 +1,4 @@
+from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import make_password
@@ -16,6 +17,7 @@ from cas_client import CASClient
 from .models import User
 from .serializers import UserSerializer, UserPublicSerializer, UserLoginSerializer
 from .permissions import GetOnlyPermission, OthersGetOnlyPermission
+import django.conf, django.urls
 
 import sys, random
 sys.path.append('../')
@@ -57,8 +59,36 @@ class UserLoginView(GenericAPIView):
         # request.session['userid1'] = user.id
         # request.session['isadmin1'] = user.is_superuser
         rep = Response(UserSerializer(user).data)
-        rep.set_cookie('userid', user.id)
+        #rep.set_cookie('userid', user.id)
         return rep
+
+class UserLoginStatusView(APIView):
+    """
+    Check if the user is authenticated.
+    Returns JSON {
+        isLoggedIn: true/false,
+        username: string,
+        userID: number
+        isSuperUser: true/false
+    }
+    """
+    permission_classes = (AllowAny,)
+    
+    def get(self, request):
+        if not request.user.id:
+            return Response({
+                'isLoggedIn': False,
+                'username': '',
+                'userID': 0,
+                'isSuperUser': False
+            })
+        else:
+            return Response({
+                'isLoggedIn': True,
+                'username': request.user.username,
+                'userID': request.user.id,
+                'isSuperUser': request.user.is_superuser
+            })
 
 class UserLogoutView(APIView):
     """
@@ -82,8 +112,11 @@ class UserUSTCLoginView(APIView):
     def get(self, request, *args):
         # 统一身份认证登录
         ticket = request.GET.get('ticket')
-        cas_url = 'https://passport.ustc.edu.cn'
-        app_login_url = 'http://home.ustc.edu.cn/~via'
+        cas_url = django.conf.settings.USTC_CAS_URL
+        app_login_url = django.conf.settings.USTC_CAS_APP_LOGIN_URL.format(
+            django.urls.reverse('ustc-login-view')
+        )
+
         cas_client = CASClient(cas_url, auth_prefix='')
         if ticket:
             try:
@@ -96,8 +129,10 @@ class UserUSTCLoginView(APIView):
                 return Response('CAS server is currently broken, try again later.', status.HTTP_503_SERVICE_UNAVAILABLE)
             if cas_response and cas_response.success:
                 student_id = cas_response.user
+                username = None
                 try:
                     user = User.objects.get(student_id=student_id)
+                    username = user.username
                     # request.session['username'] = user.username
                     # request.session['userid'] = user.id
                     # request.session['isadmin'] = user.is_superuser
@@ -125,9 +160,11 @@ class UserUSTCLoginView(APIView):
                             username = "".join(random.choices('0123456789abcdefghijklmnopqrstuvwxyz@.+-_', k=10))
 
                 # rep = Response('OK', status.HTTP_200_OK)        # 更换为 rep = redirect('home')
-                rep = redirect('http://202.38.75.113/')
-                rep.set_cookie('userid', user.id)
+                rep = redirect(f"/{django.conf.settings.WEBPATH_PREFIX}")
+                #rep.set_cookie('userid', user.id)
+
                 return rep
+
         cas_login_url = cas_client.get_login_url(service_url=app_login_url)
         return redirect(cas_login_url)
 

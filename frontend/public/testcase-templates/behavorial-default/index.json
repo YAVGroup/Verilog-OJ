@@ -1,8 +1,13 @@
 {
-    "name": "Behavorial Simulation Default Template",
-    "description": "N/A",
+    "template_code_file": "template_code.v",
+    "judge_files": [
+        "code_ref.v"
+    ],
     "testcase_files": [
         "main.sh",
-        "vcd_main.py"
+        "vcd_main.py",
+        "vcd_visualize.py",
+        "wavedump.py",
+        "testbench.v"
     ]
 }

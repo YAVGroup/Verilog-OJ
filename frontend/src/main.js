@@ -79,6 +79,29 @@ const store = new Vuex.Store({
       .catch(error => {
         payload.fail_cb(error);
       });
+    },
+    /**
+     * This is used when page refresh happens, mostly happening during CAS login
+     * @param {*} context 
+     * @param {*} payload 
+     */
+    refreshLogInStatus (context, payload) {
+      axios.get("/user/status-login").then(response => {
+        if (response.data.isLoggedIn && response.data.userID != this.state.userID) {
+          console.log("[ INFO ] Login state invalidated, do logIn");
+          context.commit({
+            type: 'logIn',
+            userID: response.data.userID,
+            username: response.data.username,
+            isSuperUser: response.data.isSuperUser
+          });
+        } else if (!response.data.isLoggedIn && this.state.loggedIn) {
+          console.log("[ INFO ] Login state invalidated, do logOut");
+          context.commit({
+            type: 'logOut'
+          });
+        }
+      })
     }
   }
 })
@@ -91,7 +114,8 @@ new Vue({
   template: '<App/>',
   render: h => h(App),
   created() {
-
+    // check if we've been logged in (e.g. cas)
+    this.$store.dispatch('refreshLogInStatus');
   }
 })
 
