@@ -24,6 +24,14 @@ problem 和 testcase 都会引用一定数量的文件。在判题时，判题�
 
 submit 中保存着用户提交的文件，对于现在的版本而言，用户只能提交一个名为 code.v 的文件，其内容就是用户在 Verilog OJ 的代码编辑框中编辑的内容。
 
+### 前端添加题目
+
+前端提交题目对应网址为`https://vlab.ustc.edu.cn/oj/problem/add`，目前只有登录用户可以添加题目。用户也可以通过题目界面上的`添加题目`按钮进入添加题目界面。题目具体内容分为具体信息、标签设置（目前还没有具体设置），判题脚本文件编辑。其中，文件编辑部分包括code.v,code_template.v,testbench.v,wavedump.py,vcd_main.py,vcd_visualize.py,main.sh。其中code.v，code_template.v，testbench.v对应题目的标准答案代码，题目显示用户初始代码和仿真文件代码，与具体题目相关，不提供直接模板。wavedump.py是用来把代码转化为波形图的文件的辅助代码，通常情况下可以直接使用，无需修改。vcd_main.py用来比较波形图，需要和wavedumpy.py配合使用。main.sh为判题脚本.vcd_visualize.py用来提供判题结果的前端展示页面。 vcd_main.py,vcd_dump.py,main.sh,vcd_visualize.py都可以直接获取模板获得。
+
+#### 多判题脚本判题（需熟悉判题脚本）
+原则上来说，多文件的判题脚本和单文件没有过多本质上的区别。但是可能在具体需求上可能需要修改main.sh对应的判题脚本来获取争取的结果。
+
+
 ### Yaml 提交入口
 
 现在 Yaml 提交还只能通过 Django admin 进行。您可以用管理员账号登陆 `http://202.38.75.113/admin-django/` 并且在 problem 选项卡中找到 Yaml 导入的相关设定。在框中粘贴您的 Yaml，并点击提交即可。
