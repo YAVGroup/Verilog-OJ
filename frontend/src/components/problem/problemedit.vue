@@ -30,8 +30,11 @@
                    @tab-click="handleTabPageClick">
             <el-tab-pane label="基本信息" name="BasicInfoTab">
 
-              <el-form ref="basicInfoForm" :model="basicInfoForm" label-width="160px">
-                <el-form-item label="题目名称">
+              <el-form ref="basicInfoForm" 
+                       :model="basicInfoForm"
+                       label-width="160px"
+                       :rules="basisInfoRules">
+                <el-form-item label="题目名称" prop="name">
                   <el-input v-model="basicInfoForm.name" maxlength="20" show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="启用截止时间">
@@ -73,14 +76,14 @@
                     </el-select>
                   </el-col>
                 </el-form-item>
-                <el-form-item label="题目描述">
+                <el-form-item label="题目描述" prop="description">
                   <el-input type="textarea" v-model="basicInfoForm.description"></el-input>
                 </el-form-item>
-                <el-form-item label="输入格式描述">
+                <el-form-item label="输入格式描述" prop="description_input">
                   <el-input type="textarea" v-model="basicInfoForm.description_input"
                             :autosize="{ minRows: 5, maxRows: 15}"></el-input>
                 </el-form-item>
-                <el-form-item label="输出格式描述">
+                <el-form-item label="输出格式描述" prop="description_output">
                   <el-input type="textarea" v-model="basicInfoForm.description_output"
                             :autosize="{ minRows: 5, maxRows: 15}"></el-input>
                 </el-form-item>
@@ -147,7 +150,7 @@
                               type="text"
                               size="mini"
                               @click.stop="() => judgeWorkspaceAddFile(data)"
-                              v-if="typeof data.fileAppendable !== 'undefined' && data.fileAppendable"
+                              v-if="(!! data.fileAppendable) && data.fileAppendable"
                               >
                               添加
                             </el-button>
@@ -155,7 +158,7 @@
                               type="text"
                               size="mini"
                               @click.stop="() => judgeWorkspaceDeleteFile(node, data)"
-                              v-if="typeof data.isFile !== 'undefined' && data.isFile"
+                              v-if="(!! data.isFile) !== 'undefined' && data.isFile"
                               >
                               删除
                             </el-button>
@@ -163,7 +166,7 @@
                               type="text"
                               size="mini"
                               @click.stop="() => judgeWorkspaceAddTestcase(data)"
-                              v-if="typeof data.testcaseAppendable !== 'undefined' && data.testcaseAppendable"
+                              v-if="(!! data.testcaseAppendable) !== 'undefined' && data.testcaseAppendable"
                               >
                               添加
                             </el-button>
@@ -171,7 +174,7 @@
                               type="text"
                               size="mini"
                               @click.stop="() => judgeWorkspaceDeleteTestcase(node, data)"
-                              v-if="typeof data.isTestCase !== 'undefined' && data.isTestCase"
+                              v-if="(!! data.isTestCase) !== 'undefined' && data.isTestCase"
                               >
                               删除
                             </el-button>
@@ -265,6 +268,20 @@ export default {
         tags: [],
         tagOptions: ['组合逻辑', '时序逻辑']
       },
+      basisInfoRules: {
+        name: [
+          { required: true, message: '请输入题目名称', trigger: 'blur'}
+        ],
+        description: [
+          { required: true, message: '请输入题目描述', trigger: 'blur'}
+        ],
+        description_input: [
+          { required: true, message: '请输入题目输入描述', trigger: 'blur'}
+        ],
+        description_output: [
+          { required: true, message: '请输入题目输出描述', trigger: 'blur'}
+        ],
+      },
       /**
        * Used to illustrate {problem, testcase} related files and grades
        */
@@ -276,7 +293,6 @@ export default {
             {
               name: '模板代码文件',
               type: 'ProblemMeta',
-              patchUrl: '/problems/{problemid}/',
               patchKey: 'template_code_file',
               fileAppendable: true,
               isMultiple: false,
@@ -285,10 +301,9 @@ export default {
             {
               name: '评测所用文件',
               type: 'ProblemMeta',
-              patchUrl: '/problems/{problemid}/',
-              patchKey: 'template_code_file',
+              patchKey: 'judge_files',
               fileAppendable: true,
-              isMultiple: false,
+              isMultiple: true,
               children: []
             }
           ]
@@ -299,6 +314,8 @@ export default {
           testcaseAppendable: true,
           // Used purely for local identification, remote have no such mechanics
           testcaseNextID: 0,
+          // To be deleted in server in next sync
+          serverTestcaseTobeDeleted: [],
           children: []
         }
       ],
@@ -315,71 +332,6 @@ export default {
       currentTabPageName: "BasicInfoTab",
       submitButtonBusy: false,
 
-      title: "",
-      des: "",
-      input: "",
-      output: "",
-      datetimeFormat: "YYYY-MM-DD HH:mm:ss",
-      endDatetime: null,
-      // author: "",
-      addtime: "",
-      ddl: "",
-      have_ddl: false,
-      is_change: false,
-      options:[],
-      problem_id:0,
-      retrieve_title: "",
-      retrieve_code: "",
-      waveedit: true,
-
-      tagnames: [],
-      activeNames: ["1", "2", "3", "4", "5", "6"],
-      level: 1,
-      ddl_time: null,
-      lastindex: 0,
-      lastchange: 0,
-      retrievefile: 0,
-      dialogVisible: false,
-
-      content: "",
-      code_items : [
-        { code: "" }
-      ],
-      code_templates : [
-        { code: "" }
-      ],
-
-      //对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.v,main.sh
-      testcases: [
-        { code:["","","","",""] }
-      ],
-
-      // language: "Verilog",
-      cmOptions: {
-        tabSize: 4,
-        mode: "Verilog",
-        theme: "base16-light",
-        lineNumbers: true,
-        readOnly: false,
-      },
-      // template_code: "",
-      submissions: [],
-
-      waveform: "",
-
-      // codetemplate: {},
-
-      // ac: 100,
-      // mle: 100,
-      // tle: 100,
-      // rte: 100,
-      // pe: 100,
-      // ce: 100,
-      // wa: 100,
-      // se: 100,
-      judgetype: "primary",
-      loadingshow: false,
-      // submitid: -1
     };
   },
   computed: {
@@ -421,91 +373,10 @@ export default {
     ])
   },
   created () {
-      if (this.$route.params.problemid!=null) {
-        this.is_change = true;
-        this.fillBasicInfoByProblem(this.$route.params.problemid);
-      }
-
-      if(this.is_change) { //edit模式
-        this.$axios.get("/problems/"+ this.$route.params.problemid +"/?id="+ this.$route.params.problemid + 
-          "&owner=" + this.userID).then(response => {
-          var problem = response.data;
-          // console.log(problem);
-          this.title = problem["name"];
-          if(problem["deadline_time"]==null) {
-            this.have_ddl = false;
-            this.ddl_time = null;
-          } else {
-            this.have_ddl = true;
-            this.ddl_time = problem["deadline_time"];
-          }
-          this.level = problem["level"];
-          this.des = problem["description"];
-          this.input = problem["description_input"];
-          this.output = problem["description_output"];
-          this.waveform = problem["app_data"];
-          //对应需要单独获取对应的testfile文件
-          var testcases = problem["testcases"][0]["testcase_files"];
-
-          //对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.v,main.sh
-          if (testcases !=null ) {
-            //循环会导致奇怪的错误
-            for(var i=0;i<testcases.length;i++) {
-              this.$axios.get("/files/" + testcases[i] + "/")
-                .then(response => {
-                  // console.log(response.data);
-                  var temp = response.headers["content-disposition"];
-                  // response['Content-Disposition'] = 'attachment; filename="%s"'
-              
-                  var filename = temp.slice(22,temp.length-1);
-                  // console.log(filename)
-                  switch(filename) {//对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.py,main.sh
-                    case "wavedump.py": 
-                      this.testcases[0].code[0] = response.data;
-                      break;
-                    case "vcd_main.py":
-                      this.testcases[0].code[1] = response.data;
-                      break;
-                    case "testbench.v":
-                      this.testcases[0].code[2] = response.data;
-                      break;
-                    case "vcd_visualize.py":
-                      this.testcases[0].code[3] = response.data;
-                      break;
-                    case "main.sh":
-                      this.testcases[0].code[4] = response.data;
-                      break;
-                  }
-              })
-            }
-          }
-
-          var  template = problem["template_code_file"];
-
-          if (template != null) {
-            this.$axios.get("/files/" + template + "/")
-            .then(response => {
-              this.code_templates[0].code = response.data;
-            })
-          }
-
-          var judge = problem["judge_files"][0];
-
-          if (judge!=null) {
-            this.$axios.get("/files/" + judge + "/")
-                .then(response => {
-              this.code_items[0].code = response.data;
-            })
-          }
-
-        }).catch(error => {
-              this.$message.error("发生错误！" + "(" + JSON.stringify(error.response.data) + ")");
-            }); 
-        this.content =  this.code_items[0].code;
-      } else {
-        console.log("add problem");
-      }
-
+    if (this.$route.params.problemid != null) {
+      this.fillBasicInfoByProblem(this.$route.params.problemid);
+      this.fillJudgeInfoByProblem(this.$route.params.problemid);
+    }
   },
   methods: {
     getModeByExtension (extName) {
@@ -736,164 +607,179 @@ export default {
     },
     // returns Promise with fileID on fulfilled
     submitFile (fileID, fileContent) {
-      
+      // TODO: Patch file instead of add - use /api/files/{}/
+      let formData = new FormData();
+      formData.append(
+        'file',
+        new Blob([fileContent], {type: "text/plain"})
+      )
+      return this.$axios.post("/files/", formData).then(
+        (response) => {
+          return response.data.id;
+        }
+      );
     },
 
     // returns Promise
-    submitJudgeWorkspace () {
+    /**
+     * TODO: use relative position
+     */
+    submitJudgeWorkspace (problemID) {
+      let problemPromises = [];
+      let testcasePromises = [];
 
+      // Problem files
+      (this.judgeInfoHierarchy[0].children).forEach(element => {
+        let name = element.name;
+        let patchKey = element.patchKey;
+        let isMultiple = element.isMultiple;
+
+        if (!isMultiple && element.children.length > 1) {
+          throw "Expected single element on " + name;
+        }
+
+        if (element.children.length == 0) {
+          return;
+        }
+
+        let filesPromises = [];
+
+        element.children.forEach(fileDesc => {
+          filesPromises.push(
+            new Promise((resolve, reject) => {
+              // Already uploaded, so no need to do it twice
+              if (fileDesc.inSyncWithServer && fileDesc.serverFileID != null) {
+                resolve(fileDesc.serverFileID);
+              } else {
+                this.submitFile(fileDesc.serverFileID, fileDesc.content).then(
+                  (fileID) => {
+                    fileDesc.serverFileID = fileID;
+                    fileDesc.inSyncWithServer = true;
+                    resolve(fileID);
+                  }
+                ).catch((error) => {
+                  reject(error);
+                })
+              }
+            })
+            
+          );
+        });
+
+        // Patch it when everything ready
+        problemPromises.push(
+          Promise.all(filesPromises).then((values) => {
+            let body = {};
+            if (isMultiple) {
+              body[patchKey] = values;
+            } else {
+              body[patchKey] = values[0];
+            }
+
+            return this.$axios.patch(
+              "/problems/" + problemID + "/", body
+            );
+          })
+        );
+      });
+
+
+      // Testcase preparation
+      let testcasePreparation = Promise.all([
+        ...this.judgeInfoHierarchy[1].serverTestcaseTobeDeleted.map(
+          (testcaseID) => {
+            return this.$axios.delete("/problem-testcases/" + testcaseID + "/");
+          }
+        )
+      ]);
+
+      // Testcase files
+      (this.judgeInfoHierarchy[1].children).forEach((element) => {
+        // Submit all files
+        let filesPromises = [];
+
+        element.children.forEach(fileDesc => {
+          filesPromises.push(
+            new Promise((resolve, reject) => {
+              // Already uploaded, so no need to do it twice
+              if (fileDesc.inSyncWithServer && fileDesc.serverFileID != null) {
+                resolve(fileDesc.serverFileID);
+              } else {
+                this.submitFile(fileDesc.serverFileID, fileDesc.content).then(
+                  (fileID) => {
+                    fileDesc.serverFileID = fileID;
+                    fileDesc.inSyncWithServer = true;
+                    resolve(fileID);
+                  }
+                ).catch((error) => {
+                  reject(error);
+                })
+              }
+            })
+            
+          );
+        });
+
+        // Patch or make it when everything ready
+        problemPromises.push(
+          Promise.all(filesPromises).then((values) => {
+            if (element.serverTestCaseID == null) {
+              return this.$axios.post(
+                "/problem-testcases/", {
+                  type: 'SIM',
+                  testcase_files: values,
+                  problem: problemID
+                }
+              ).then((response) => {
+                element.serverTestCaseID = response.data.id;
+                element.inSyncWithServer = true;
+                return element.serverTestCaseID;
+              })
+            } else {
+              // patch existing server testcase
+              // TODO: use inSyncWithServer and maintain properly
+              return this.$axios.patch(
+                "/problem-testcases/" + element.serverTestCaseID + "/", {
+                  testcase_files: values,
+                  problem: problemID
+                }
+              ).then((response) => {
+                element.inSyncWithServer = true;
+              });
+            }
+          })
+        );
+      });
+
+      return Promise.all([...problemPromises, testcasePreparation, ...testcasePromises]);
     },
     submitAll () {
       console.log("submitAll() called.");
-      this.submitButtonBusy = true;
-      this.submitBasicInfo().then(
-        (problemID) => {
-          // submit everything else
 
+      this.submitButtonBusy = true;
+      // validate forms
+      this.$refs["basicInfoForm"].validate().then(
+        () => {
+          this.submitBasicInfo().then(
+            (problemID) => {
+              // submit everything else
+              return this.submitJudgeWorkspace(problemID);
+            },
+            (error) => {
+              this.$message.error("提交基本信息失败：" + error);
+              console.log("ERROR:", error.response.data);
+            }
+          ).then(() => {
+            this.$message.success("提交成功！");
+          })
         },
         (error) => {
-          this.$message.error("提交基本信息失败：" + error.response.data);
+          this.$message.error("校验基本信息失败：" + error);
         }
       ).finally(() => {
-        this.$message.success("提交成功!");
         this.submitButtonBusy = false;
       });
 
-    },
-
-    async upload(code, filename) {
-        var formData = new FormData();
-        var blob = new Blob([code], {type: "text/plain"});
-        formData.append('file', blob, filename);
-        return this.$axios.post("/files/", formData).then(response => {
-          return response.data.id;
-        }).catch(error => {
-            this.$message.error("提交错误！" + filename + "(" + JSON.stringify(error.response.data) + ")");
-          });  
-    },
-
-    async upload_testcase(code_ids,problemid) {
-        var body = {};
-        body['type'] = 'SIM';
-        body['testcase_files'] = code_ids ;
-        body['problem'] = problemid;
-        return this.$axios.post("/problem-testcases/", body).catch(error => {
-            this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          });  
-    },
-
-    async deltestcase(problemid) {
-      return this.$axios.get("/problem-testcases/?problem=" + problemid + "/" ).then(response => {
-        var res = response.data;
-        for (var i=0;i < res.length;i=i+1) {
-            console.log(res[i]);
-            this.$axios.delete("problem-testcases/"+
-              res[i].id+"/"
-            );
-        }
-            }).catch(error => {
-            this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          });  
-    },
-
-    async problemedit() {
-      if(this.is_edit==false) {
-        this.is_edit = true;
-        return;
-      }
-      else if(!this.loggedIn){
-        this.$message.error("请先登录！");
-        return;
-      }
-      else{
-        switch(this.lastchange) {
-          case 0:
-            this.code_items[this.lastindex].code = this.content;
-            break;
-          case 1:
-            this.code_templates[this.lastindex].code = this.content;
-            break;
-          case 2:
-            this.testcases[this.lastindex].code[0] = this.content;
-            break;
-          case 3:
-            this.testcases[this.lastindex].code[1] = this.content;
-            break;
-          case 4:
-            this.testcases[this.lastindex].code[2] = this.content;
-            break;
-          case 5:
-            this.testcases[this.lastindex].code[3] = this.content;
-            break;
-          case 6:
-            this.testcases[this.lastindex].code[4] = this.content;
-            break;
-      }
-        this.is_edit = false;
-
-        const code_id = await this.upload(this.code_items[0].code,'code_ref.v');
-        const template_id = await this.upload(this.code_templates[0].code,'template_code.v');
-        const wavedump_id = await this.upload(this.testcases[0].code[0],'wavedump.py');
-        const vcd_main_id = await this.upload(this.testcases[0].code[1],'vcd_main.py');
-        const testbench_id = await this.upload(this.testcases[0].code[2],'testbench.v');
-        const vcd_visualize_id = await this.upload(this.testcases[0].code[3],'vcd_visualize.py');
-        const main_id = await this.upload(this.testcases[0].code[4],'main.sh');
-        var body = {}
-        body['name'] = this.title;
-        body['description'] = this.des;
-        body['description_input'] = this.input;
-        body['description_output'] = this.output;
-        body['app_data'] = this.waveform;
-        body['level'] = this.level;
-        body['owner'] = this.userID;
-        body['template_code_file'] = template_id;
-        body['judge_files'] = [code_id];
-        if(this.have_ddl)
-          body['deadline_time'] = this.ddl_time;
-        // console.log(template_id);
-        if (this.is_change) {
-
-          await this.deltestcase(this.$route.params.problemid);
-          this.$axios.patch(
-            "/problems/" + this.$route.params.problemid + "/", body
-          )
-
-          // for(var j=0;j<testcase_list.length;j=j+1) {
-          //   this.$axios.delete("/problem-testcases/"+testcase_list[j].id+"/").catch(error=>{
-          //     this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          //   });
-          // }
-          // var testcase_body = {};
-          // testcase_body['type'] = 'SIM';
-          // testcase_body['testcase_files'] = [wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id];
-          // testcase_body['problem'] = this.$route.params.problemid;
-          // this.$axios.patch("/problem-testcases/"+ this.$route.params.problemid + "/", testcase_body).catch(error => {
-          //     this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          //   });
-          this.upload_testcase([wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id],
-              this.$route.params.problemid
-            );
-            return   this.$router.push({
-              name: 'problemdetail',
-              params: {problemid: this.$route.params.problemid}
-              }).catch(error => {
-              this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          });  
-
-        }
-        else return this.$axios.post(
-            "/problems/",body
-          ).then(response => {
-            this.upload_testcase([wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id],
-              response.data.id
-            );
-            this.$router.push({
-            name: 'problemdetail',
-            params: {problemid: response.data.id}
-        })}).catch(error => {
-            this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          });  
-      }
     },
     fillBasicInfoByProblem (problemID) {
       this.$axios.get("/problems/" + problemID).then(response => {
@@ -927,8 +813,11 @@ export default {
         
         const downloadFile = (fileID) => {
           return this.$axios.get("/files/" + fileID).then(response => {
+            // response['Content-Disposition'] = 'attachment; filename="%s"'
+            let content_disp = response.headers["content-disposition"];
+
             return {
-              fileName: null,
+              fileName: content_disp.slice(22, content_disp.length - 1),
               content: response.data
             };
           });
@@ -945,6 +834,32 @@ export default {
         let judgeFiles = problem.judge_files;
         let templateCodeFile = problem.template_code_file;
 
+        let problemPromises = [
+          // template_code_file
+          downloadFile(templateCodeFile).then((val) => {
+            let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[0].children[0]);
+            fileInst.fileName = val.fileName;
+            fileInst.content = val.content;
+            // TODO: metadata maintenance
+          }),
+          // judge_files
+          ...judgeFiles.map(
+            (fileID) => {
+              downloadFile(fileID).then((val) => {
+                let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[0].children[1]);
+                fileInst.fileName = val.fileName;
+                fileInst.content = val.content;
+                // TODO: metadata maintenance
+              })
+            }
+          )
+        
+        ];
+
+        // TODO: do this !!
+        let testcasePromises = [];
+
+        return Promise.all([...problemPromises, ...testcasePromises]);
       }).catch(error => {
         this.$message.error(
           "题目信息获取失败：" + JSON.stringify(error.response.data)
