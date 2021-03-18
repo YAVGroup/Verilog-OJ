@@ -196,7 +196,8 @@
                     </el-row>
                     <el-row>
                       <codemirror ref="masterCm" v-model="currentWorkspace.fileNode.content"
-                                  :options="cmOptionsByFileName"></codemirror>
+                                  :options="cmOptionsByFileName"
+                                  v-on:changes="handleEditorContentChange"></codemirror>
                     </el-row>
 
                   </el-main>
@@ -309,7 +310,9 @@ export default {
           ]
         },
         {
-          name: '测试用例',
+          get name() {
+            return "测试用例 " + "(需要删除: " + this.serverTestcaseTobeDeleted.length + ")";
+          },
           type: 'TestCases',
           testcaseAppendable: true,
           // Used purely for local identification, remote have no such mechanics
@@ -325,8 +328,12 @@ export default {
       currentWorkspace: {
         fileNode: {       // one-off default for now
           fileName: "",
-          content: "在左侧创建文件以开始编辑。"
-        }
+          content: "在左侧创建文件以开始编辑。",
+          contentChanged: () => {
+            // No-op for this placebo
+          }
+        },
+        enableNotification: false
       },
       // BasicInfoTab, JudgeInfoTab
       currentTabPageName: "BasicInfoTab",
@@ -400,8 +407,17 @@ export default {
     },
     handleTreeHierarchyClick (node, data) {
       if (typeof data.isFile != 'undefined' && data.isFile) {
+        this.currentWorkspace.enableNotification = false;
         this.$set(this.currentWorkspace, "fileNode", data);
-     }
+        this.$nextTick(() => {
+          this.currentWorkspace.enableNotification = true;
+        })
+      }
+    },
+    handleEditorContentChange (changeObj) {
+      if (this.currentWorkspace.enableNotification) {
+        this.currentWorkspace.fileNode.contentChanged();
+      }
     },
     // Judge File Related
     judgeWorkspaceAddFile (data) {
@@ -416,10 +432,20 @@ export default {
         // ^ So no problem defining user getters
         get name() {
           return this.fileName 
-                 + (this.inSyncWithServer ? 
-                    " (" + this.serverFileID + ")" : " (Not Sync)");
+                 + (this.serverFileID != null ? 
+                    " (ID: " + this.serverFileID + ")" : "")
+                 + (this.inSyncWithServer ? " (Sync)" : " (Not Sync)");
+        },
+        contentChanged: function () {
+          this.inSyncWithServer = false;
+          if (typeof data.inSyncWithServer != 'undefined') {
+            data.inSyncWithServer = false;
+          }
         }
       };
+      if (typeof data.inSyncWithServer != 'undefined') {
+        data.inSyncWithServer = false;
+      }
       data.children.push(newFile);
       if (!data.isMultiple) {
         data.fileAppendable = false;
@@ -432,6 +458,10 @@ export default {
       // Compare Object means compare reference
       const index = children.findIndex(d => d === data);
       children.splice(index, 1);
+      if (typeof parent.data.inSyncWithServer != 'undefined') {
+        parent.data.inSyncWithServer = false;
+      }
+
 
       if (!parent.data.isMultiple) {
         parent.data.fileAppendable = true;
@@ -447,13 +477,13 @@ export default {
         localTestcaseID: data.testcaseNextID++,
         children: [],
         get name() {
-          return "Testcase #" + this.localTestcaseID +
-                (this.inSyncWithServer ? 
-                    " (" + this.serverTestCaseID + ")"
-                  : " (Not Sync)" );
+          return "Testcase #" + this.localTestcaseID
+                + (this.serverTestCaseID != null ? " (ID: " + this.serverTestCaseID.toString() + ")" : "")
+                + (this.inSyncWithServer ? " (Sync)" : " (Not Sync)");
         }
       };
       data.children.push(newTestcase);
+      return newTestcase;
     },
     judgeWorkspaceDeleteTestcase (node, data) {
       const parent = node.parent;
@@ -462,8 +492,8 @@ export default {
       const index = children.findIndex(d => d === data);
       children.splice(index, 1);
 
-      if (!parent.data.isMultiple) {
-        parent.data.fileAppendable = true;
+      if (data.serverTestCaseID != null) {
+        parent.data.serverTestcaseTobeDeleted.push(data.serverTestCaseID);
       }
     },
     judgeWorkspaceShowTemplateSelection () {
@@ -508,6 +538,12 @@ export default {
       return this.judgeWorkspaceGetTemplate(templateName).then(() => {
         let problemPromises = [];
         if (!testcaseOnly) {
+          // erase existing problem files
+          this.$set(this.judgeInfoHierarchy[0].children[0], "children", []);
+          this.judgeInfoHierarchy[0].children[0].fileAppendable = true;
+          this.$set(this.judgeInfoHierarchy[0].children[1], "children", []);
+          this.judgeInfoHierarchy[0].children[1].fileAppendable = true;
+
           problemPromises = [
             // template_code_file
             this.$axios({
@@ -538,9 +574,7 @@ export default {
           ];
         }
         
-        // erase existing testcases
-        this.$set(this.judgeInfoHierarchy[1], "children", []);
-        this.judgeWorkspaceAddTestcase(this.judgeInfoHierarchy[1]);
+        let testInst = this.judgeWorkspaceAddTestcase(this.judgeInfoHierarchy[1]);
 
         const testcasePromises = [
           // testcase_files
@@ -552,7 +586,7 @@ export default {
                       + filename,
                 baseURL: process.env.BASE_URL
               }).then(response => {
-                let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[1].children[0]);
+                let fileInst = this.judgeWorkspaceAddFile(testInst);
                 fileInst.fileName = filename;
                 fileInst.content = response.data;
               })
@@ -606,12 +640,13 @@ export default {
       }
     },
     // returns Promise with fileID on fulfilled
-    submitFile (fileID, fileContent) {
+    submitFile (fileID, fileContent, fileName) {
       // TODO: Patch file instead of add - use /api/files/{}/
       let formData = new FormData();
       formData.append(
         'file',
-        new Blob([fileContent], {type: "text/plain"})
+        new Blob([fileContent], {type: "text/plain"}),
+        fileName
       )
       return this.$axios.post("/files/", formData).then(
         (response) => {
@@ -651,7 +686,11 @@ export default {
               if (fileDesc.inSyncWithServer && fileDesc.serverFileID != null) {
                 resolve(fileDesc.serverFileID);
               } else {
-                this.submitFile(fileDesc.serverFileID, fileDesc.content).then(
+                this.submitFile(
+                  fileDesc.serverFileID,
+                  fileDesc.content,
+                  fileDesc.fileName
+                ).then(
                   (fileID) => {
                     fileDesc.serverFileID = fileID;
                     fileDesc.inSyncWithServer = true;
@@ -691,7 +730,10 @@ export default {
             return this.$axios.delete("/problem-testcases/" + testcaseID + "/");
           }
         )
-      ]);
+      ]).then((val) => {
+        this.judgeInfoHierarchy[1].serverTestcaseTobeDeleted = [];
+        return val;
+      });
 
       // Testcase files
       (this.judgeInfoHierarchy[1].children).forEach((element) => {
@@ -705,7 +747,11 @@ export default {
               if (fileDesc.inSyncWithServer && fileDesc.serverFileID != null) {
                 resolve(fileDesc.serverFileID);
               } else {
-                this.submitFile(fileDesc.serverFileID, fileDesc.content).then(
+                this.submitFile(
+                  fileDesc.serverFileID,
+                  fileDesc.content,
+                  fileDesc.fileName
+                ).then(
                   (fileID) => {
                     fileDesc.serverFileID = fileID;
                     fileDesc.inSyncWithServer = true;
@@ -840,7 +886,8 @@ export default {
             let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[0].children[0]);
             fileInst.fileName = val.fileName;
             fileInst.content = val.content;
-            // TODO: metadata maintenance
+            fileInst.serverFileID = templateCodeFile;
+            fileInst.inSyncWithServer = true;
           }),
           // judge_files
           ...judgeFiles.map(
@@ -849,7 +896,8 @@ export default {
                 let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[0].children[1]);
                 fileInst.fileName = val.fileName;
                 fileInst.content = val.content;
-                // TODO: metadata maintenance
+                fileInst.serverFileID = fileID;
+                fileInst.inSyncWithServer = true;
               })
             }
           )
@@ -857,7 +905,27 @@ export default {
         ];
 
         // TODO: do this !!
-        let testcasePromises = [];
+        let testcasePromises = [
+          ...problem.testcases.map((testcase) => {
+            let testInst = this.judgeWorkspaceAddTestcase(this.judgeInfoHierarchy[1]);
+            
+            return Promise.all([
+              ...testcase.testcase_files.map((fileID) => {
+                return downloadFile(fileID).then((val) => {
+                  let fileInst = this.judgeWorkspaceAddFile(testInst);
+                  fileInst.fileName = val.fileName;
+                  fileInst.content = val.content;
+                  fileInst.inSyncWithServer = true;
+                  fileInst.serverFileID = fileID;
+                })
+              })
+            ]).then((val) => {
+              testInst.inSyncWithServer = true;
+              testInst.serverTestCaseID = testcase.id;
+              return val;
+            })
+          })
+        ];
 
         return Promise.all([...problemPromises, ...testcasePromises]);
       }).catch(error => {
