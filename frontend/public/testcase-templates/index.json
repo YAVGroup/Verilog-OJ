@@ -1,3 +1,8 @@
-[
-    "behavorial-default"
-]
+{
+    "behavorial-default": {
+        "url": "behavorial-default",
+        "name": "行为级仿真通用模板 - (基于 Output Zero)",
+        "description": "使用 iVerilog 判题，pyDigitalWaveTools 进行 vcd 处理并输出",
+        "content": null
+    }
+}

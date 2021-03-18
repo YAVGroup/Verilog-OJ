@@ -25,195 +25,209 @@
 
       <el-row>
         <el-card shadow="never">
-          <el-tabs tab-position="top">
-            <el-tab-pane label="基本信息">
-              <!--标题、DDL-->
-              <!-- <el-row :gutter="18" 
-                class="problem-description-title" v-if="is_change">select problem</el-row>
-              <el-row :gutter="18" 
-                class="problem-description-title" v-if="is_change">
-                  <el-select v-model="problem_id" placeholder="题目：">
-                    <el-option
-                      v-for="item in options"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>
-                </el-row> -->
-              <el-row :gutter="18" id="ddl" >Title</el-row>
-              <el-row :gutter="18" id="title">
-                <el-col :span="20">
-                  <el-input v-model="title"></el-input>
-                </el-col>
-              </el-row>
-              <el-row :gutter="18" id="ddl" >Deadline</el-row>
-              <el-row :gutter="18" class="problem-descriptions" >
-                  <el-radio v-model="have_ddl" :label="true">have ddl</el-radio>
-                  <el-radio v-model="have_ddl" :label="false">no ddl</el-radio>
-                  <datetime type="datetime" icon="el-icon-date" v-model="ddl_time" v-show="have_ddl" ></datetime>
-              </el-row>
-              
+          <el-tabs tab-position="top"
+                   v-model="currentTabPageName"
+                   @tab-click="handleTabPageClick">
+            <el-tab-pane label="基本信息" name="BasicInfoTab">
 
-              <!--题目描述、输入、输出-->
-              <el-row :gutter="18"
-                      class="problem-description-title">Description</el-row>
-              <el-row :gutter="18" class="problem-descriptions">
-                <el-input  type="textarea" v-model="des"></el-input>
-              </el-row>
-
-              <el-row :gutter="18"
-                      class="problem-description-title">Input</el-row>
-              <el-row :gutter="18" class="problem-descriptions">
-                <el-input  type="textarea" v-model="input"></el-input>
-              </el-row>
-              <el-row :gutter="18"
-                      class="problem-description-title">Output</el-row>
-              <el-row :gutter="18" class="problem-descriptions">
-                <el-input  type="textarea" v-model="output"></el-input>
-              </el-row>
-
-              <el-row :gutter="18"
-                      class="problem-description-title">Level </el-row>
-              <el-row :gutter="18" class="problem-descriptions">        
-                  <el-select v-model="level" placeholder="难度：">
+              <el-form ref="basicInfoForm" 
+                       :model="basicInfoForm"
+                       label-width="160px"
+                       :rules="basisInfoRules">
+                <el-form-item label="题目名称" prop="name">
+                  <el-input v-model="basicInfoForm.name" maxlength="20" show-word-limit></el-input>
+                </el-form-item>
+                <el-form-item label="启用截止时间">
+                  <el-switch v-model="basicInfoForm.deadlineEnabled"></el-switch>
+                </el-form-item>
+                <el-form-item label="截止时间" v-if="basicInfoForm.deadlineEnabled">
+                  <el-col :span="11">
+                    <el-date-picker type="datetime"
+                                    placeholder="选择日期"
+                                    v-model="basicInfoForm.deadline_time"
+                                    style="width: 100%;"></el-date-picker>
+                  </el-col>
+                </el-form-item>
+                <el-form-item label="难度">
+                  <el-select v-model="basicInfoForm.level" placeholder="请选择难度">
                     <el-option key="1" label="简单" :value="1"></el-option>
                     <el-option key="2" label="普通" :value="2"></el-option>
                     <el-option key="3" label="中等" :value="3"></el-option>
                     <el-option key="4" label="困难" :value="4"></el-option>
                     <el-option key="5" label="极其困难" :value="5"></el-option>
                   </el-select>
-              </el-row>
+                </el-form-item>
+                <el-form-item label="题目标签">
+                  <el-col :span="11">
+                    <el-select
+                      v-model="basicInfoForm.tags"
+                      multiple
+                      filterable
+                      allow-create
+                      default-first-option
+                      style="width: 100%;"
+                      placeholder="请选择或新增题目标签">
+                      <el-option
+                        v-for="item in basicInfoForm.tagOptions"
+                        :key="item"
+                        :label="item"
+                        :value="item">
+                      </el-option>
+                    </el-select>
+                  </el-col>
+                </el-form-item>
+                <el-form-item label="题目描述" prop="description">
+                  <el-input type="textarea" v-model="basicInfoForm.description"></el-input>
+                </el-form-item>
+                <el-form-item label="输入格式描述" prop="description_input">
+                  <el-input type="textarea" v-model="basicInfoForm.description_input"
+                            :autosize="{ minRows: 5, maxRows: 15}"></el-input>
+                </el-form-item>
+                <el-form-item label="输出格式描述" prop="description_output">
+                  <el-input type="textarea" v-model="basicInfoForm.description_output"
+                            :autosize="{ minRows: 5, maxRows: 15}"></el-input>
+                </el-form-item>
+                <el-form-item label="示例波形 (WaveJSON)">
+                  <el-input type="textarea" v-model="basicInfoForm.waveform"
+                            :autosize="{ minRows: 5, maxRows: 15}"></el-input>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="waveformPreview">示例波形预览</el-button>
+                  <el-button @click="importFromOtherProblem">从其他题目导入</el-button>
+                </el-form-item>
+              </el-form>
+            
+            <!-- Sample waveform preview -->
+            <el-dialog
+              title="示例波形预览"
+              :visible.sync="waveformPreviewDialogVisible"
+              width="60%">
+                <wavedrom waveId="1"
+                          :parentText="basicInfoForm.waveform"
+                          errorMessage="解析波形时出现错误，请确认您的 WaveJSON 格式正确"></wavedrom>
 
-              <!--这里放样例波形图-->
-              <el-row :gutter="18"
-                      class="problem-description-title">Sample waveform</el-row>
-              <el-row :gutter="18"
-                      id="sample_waveform" class="problem-descriptions">
-                <el-input  v-model="waveform" type="textarea" v-if="waveedit"></el-input>
-                <wavedrom v-else waveId="1"
-                                :parentText="waveform"
-                                errorMessage="Sorry, no sample waveform available"></wavedrom>
-              </el-row>
-              <el-row :gutter="18"
-                      class="problem-description-title">
-                <el-button @click="waveedit=!waveedit" type="success">
-                  <div v-if="waveedit">view</div>
-                  <div v-else>edit</div>
-                </el-button>
-              </el-row>
+              <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="waveformPreviewDialogVisible = false">关闭</el-button>
+              </span>
+            </el-dialog>
+
+
             </el-tab-pane>
-            <el-tab-pane label="标签设置">
-              
-            </el-tab-pane>
-            <el-tab-pane label="文件编辑">
-              <!--提交界面-->
-              <el-row :gutter="15">
+            <el-tab-pane label="评测信息" name="JudgeInfoTab">
+              <el-dialog
+                title="选择模板"
+                :visible.sync="templateSelectionDialogVisible"
+                :before-close="judgeWorkspaceAbortTemplateSelection"
+                :show-close="false"
+                width="30%">
+                <div v-for="(value, key) in judgeWorkspaceTemplates" v-bind:key="key">
+                  <el-radio :label="key" v-model="templateSelectionChosen">{{ value.name }}</el-radio>
+                  <el-row style="margin-top: 6px;">描述：{{ value.description }}</el-row>
+                </div>
 
+                <span slot="footer" class="dialog-footer">
+                  <el-button type="primary" plain 
+                             @click="() => {this.judgeWorkspaceImport(this.templateSelectionChosen, false); templateSelectionDialogVisible = false;}"
+                             >导入全部</el-button>
+                  <el-button type="primary" plain 
+                             @click="() => {this.judgeWorkspaceImport(this.templateSelectionChosen, true); templateSelectionDialogVisible = false;}"
+                             >仅导入测试用例</el-button>
+                  <el-button plain @click="templateSelectionDialogVisible = false">取消</el-button>
+                </span>
+              </el-dialog>
 
-                <!-- <el-col :span="2">
-                  <el-button type="info"
-                            style="font-weight:bold;margin-left:30px;">Submit Files</el-button>
-                </el-col> -->
-              </el-row>
-              <el-row :gutter="18" class="problem-descriptions">        
-                  <el-select v-model="retrievefile" placeholder="模板文件：">
-                    <el-option
-                      v-for="item in options"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>
-              </el-row>
               <el-row>
-                <el-button @click="retrieveTemplate" type="success">
-                  模板获取
-                </el-button>
-                <el-button @click="addtestcase" type="success">
-                  判题脚本添加
-                </el-button>
-                <el-button @click="deletetestcase" type="danger">
-                  判题脚本删除
-                </el-button>
-              </el-row>
-              <el-row>
-                <el-dialog
-                    title="提示"
-                    :visible.sync="dialogVisible"
-                    width="100%"
-                    :before-close="handleClose">    
+                <el-container>
+                  <el-aside>
+                    <el-row style="margin: 20px;">
+                      <el-button-group>
+                        <!-- Add {file, testcase} -->
+                        <el-button plain size="small" @click="judgeWorkspaceShowTemplateSelection">导入模板</el-button>
+                      </el-button-group>
+                      
+                    </el-row>
+                    <el-row>
+                      <el-tree  :data="judgeInfoHierarchy"
+                                :props="{
+                                          children: 'children',
+                                          label: 'name'
+                                        }"
+                                :expand-on-click-node="false"
+                                default-expand-all
+                                highlight-current
+                                >
+                        <span class="judge-workspace-treenode" slot-scope="{ node, data }"
+                              @click="handleTreeHierarchyClick(node, data)">
+                          <span>{{ node.label }}</span>
+                          <span>
+                            <el-button
+                              type="text"
+                              size="mini"
+                              @click.stop="() => judgeWorkspaceAddFile(data)"
+                              v-if="(!! data.fileAppendable) && data.fileAppendable"
+                              >
+                              添加
+                            </el-button>
+                            <el-button
+                              type="text"
+                              size="mini"
+                              @click.stop="() => judgeWorkspaceDeleteFile(node, data)"
+                              v-if="(!! data.isFile) !== 'undefined' && data.isFile"
+                              >
+                              删除
+                            </el-button>
+                            <el-button
+                              type="text"
+                              size="mini"
+                              @click.stop="() => judgeWorkspaceAddTestcase(data)"
+                              v-if="(!! data.testcaseAppendable) !== 'undefined' && data.testcaseAppendable"
+                              >
+                              添加
+                            </el-button>
+                            <el-button
+                              type="text"
+                              size="mini"
+                              @click.stop="() => judgeWorkspaceDeleteTestcase(node, data)"
+                              v-if="(!! data.isTestCase) !== 'undefined' && data.isTestCase"
+                              >
+                              删除
+                            </el-button>
+                          </span>
+                        </span>
+                      </el-tree>
+                    </el-row>
 
-                    <div slot="title" class="header-title">
-                        <span> {{ retrieve_title }}</span>
-                    </div>
-                    <!-- <el-input  type="textarea" v-model="retrieve_code"></el-input> -->
-                    <codemirror v-model="retrieve_code"
-                            :options="cmOptions"></codemirror>
-                    <span slot="footer" class="dialog-footer">
-                      <el-button @click="dialogVisible = false">取 消</el-button>
-                      <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-                    </span>
-                  </el-dialog>
-                </el-row> 
-
-              <!--代码编辑-->
-              <el-row>
-                <el-container style="height: 500px; border: 1px solid #eee">
-                  <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-                    <el-menu :default-openeds="['1', '3']">
-                      <el-submenu index="1">
-                        <template slot="title"><i class="el-icon-message"></i>代码文件</template>
-                        <el-menu-item-group>
-                          <template slot="title">模板文件</template>
-                          <li v-for="(code_item, index) in code_items" :key="code_item.code">
-                            <el-menu-item @click="code_select(code_item.code,'verilog',0,index)">code.v </el-menu-item>
-                          </li>
-                          <li v-for="(code_template, index) in code_templates" :key="code_template.code">
-                            <el-menu-item @click="code_select(code_template.code,'verilog',1,index)">code_template.v</el-menu-item>
-                          </li>
-                        </el-menu-item-group>
-                        <!-- <el-menu-item-group title="仿真文件">
-                          <li v-for="(testbench,index) in testbenches" :key="testbench.code">
-                            <el-menu-item @click="code_select(testbench.code,'verilog',2,index)" >testbench.v</el-menu-item>
-                          </li>
-                        </el-menu-item-group> -->
-                      </el-submenu>
-                      <el-submenu index="2">
-                        <template slot="title"><i class="el-icon-menu"></i>判题文件</template>
-                        <li v-for="(testcase,index) in testcases" :key="testcase.code">
-                        <el-menu-item-group>
-                          <template slot="title">判题脚本{{index}}</template>
-                          <el-menu-item @click="code_select(testcase.code[0],'python',2,index)" >wavedump.py</el-menu-item>
-                          <el-menu-item @click="code_select(testcase.code[1],'python',3,index)" >vcd_main.py</el-menu-item>
-                          <el-menu-item @click="code_select(testcase.code[2],'verilog',4,index)" >testbench.v</el-menu-item>
-                          <el-menu-item @click="code_select(testcase.code[3],'python',5,index)" >vcd_visualize.py</el-menu-item>
-                          <el-menu-item @click="code_select(testcase.code[4],'shell',6,index)"  >main.sh</el-menu-item>
-                        </el-menu-item-group>
-                        </li>
-
-                      </el-submenu>
-
-                    </el-menu>
+                    
                   </el-aside>
-                  
-                  <el-container>             
-                    <el-main id="container_main">
-                      <!-- <el-input v-model="code" size=big tpye="textarea"></el-input> -->
-                      <codemirror v-model="content"
-                            :options="cmOptions"></codemirror>
-                    </el-main>
-                  </el-container>
+                  <el-main>
+                    <el-row>
+                        <el-input placeholder="example.py" v-model="currentWorkspace.fileNode.fileName">
+                          <template slot="prepend">文件名</template>
+                          <template slot="append">{{ prettyModeName }}</template>
+                        </el-input>
+
+                      
+                    </el-row>
+                    <el-row>
+                      <codemirror ref="masterCm" v-model="currentWorkspace.fileNode.content"
+                                  :options="cmOptionsByFileName"
+                                  v-on:changes="handleEditorContentChange"></codemirror>
+                    </el-row>
+
+                  </el-main>
                 </el-container>
 
               </el-row>
+
+
             </el-tab-pane>
           </el-tabs>
           <!-- 这里的操作比较 dirty，是直接用 absolute 定位扔到那个位置，这里要注意叠放次序保证按钮在上（就是先写 el-tabs 后写 el-button），否则会按不到 -->
           <!-- Ref: https://segmentfault.com/q/1010000020057405 -->
           <el-button type="success"
                     size="medium"
-                    @click="problemedit"
+                    @click="submitAll"
+                    :loading="submitButtonBusy"
                     style="font-weight: bold; position: absolute; right: 25px; top: 17px;">提交</el-button>
         </el-card>
       </el-row>
@@ -239,6 +253,7 @@ import wavedrom from "@/components/utils/wavedrom";
 import 'vue-datetime/dist/vue-datetime.css'
 
 import { mapState } from 'vuex';
+import Userhyperlink from '../utils/userhyperlink.vue';
 
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
@@ -252,531 +267,693 @@ export default {
   name: "addproblem",
   components: {
     codemirror,
-    // statusmini,
-    // prostatistice,
-    datetime: Datetime,
     wavedrom
   },
   data () {
     return {
-      title: "",
-      des: "",
-      input: "",
-      output: "",
-      datetimeFormat: "YYYY-MM-DD HH:mm:ss",
-      endDatetime: null,
-      // author: "",
-      addtime: "",
-      ddl: "",
-      have_ddl: false,
-      is_change: false,
-      options:[],
-      problem_id:0,
-      retrieve_title: "",
-      retrieve_code: "",
-      waveedit: true,
-
-      tagnames: [],
-      activeNames: ["1", "2", "3", "4", "5", "6"],
-      level: 1,
-      ddl_time: null,
-      lastindex: 0,
-      lastchange: 0,
-      retrievefile: "wavedump.py",
-      dialogVisible: false,
-
-      content: "",
-      code_items : [
-        { code: "" }
+      basicInfoForm: {
+        name: '',
+        description: '',
+        description_input: '',
+        description_output: '',
+        deadlineEnabled: false,
+        deadline_time: '',
+        waveform: '',
+        level: 1,
+        tags: [],
+        tagOptions: ['组合逻辑', '时序逻辑']
+      },
+      basisInfoRules: {
+        name: [
+          { required: true, message: '请输入题目名称', trigger: 'blur'}
+        ],
+        description: [
+          { required: true, message: '请输入题目描述', trigger: 'blur'}
+        ],
+        description_input: [
+          { required: true, message: '请输入题目输入描述', trigger: 'blur'}
+        ],
+        description_output: [
+          { required: true, message: '请输入题目输出描述', trigger: 'blur'}
+        ],
+      },
+      /**
+       * Used to illustrate {problem, testcase} related files and grades
+       */
+      judgeInfoHierarchy: [
+        {
+          name: '题目',
+          type: 'Problem',
+          children: [
+            {
+              name: '模板代码文件',
+              type: 'ProblemMeta',
+              patchKey: 'template_code_file',
+              fileAppendable: true,
+              isMultiple: false,
+              children: []
+            },
+            {
+              name: '评测所用文件',
+              type: 'ProblemMeta',
+              patchKey: 'judge_files',
+              fileAppendable: true,
+              isMultiple: true,
+              children: []
+            }
+          ]
+        },
+        {
+          get name() {
+            return "测试用例 " + "(需要删除: " + this.serverTestcaseTobeDeleted.length + ")";
+          },
+          type: 'TestCases',
+          testcaseAppendable: true,
+          // Used purely for local identification, remote have no such mechanics
+          testcaseNextID: 0,
+          // To be deleted in server in next sync
+          serverTestcaseTobeDeleted: [],
+          children: []
+        }
       ],
-      code_templates : [
-        { code: "" }
-      ],
+      judgeWorkspaceTemplates: {},
+      templateSelectionDialogVisible: false,
+      templateSelectionChosen: "",
+      currentWorkspace: {
+        fileNode: {       // one-off default for now
+          fileName: "",
+          content: "在左侧创建文件以开始编辑。",
+          contentChanged: () => {
+            // No-op for this placebo
+          }
+        },
+        enableNotification: false
+      },
+      // BasicInfoTab, JudgeInfoTab
+      currentTabPageName: "BasicInfoTab",
+      submitButtonBusy: false,
+      waveformPreviewDialogVisible: false
+    };
+  },
+  computed: {
+    prettyModeName () {
+      let currentCmOptions = this.cmOptionsByFileName;
+      if (currentCmOptions.mode == "null") {
+        return "无高亮";
+      } else {
+        let mode = currentCmOptions.mode;
+        return mode.substring(0, 1).toUpperCase() + mode.substring(1);
+      }
+    },
+    cmOptionsByFileName () {
+      let segments = this.currentWorkspace.fileNode.fileName.split(".");
+      let mode = "";
+      if (segments.length < 2) {
+        mode = "null";
+      } else {
+        let extension = segments[segments.length - 1];
+        mode = this.getModeByExtension(extension);
+      }
 
-      //对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.v,main.sh
-      testcases: [
-        { code:["","","","",""] }
-      ],
-
-      // language: "Verilog",
-      cmOptions: {
+      return {
         tabSize: 4,
-        mode: "Verilog",
+        mode: mode,
         theme: "base16-light",
         lineNumbers: true,
         readOnly: false,
-      },
-      // template_code: "",
-      submissions: [],
-
-      waveform: "",
-
-      // codetemplate: {},
-
-      // ac: 100,
-      // mle: 100,
-      // tle: 100,
-      // rte: 100,
-      // pe: 100,
-      // ce: 100,
-      // wa: 100,
-      // se: 100,
-      judgetype: "primary",
-      loadingshow: false,
-      // submitid: -1
-    };
+      };
+    },
+    inProblemEditMode () {
+      return this.$route.params.problemid != null;
+    },
+    ...mapState([
+      'loggedIn',
+      'userID',
+      'username',
+      'isSuperUser'
+    ])
   },
-  computed: mapState([
-    'loggedIn',
-    'userID',
-    'username',
-    'isSuperUser'
-  ]),
   created () {
-      if (this.$route.params.problemid!=null) {
-        this.is_change = true;
-      }
-
-                //获取模板
-      let url = "testcase-templates/index.json";
-      this.$axios({
-        // url: 'testcase-templates/index.json',
-        url: url,
-        baseURL: process.env.BASE_URL
-      }).then(response => {
-        let url = "testcase-templates/"+response.data[0]+"/index.json";
-        this.$axios({
-          url:url,
-          baseURL: process.env.BASE_URL
-        }).then(response => {
-          let testcases = response.data.testcase_files;
-        // console.log(testcases);
-          for(let j=0;j<testcases.length;j++) {
-            this.options.push({"value":testcases[j],"label":testcases[j]});
-          }
-        })
-      });
-
-      if(this.is_change) { //edit模式
-        this.$axios.get("/problems/"+ this.$route.params.problemid +"/?id="+ this.$route.params.problemid + 
-          "&owner=" + this.userID).then(response => {
-          let problem = response.data;
-          // console.log(problem);
-          this.title = problem["name"];
-          if(problem["deadline_time"]==null) {
-            this.have_ddl = false;
-            this.ddl_time = null;
-          } else {
-            this.have_ddl = true;
-            this.ddl_time = problem["deadline_time"];
-          }
-          this.level = problem["level"];
-          this.des = problem["description"];
-          this.input = problem["description_input"];
-          this.output = problem["description_output"];
-          this.waveform = problem["app_data"];
-          //对应需要单独获取对应的testfile文件
-          //可能对应多个testcases
-          // console.log("created testcases length");
-          // console.log(problem["testcases"].length);
-          for(let j=0;j<problem["testcases"].length;j=j+1) {
-            let testcases = problem["testcases"][j]["testcase_files"];
-            if(j!=0) {
-              this.testcases.push({ code:["","","","",""] });
-            }
-
-            this.settestcase(testcases,j);
-
-          //对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.v,main.sh
-          }
-
-          // console.log(this.testcases);
-          var  template = problem["template_code_file"];
-
-          if (template != null) {
-            this.$axios.get("/files/" + template + "/")
-            .then(response => {
-              this.code_templates[0].code = response.data;
-            })
-          }
-
-          var judge = problem["judge_files"];
-
-          this.code_items = [];
-
-          if (judge!=null) {
-            judge.forEach(async(item) => {
-              await this.$axios.get("/files/" + item + "/")
-                .then(response => {
-              this.code_items.push({"code":response.data});
-              this.content =  this.code_items[0].code;
-              console.log(this.content);
-              })
-            })
-          }
-
-        }).catch(error => {
-              this.$message.error("发生错误！" + "(" + JSON.stringify(error.response.data) + ")");
-            }); 
-
-      } else {
-        console.log("add problem");
-      }
-      this.lastchange = 0;
-      this.lastindex = 0;
+    if (this.$route.params.problemid != null) {
+      this.fillBasicInfoByProblem(this.$route.params.problemid);
+      this.fillJudgeInfoByProblem(this.$route.params.problemid);
+    }
   },
   methods: {
-    /*
-    changetemplate (lang) {
-      var t = this.codetemplate[lang]
-      if (t) {
-        this.$confirm("确定切换语言吗？", "切换后当前代码不会保存！", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
-
-          this.code = this.codetemplate[lang]
+    waveformPreview () {
+      this.waveformPreviewDialogVisible = true;
+    },
+    importFromOtherProblem () {
+      this.$message.error("尚未实现！");
+    },
+    getModeByExtension (extName) {
+      const mmap = {
+        py: "python",
+        v: "verilog",
+        sh: "shell"
+      };
+      if (typeof mmap[extName] != 'undefined') {
+        return mmap[extName];
+      } else {
+        return "null";
+      }
+    },
+    // Ref: https://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked
+    handleTabPageClick (tabInst, event) {
+      // console.log(tabInst, event);
+      if (tabInst.name == 'JudgeInfoTab') {
+        this.$refs.masterCm.refresh();
+      }
+    },
+    handleTreeHierarchyClick (node, data) {
+      if (typeof data.isFile != 'undefined' && data.isFile) {
+        this.currentWorkspace.enableNotification = false;
+        this.$set(this.currentWorkspace, "fileNode", data);
+        this.$nextTick(() => {
+          this.currentWorkspace.enableNotification = true;
         })
       }
     },
-  */
-    settestcase(testcases,index) {
-      if (testcases !=null ) {
-              //循环会导致奇怪的错误
-            for(var i=0;i<testcases.length;i++) {
-              this.$axios.get("/files/" + testcases[i] + "/")
-                .then(response => {
-                    // console.log(response.data);
-                  var temp = response.headers["content-disposition"];
-                    // response['Content-Disposition'] = 'attachment; filename="%s"'
-                
-                  var filename = temp.slice(22,temp.length-1);
-                    // console.log(filename)
-                  switch(filename) {//对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.py,main.sh
-                    case "wavedump.py": 
-                      this.testcases[index].code[0] = response.data;
-                      break;
-                    case "vcd_main.py":
-                      this.testcases[index].code[1] = response.data;
-                      break;
-                    case "testbench.v":
-                      this.testcases[index].code[2] = response.data;
-                      break;
-                    case "vcd_visualize.py":
-                      this.testcases[index].code[3] = response.data;
-                      break;
-                    case "main.sh":
-                      this.testcases[index].code[4] = response.data;
-                      break;
-                  }
-              })
-            }
+    handleEditorContentChange (changeObj) {
+      if (this.currentWorkspace.enableNotification) {
+        this.currentWorkspace.fileNode.contentChanged();
+      }
+    },
+    // Judge File Related
+    judgeWorkspaceAddFile (data) {
+      const newFile = {
+        isFile: true,
+        fileName: "newFile.txt",
+        isBinary: false, // TODO: support for binary files
+        inSyncWithServer: false, // use el-icon-cloudy to represent server sync
+        serverFileID: null,
+        content: "",
+        // https://stackoverflow.com/questions/51059477/defining-user-defined-getters-in-a-vue-component
+        // ^ So no problem defining user getters
+        get name() {
+          return this.fileName 
+                 + (this.serverFileID != null ? 
+                    " (ID: " + this.serverFileID + ")" : "")
+                 + (this.inSyncWithServer ? " (Sync)" : " (Not Sync)");
+        },
+        contentChanged: function () {
+          this.inSyncWithServer = false;
+          if (typeof data.inSyncWithServer != 'undefined') {
+            data.inSyncWithServer = false;
           }
-    },
-
-    onCopy (e) {
-      this.$message.success("复制成功！");
-    },
-    // 复制失败
-    onError (e) {
-      this.$message.error("复制失败：" + e);
-    },
-
-    code_select: function( message, language, change, index ) {
-      switch(this.lastchange) {
-        case 0:
-          this.code_items[this.lastindex].code = this.content;
-          break;
-        case 1:
-          this.code_templates[this.lastindex].code = this.content;
-          break;
-        case 2:
-          this.testcases[this.lastindex].code[0] = this.content;
-          break;
-        case 3:
-          this.testcases[this.lastindex].code[1] = this.content;
-          break;
-        case 4:
-          this.testcases[this.lastindex].code[2] = this.content;
-          break;
-        case 5:
-          this.testcases[this.lastindex].code[3] = this.content;
-          break;
-        case 6:
-          this.testcases[this.lastindex].code[4] = this.content;
-          break;
-      }
-
-      this.lastchange = change;
-      this.lastindex = index;
-      this.content = message;
-      this.cmOptions["mode"] = language;
-    },
-
-    problemlevel: function (type) {
-      if (type == "Easy") return "info";
-      if (type == "Medium") return "success";
-      if (type == "Hard") return "";
-      if (type == "VeryHard") return "warning";
-      if (type == "ExtremelyHard") return "danger";
-    },
-    tableRowClassName({ row, rowIndex }) {
-      if (row.result == "Pending") return "info-row";
-      if (row.result == "Judging") return "judging-row";
-      if (row.result == "Wrong Answer") return "danger-row";
-      if (row.result == "Compile Error") return "warning-row";
-      if (row.result == "Presentation Error") return "warning-row";
-      if (row.result == "Waiting") return "info-row";
-      if (row.result == "Accepted") return "success-row";
-      if (row.result == "Time Limit Exceeded") return "warning-row";
-      if (row.result == "Time Limit Exceeded") return "warning-row";
-      if (row.result == "Memory Limit Exceeded") return "warning-row";
-      if (row.result == "Runtime Error") return "warning-row";
-      if (row.result == "System Error") return "warning-row";
-      return "";
-    },
-    statuetype: function(type) {
-      if (type == "Pending") return "info";
-      if (type == "Judging") return "";
-      if (type == "Wrong Answer") return "danger";
-      if (type == "Compile Error") return "warning";
-      if (type == "Presentation Error") return "warning";
-      if (type == "Waiting") return "info";
-      if (type == "Accepted") return "success";
-      if (type == "Time Limit Exceeded") return "warning";
-      if (type == "Memory Limit Exceeded") return "warning";
-      if (type == "Runtime Error") return "warning";
-      if (type == "System Error") return "danger";
-      return "danger";
-    },
-    statuejudge: function(type) {
-      if (type == "Pending") return true;
-      if (type == "Judging") return true;
-      return false;
-    },
-
-    rowClick(row, col, e) {
-      this.$router.push({
-        name: 'submission',
-        params: {submissionid: row.id}
-      })
-    },
-
-    submissions_refresh(){
-      this.$axios
-        .get(
-          "/submissions/?user=" +
-            this.userID +
-            "&problem=" +
-            this.problem
-        )
-        .then(response => {
-          for (var i = 0; i < response.data.length; i++) {
-            response.data[i]["submittime"] = moment(
-              response.data[i]["submit_time"]
-            ).format("YYYY-MM-DD");
-          }
-          this.submissions = response.data;
-        });
-    },
-
-    async upload(code, filename) {
-        var formData = new FormData();
-        var blob = new Blob([code], {type: "text/plain"});
-        formData.append('file', blob, filename);
-        return this.$axios.post("/files/", formData).then(response => {
-          return response.data.id;
-        }).catch(error => {
-            this.$message.error("提交错误！" + filename + "(" + JSON.stringify(error.response.data) + ")");
-          });  
-    },
-
-    async upload_testcase(code_ids,problemid) {
-        var body = {};
-        body['type'] = 'SIM';
-        body['testcase_files'] = code_ids ;
-        body['problem'] = problemid;
-        return this.$axios.post("/problem-testcases/", body).catch(error => {
-            this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          });  
-    },
-
-    async upload_testcases(testcase,problem) {
-        const wavedump_id = await this.upload(testcase.code[0],'wavedump.py');
-        const vcd_main_id = await this.upload(testcase.code[1],'vcd_main.py');
-        const testbench_id = await this.upload(testcase.code[2],'testbench.v');
-        const vcd_visualize_id = await this.upload(testcase.code[3],'vcd_visualize.py');
-        const main_id = await this.upload(testcase.code[4],'main.sh');
-
-        return this.upload_testcase([wavedump_id,vcd_main_id,testbench_id,vcd_visualize_id,main_id]
-          ,problem);
-    },
-
-    async deltestcase(problemid) {
-      return this.$axios.get("/problem-testcases/?problem=" + problemid).then(response => {
-        var res = response.data;
-        for (var i=0;i < res.length;i=i+1) {
-            console.log(res[i]);
-            this.$axios.delete("problem-testcases/"+
-              res[i].id+"/"
-            );
         }
-            }).catch(error => {
-            this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          });  
+      };
+      if (typeof data.inSyncWithServer != 'undefined') {
+        data.inSyncWithServer = false;
+      }
+      data.children.push(newFile);
+      if (!data.isMultiple) {
+        data.fileAppendable = false;
+      }
+      return newFile;
     },
-
-    async problemedit() {
-      if(this.is_edit==false) {
-        this.is_edit = true;
-        return;
+    judgeWorkspaceDeleteFile (node, data) {
+      const parent = node.parent;
+      const children = parent.data.children;
+      // Compare Object means compare reference
+      const index = children.findIndex(d => d === data);
+      children.splice(index, 1);
+      if (typeof parent.data.inSyncWithServer != 'undefined') {
+        parent.data.inSyncWithServer = false;
       }
-      else if(!this.loggedIn){
-        this.$message.error("请先登录！");
-        return;
+
+
+      if (!parent.data.isMultiple) {
+        parent.data.fileAppendable = true;
       }
-      else{
-        switch(this.lastchange) {
-          case 0:
-            this.code_items[this.lastindex].code = this.content;
-            break;
-          case 1:
-            this.code_templates[this.lastindex].code = this.content;
-            break;
-          case 2:
-            this.testcases[this.lastindex].code[0] = this.content;
-            break;
-          case 3:
-            this.testcases[this.lastindex].code[1] = this.content;
-            break;
-          case 4:
-            this.testcases[this.lastindex].code[2] = this.content;
-            break;
-          case 5:
-            this.testcases[this.lastindex].code[3] = this.content;
-            break;
-          case 6:
-            this.testcases[this.lastindex].code[4] = this.content;
-            break;
-      }
-        this.is_edit = false;
-
-        const code_id = await this.upload(this.code_items[0].code,'code_ref.v');
-        const template_id = await this.upload(this.code_templates[0].code,'template_code.v');
-
-        var body = {}
-        body['name'] = this.title;
-        body['description'] = this.des;
-        body['description_input'] = this.input;
-        body['description_output'] = this.output;
-        body['app_data'] = this.waveform;
-        body['level'] = this.level;
-        body['owner'] = this.userID;
-        body['template_code_file'] = template_id;
-        body['judge_files'] = [code_id];
-        if(this.have_ddl)
-          body['deadline_time'] = this.ddl_time;
-        // console.log(template_id);
-        if (this.is_change) {
-
-          await this.deltestcase(this.$route.params.problemid);
-          this.$axios.patch(
-            "/problems/" + this.$route.params.problemid + "/", body
-          )
-
-          // for(var j=0;j<testcase_list.length;j=j+1) {
-          //   this.$axios.delete("/problem-testcases/"+testcase_list[j].id+"/").catch(error=>{
-          //     this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          //   });
-          // }
-          // var testcase_body = {};
-          // testcase_body['type'] = 'SIM';
-          // testcase_body['testcase_files'] = [wavedump_id,vcd_main_id,vcd_visualize_id,main_id,testbench_id];
-          // testcase_body['problem'] = this.$route.params.problemid;
-          // this.$axios.patch("/problem-testcases/"+ this.$route.params.problemid + "/", testcase_body).catch(error => {
-          //     this.$message.error("提交错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          //   });
-          this.testcases.forEach(async(item) => {
-            await this.upload_testcases(item,this.$route.params.problemid)
-          })
-          return   this.$router.push({
-            name: 'problemdetail',
-            params: {problemid: this.$route.params.problemid}
-            }).catch(error => {
-            this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          });  
+    },
+    judgeWorkspaceAddTestcase (data) {
+      const newTestcase = {
+        isTestCase: true,
+        inSyncWithServer: false,
+        serverTestCaseID: null,
+        isMultiple: true,
+        fileAppendable: true,
+        localTestcaseID: data.testcaseNextID++,
+        children: [],
+        get name() {
+          return "Testcase #" + this.localTestcaseID
+                + (this.serverTestCaseID != null ? " (ID: " + this.serverTestCaseID.toString() + ")" : "")
+                + (this.inSyncWithServer ? " (Sync)" : " (Not Sync)");
         }
-        else return this.$axios.post(
-            "/problems/",body
-          ).then(response => {
-            this.testcases.forEach(async(item) => {
-              await this.upload_testcases(item,response.data.id)
-            })
-            this.$router.push({
-            name: 'problemdetail',
-            params: {problemid: response.data.id}
-        })}).catch(error => {
-            this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
-          });  
+      };
+      data.children.push(newTestcase);
+      return newTestcase;
+    },
+    judgeWorkspaceDeleteTestcase (node, data) {
+      const parent = node.parent;
+      const children = parent.data.children;
+      // Compare Object means compare reference
+      const index = children.findIndex(d => d === data);
+      children.splice(index, 1);
+
+      if (data.serverTestCaseID != null) {
+        parent.data.serverTestcaseTobeDeleted.push(data.serverTestCaseID);
       }
     },
-    
-    retrieveTemplate: function () {
-      var url = "testcase-templates/"+this.retrievefile;
-      this.$axios({
-        // url: 'testcase-templates/index.json',
-        url: url,
+    judgeWorkspaceShowTemplateSelection () {
+      this.judgeWorkspaceGetTemplatesBrief().then(() => {
+        this.templateSelectionDialogVisible = true;
+      });
+    },
+    judgeWorkspaceAbortTemplateSelection (done) {
+      // no-op to force click "Cancel"
+      return;
+    },
+    judgeWorkspaceGetTemplatesBrief () {
+      return this.$axios({
+        url: 'testcase-templates/index.json',
         baseURL: process.env.BASE_URL
       }).then(response => {
-        this.retrieve_title = this.retrievefile;
-        this.retrieve_code = response.data;
-        this.dialogVisible = true;
-// switch(this.retrievefile) {
-        //       case "wavedump.py": 
-        //         this.testcases[0].code[0] = response.data;
-        //         break;
-        //       case "vcd_main.py":
-        //         this.testcases[0].code[1] = response.data;
-        //         break;
-        //       case "testbench.v":
-        //         this.testcases[0].code[2] = response.data;
-        //         break;
-        //       case "vcd_visualize.py":
-        //         this.testcases[0].code[3] = response.data;
-        //         break;
-        //       case "main.sh":
-        //         this.testcases[0].code[4] = response.data;
-        //         break;
-        // }
-      })
+        this.judgeWorkspaceTemplates = response.data;
+      }).catch(error => {
+        this.$message.error(
+          "获取模板时出现错误：" + JSON.stringify(error.response.data)
+        );
+      });
     },
-    addtestcase(){
-      //对应顺序为wavedump.py,vcd_main.py,testbench.v,vcd_visualize.v,main.sh
-      this.testcases.push({ code:["","","","",""] })
+    judgeWorkspaceGetTemplate (templateName) {
+      return this.$axios({
+        url: 'testcase-templates/' + this.judgeWorkspaceTemplates[templateName].url + "/index.json",
+        baseURL: process.env.BASE_URL
+      }).then(response => {
+        this.judgeWorkspaceTemplates[templateName]["content"] = response.data;
+      }).catch(error => {
+        this.$message.error(
+          "获取模板 " + templateName + " 时出现错误：" + JSON.stringify(error.response.data)
+        );
+      });
     },
+    /**
+     * judgeWorkspaceImport
+     * testcaseOnly - add a new testcase, ignore others
+     * TODO: use relative position
+     */
+    judgeWorkspaceImport (templateName, testcaseOnly) {
+      return this.judgeWorkspaceGetTemplate(templateName).then(() => {
+        let problemPromises = [];
+        if (!testcaseOnly) {
+          // erase existing problem files
+          this.$set(this.judgeInfoHierarchy[0].children[0], "children", []);
+          this.judgeInfoHierarchy[0].children[0].fileAppendable = true;
+          this.$set(this.judgeInfoHierarchy[0].children[1], "children", []);
+          this.judgeInfoHierarchy[0].children[1].fileAppendable = true;
 
-    deletetestcase() {
-      this.$confirm("确定要删除测试脚本嘛", "删除", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        this.$message({
-          type: "success",
-          message: "删除最后一个测试脚本"
+          problemPromises = [
+            // template_code_file
+            this.$axios({
+              url: 'testcase-templates/' 
+                    + this.judgeWorkspaceTemplates[templateName].url + "/"
+                    + this.judgeWorkspaceTemplates[templateName].content.template_code_file,
+              baseURL: process.env.BASE_URL
+            }).then(response => {
+              let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[0].children[0]);
+              fileInst.fileName = this.judgeWorkspaceTemplates[templateName].content.template_code_file;
+              fileInst.content = response.data;
+            }),
+            // judge_files
+            ...this.judgeWorkspaceTemplates[templateName].content.judge_files.map(
+              (filename) => {
+                return this.$axios({
+                  url: 'testcase-templates/' 
+                        + this.judgeWorkspaceTemplates[templateName].url + "/"
+                        + filename,
+                  baseURL: process.env.BASE_URL
+                }).then(response => {
+                  let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[0].children[1]);
+                  fileInst.fileName = filename;
+                  fileInst.content = response.data;
+                })
+              }
+            )
+          ];
+        }
+        
+        let testInst = this.judgeWorkspaceAddTestcase(this.judgeInfoHierarchy[1]);
+
+        const testcasePromises = [
+          // testcase_files
+          ...this.judgeWorkspaceTemplates[templateName].content.testcase_files.map(
+            (filename) => {
+              return this.$axios({
+                url: 'testcase-templates/' 
+                      + this.judgeWorkspaceTemplates[templateName].url + "/"
+                      + filename,
+                baseURL: process.env.BASE_URL
+              }).then(response => {
+                let fileInst = this.judgeWorkspaceAddFile(testInst);
+                fileInst.fileName = filename;
+                fileInst.content = response.data;
+              })
+            }
+          )
+        ];
+        
+        Promise.all([...problemPromises, ...testcasePromises]).then(() => {
+          this.$message.success("模板导入成功！");
+        }).catch((error) => {
+          this.$message.error("模板导入失败! " + error.response.data);
         });
       })
-      this.testcases.pop();
-
     },
 
-    problemchange() {
-      this.is_change = true;
-      this.$axios
+    // Returns a Promise with problemID on fulfilled
+    submitBasicInfo () {
+      let basicInfo = {
+        name: this.basicInfoForm.name,
+        deadline_time: this.basicInfoForm.deadlineEnabled ? 
+                        this.basicInfoForm.deadline_time :
+                        null,
+        level: this.basicInfoForm.level,
+        tags: this.basicInfoForm.tags.join("|"),
+        description: this.basicInfoForm.description,
+        description_input: this.basicInfoForm.description_input,
+        description_output: this.basicInfoForm.description_output,
+        app_data: this.basicInfoForm.waveform
+      };
+
+      if (this.inProblemEditMode) {
+        // should override existing ones
+        let problemID = this.$route.params.problemid;
+
+        return this.$axios.patch(
+          "/problems/" + problemID + "/", {
+            id: problemID,
+            ...basicInfo
+          }
+        ).then((response) => {
+          return response.data.id;   // return problemID on resolved
+        });
+      } else {
+        return this.$axios.post(
+          "/problems/", {
+            ...basicInfo
+          }
+        ).then((response) => {
+          return response.data.id;   // return problemID on resolved
+        });
+      }
+    },
+    // returns Promise with fileID on fulfilled
+    submitFile (fileID, fileContent, fileName) {
+      // TODO: Patch file instead of add - use /api/files/{}/
+      let formData = new FormData();
+      formData.append(
+        'file',
+        new Blob([fileContent], {type: "text/plain"}),
+        fileName
+      )
+      return this.$axios.post("/files/", formData).then(
+        (response) => {
+          return response.data.id;
+        }
+      );
     },
 
+    // returns Promise
+    /**
+     * TODO: use relative position
+     */
+    submitJudgeWorkspace (problemID) {
+      let problemPromises = [];
+      let testcasePromises = [];
 
+      // Problem files
+      (this.judgeInfoHierarchy[0].children).forEach(element => {
+        let name = element.name;
+        let patchKey = element.patchKey;
+        let isMultiple = element.isMultiple;
+
+        if (!isMultiple && element.children.length > 1) {
+          throw "Expected single element on " + name;
+        }
+
+        if (element.children.length == 0) {
+          return;
+        }
+
+        let filesPromises = [];
+
+        element.children.forEach(fileDesc => {
+          filesPromises.push(
+            new Promise((resolve, reject) => {
+              // Already uploaded, so no need to do it twice
+              if (fileDesc.inSyncWithServer && fileDesc.serverFileID != null) {
+                resolve(fileDesc.serverFileID);
+              } else {
+                this.submitFile(
+                  fileDesc.serverFileID,
+                  fileDesc.content,
+                  fileDesc.fileName
+                ).then(
+                  (fileID) => {
+                    fileDesc.serverFileID = fileID;
+                    fileDesc.inSyncWithServer = true;
+                    resolve(fileID);
+                  }
+                ).catch((error) => {
+                  reject(error);
+                })
+              }
+            })
+            
+          );
+        });
+
+        // Patch it when everything ready
+        problemPromises.push(
+          Promise.all(filesPromises).then((values) => {
+            let body = {};
+            if (isMultiple) {
+              body[patchKey] = values;
+            } else {
+              body[patchKey] = values[0];
+            }
+
+            return this.$axios.patch(
+              "/problems/" + problemID + "/", body
+            );
+          })
+        );
+      });
+
+
+      // Testcase preparation
+      let testcasePreparation = Promise.all([
+        ...this.judgeInfoHierarchy[1].serverTestcaseTobeDeleted.map(
+          (testcaseID) => {
+            return this.$axios.delete("/problem-testcases/" + testcaseID + "/");
+          }
+        )
+      ]).then((val) => {
+        this.judgeInfoHierarchy[1].serverTestcaseTobeDeleted = [];
+        return val;
+      });
+
+      // Testcase files
+      (this.judgeInfoHierarchy[1].children).forEach((element) => {
+        // Submit all files
+        let filesPromises = [];
+
+        element.children.forEach(fileDesc => {
+          filesPromises.push(
+            new Promise((resolve, reject) => {
+              // Already uploaded, so no need to do it twice
+              if (fileDesc.inSyncWithServer && fileDesc.serverFileID != null) {
+                resolve(fileDesc.serverFileID);
+              } else {
+                this.submitFile(
+                  fileDesc.serverFileID,
+                  fileDesc.content,
+                  fileDesc.fileName
+                ).then(
+                  (fileID) => {
+                    fileDesc.serverFileID = fileID;
+                    fileDesc.inSyncWithServer = true;
+                    resolve(fileID);
+                  }
+                ).catch((error) => {
+                  reject(error);
+                })
+              }
+            })
+            
+          );
+        });
+
+        // Patch or make it when everything ready
+        problemPromises.push(
+          Promise.all(filesPromises).then((values) => {
+            if (element.serverTestCaseID == null) {
+              return this.$axios.post(
+                "/problem-testcases/", {
+                  type: 'SIM',
+                  testcase_files: values,
+                  problem: problemID
+                }
+              ).then((response) => {
+                element.serverTestCaseID = response.data.id;
+                element.inSyncWithServer = true;
+                return element.serverTestCaseID;
+              })
+            } else {
+              // patch existing server testcase
+              // TODO: use inSyncWithServer and maintain properly
+              return this.$axios.patch(
+                "/problem-testcases/" + element.serverTestCaseID + "/", {
+                  testcase_files: values,
+                  problem: problemID
+                }
+              ).then((response) => {
+                element.inSyncWithServer = true;
+              });
+            }
+          })
+        );
+      });
+
+      return Promise.all([...problemPromises, testcasePreparation, ...testcasePromises]);
+    },
+    submitAll () {
+      console.log("submitAll() called.");
+
+      this.submitButtonBusy = true;
+      // validate forms
+      this.$refs["basicInfoForm"].validate().then(
+        () => {
+          this.submitBasicInfo().then(
+            (problemID) => {
+              // submit everything else
+              return this.submitJudgeWorkspace(problemID);
+            },
+            (error) => {
+              this.$message.error("提交基本信息失败：" + error);
+              console.log("ERROR:", error.response.data);
+            }
+          ).then(() => {
+            this.$message.success("提交成功！");
+          })
+        },
+        (error) => {
+          this.$message.error("校验基本信息失败：" + error);
+        }
+      ).finally(() => {
+        this.submitButtonBusy = false;
+      });
+
+    },
+    fillBasicInfoByProblem (problemID) {
+      this.$axios.get("/problems/" + problemID).then(response => {
+        let problem = response.data;
+        
+        let formNewVal = {
+          name: problem.name,
+          description: problem.description,
+          description_input: problem.description_input,
+          description_output: problem.description_output,
+          deadlineEnabled: (problem.deadline_time != null),
+          deadline_time: problem.deadline_time,
+          waveform: problem.app_data,
+          level: problem.level,
+          tags: problem.tags.split("|").length == 1 ? [] : problem.tags.split("|")
+        };
+
+        this.basicInfoForm = formNewVal;
+      }).catch(error => {
+        this.$message.error(
+          "题目信息获取失败：" + JSON.stringify(error.response.data)
+        );
+      });
+    },
+    /*
+     * This only works with problem owned by the current logged user
+     */
+    fillJudgeInfoByProblem (problemID) {
+      this.$axios.get("/problems/" + problemID).then(response => {
+        let problem = response.data;
+        
+        const downloadFile = (fileID) => {
+          return this.$axios.get("/files/" + fileID).then(response => {
+            // response['Content-Disposition'] = 'attachment; filename="%s"'
+            let content_disp = response.headers["content-disposition"];
+
+            return {
+              fileName: content_disp.slice(22, content_disp.length - 1),
+              content: response.data
+            };
+          });
+        };
+
+        // [ { id: 5, files: [1,2,3] } , ...]
+        let testcaseFiles = problem.testcases.map((testcase) => {
+          return {
+            id: testcase.id,
+            files: testcase.testcase_files
+          };
+        });
+
+        let judgeFiles = problem.judge_files;
+        let templateCodeFile = problem.template_code_file;
+
+        let problemPromises = [
+          // template_code_file
+          downloadFile(templateCodeFile).then((val) => {
+            let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[0].children[0]);
+            fileInst.fileName = val.fileName;
+            fileInst.content = val.content;
+            fileInst.serverFileID = templateCodeFile;
+            fileInst.inSyncWithServer = true;
+          }),
+          // judge_files
+          ...judgeFiles.map(
+            (fileID) => {
+              downloadFile(fileID).then((val) => {
+                let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[0].children[1]);
+                fileInst.fileName = val.fileName;
+                fileInst.content = val.content;
+                fileInst.serverFileID = fileID;
+                fileInst.inSyncWithServer = true;
+              })
+            }
+          )
+        
+        ];
+
+        // TODO: do this !!
+        let testcasePromises = [
+          ...problem.testcases.map((testcase) => {
+            let testInst = this.judgeWorkspaceAddTestcase(this.judgeInfoHierarchy[1]);
+            
+            return Promise.all([
+              ...testcase.testcase_files.map((fileID) => {
+                return downloadFile(fileID).then((val) => {
+                  let fileInst = this.judgeWorkspaceAddFile(testInst);
+                  fileInst.fileName = val.fileName;
+                  fileInst.content = val.content;
+                  fileInst.inSyncWithServer = true;
+                  fileInst.serverFileID = fileID;
+                })
+              })
+            ]).then((val) => {
+              testInst.inSyncWithServer = true;
+              testInst.serverTestCaseID = testcase.id;
+              return val;
+            })
+          })
+        ];
+
+        return Promise.all([...problemPromises, ...testcasePromises]);
+      }).catch(error => {
+        this.$message.error(
+          "题目信息获取失败：" + JSON.stringify(error.response.data)
+        );
+      });
+    }
   },
   destroyed () {
   }
@@ -790,11 +967,6 @@ export default {
   font-weight: bold;
   margin-right: 13px;
   margin-bottom: 13px;
-}
-#title {
-  color: dimgrey;
-  left: 10px;
-  font-size: 20px;
 }
 #ddl {
   color: tomato;
@@ -824,13 +996,6 @@ export default {
   font-weight: bold;
   left: 20px;
   font-size: 20px;
-}
-.problem-descriptions {
-  left: 30px;
-  font-size: 16px;
-  margin-right: 50px;
-  word-break: break-all;
-  white-space: pre-line;
 }
 .el-row {
   margin-bottom: 20px;
@@ -862,6 +1027,15 @@ export default {
   display: none;
   overflow: hidden;
   background-color: #f1f1f1;
+}
+
+.judge-workspace-treenode {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
 }
 
 </style>

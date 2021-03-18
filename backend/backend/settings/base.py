@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'corsheaders',
     'user',
     'file',
@@ -151,3 +152,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Path prefix, for vlab.ustc.edu.cn it's oj/; used in urls.py
 WEBPATH_PREFIX = 'oj/'
+
+# CAS Related
+USTC_CAS_URL = 'https://passport.ustc.edu.cn'
+USTC_CAS_APP_LOGIN_URL = 'https://vlab.ustc.edu.cn{}'
