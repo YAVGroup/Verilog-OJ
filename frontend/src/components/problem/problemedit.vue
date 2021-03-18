@@ -92,10 +92,24 @@
                             :autosize="{ minRows: 5, maxRows: 15}"></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary">预览</el-button>
-                  <el-button>从其他题目导入</el-button>
+                  <el-button type="primary" @click="waveformPreview">示例波形预览</el-button>
+                  <el-button @click="importFromOtherProblem">从其他题目导入</el-button>
                 </el-form-item>
               </el-form>
+            
+            <!-- Sample waveform preview -->
+            <el-dialog
+              title="示例波形预览"
+              :visible.sync="waveformPreviewDialogVisible"
+              width="60%">
+                <wavedrom waveId="1"
+                          :parentText="basicInfoForm.waveform"
+                          errorMessage="解析波形时出现错误，请确认您的 WaveJSON 格式正确"></wavedrom>
+
+              <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="waveformPreviewDialogVisible = false">关闭</el-button>
+              </span>
+            </el-dialog>
 
 
             </el-tab-pane>
@@ -253,7 +267,7 @@ export default {
   name: "addproblem",
   components: {
     codemirror,
-    // wavedrom
+    wavedrom
   },
   data () {
     return {
@@ -338,7 +352,7 @@ export default {
       // BasicInfoTab, JudgeInfoTab
       currentTabPageName: "BasicInfoTab",
       submitButtonBusy: false,
-
+      waveformPreviewDialogVisible: false
     };
   },
   computed: {
@@ -386,6 +400,12 @@ export default {
     }
   },
   methods: {
+    waveformPreview () {
+      this.waveformPreviewDialogVisible = true;
+    },
+    importFromOtherProblem () {
+      this.$message.error("尚未实现！");
+    },
     getModeByExtension (extName) {
       const mmap = {
         py: "python",
