@@ -143,7 +143,12 @@ class UserUSTCLoginView(APIView):
                     
                     while True:
                         try:
-                            user = {'username':username, 'student_id':student_id, 'password':student_id}
+                            user = {
+                                'username': username, 
+                                'student_id': student_id,
+                                # roughly equivalent to /sbin/nologin
+                                'password': make_password(None)
+                            }
                             serializer = UserSerializer(data=user)
                             serializer.is_valid(True)
                             serializer.save()
