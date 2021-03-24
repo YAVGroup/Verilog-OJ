@@ -1,6 +1,6 @@
 module testbench();
-    wire y;
-    top_module DUT(y);
+    wire out;
+    top_module DUT(out);
     // http://www.referencedesigner.com/tutorials/verilog/verilog_62.php
     initial begin
         $dumpfile("out.vcd");
@@ -10,7 +10,7 @@ module testbench();
         //$dumpvars(1, testbench);
         // dumping only these variable
         // the first number (level) is actually useless
-        $dumpvars(0, y);
+        $dumpvars(0, out);
     end
     integer i;
     initial begin

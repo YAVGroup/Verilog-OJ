@@ -56,6 +56,7 @@ def main():
     vc_ref.addCompare(compare_list,"your_","reference_",1)
 
     out = vc_ref.emitWaveJson()
+    print(out)
 
     with open("./appdata.txt", "w") as f:
         f.write(out)
