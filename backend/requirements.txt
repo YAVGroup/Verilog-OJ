@@ -5,7 +5,7 @@ pytz==2019.3
 six==1.15.0
 djangorestframework==3.11.2
 pycryptodome==3.9.8
-PyYAML==5.3.1
+PyYAML==5.4
 coreapi==2.3.3
 django-cors-headers==3.4.0
 celery==4.4.7
