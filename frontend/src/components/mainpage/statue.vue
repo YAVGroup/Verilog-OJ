@@ -4,7 +4,7 @@
       type="flex"
       justify="end"
       align="middle"
-      style="text-align: right; margin-bottom: 5px; margin-top: 15px;"
+      style="text-align: right; margin-bottom: 5px; margin-top: 15px"
     >
       <el-col
         :xs="{ span: 12, pull: 0 }"
@@ -20,7 +20,7 @@
           :disabled="!this.loggedIn"
         ></el-switch>
         <el-button
-          style="margin-left: 15px;"
+          style="margin-left: 15px"
           plain
           @click="resetsearch"
           size="mini"
@@ -54,7 +54,7 @@
           >
             <template slot-scope="scope">
               <font color="#409EFF">
-                <b style="cursor:pointer;">{{
+                <b style="cursor: pointer">{{
                   scope.row.problem_belong.name
                 }}</b>
               </font>
@@ -84,9 +84,7 @@
         </el-table>
       </el-col>
     </el-row>
-    <el-row>
-      &nbsp;
-    </el-row>
+    <el-row> &nbsp; </el-row>
     <el-row>
       <el-col>
         <center>
@@ -124,20 +122,20 @@ export default {
         if (this.contest != "0") return;
         this.$router.push({
           name: "problemdetail",
-          params: { problemid: row.problem_belong.id }
+          params: { problemid: row.problem_belong.id },
         });
         return;
       }
       if (col.label == "用户") {
         this.$router.push({
           name: "user",
-          params: { userid: row.user_belong.id }
+          params: { userid: row.user_belong.id },
         });
         return;
       }
       this.$router.push({
         name: "submission",
-        params: { submissionid: row.id }
+        params: { submissionid: row.id },
       });
     },
 
@@ -186,7 +184,7 @@ export default {
       return "color:#303133;" + back;
     },
 
-    statuetype: function(type) {
+    statuetype: function (type) {
       if (type == "Pending") return "info";
       if (type == "Judging") return "";
       if (type == "Wrong Answer") return "danger";
@@ -203,7 +201,7 @@ export default {
       return "danger";
     },
 
-    statuejudge: function(type) {
+    statuejudge: function (type) {
       if (type == "Pending") return true;
       if (type == "Judging") return true;
       if (type == "Wrong Answer") return false;
@@ -229,7 +227,7 @@ export default {
       if (this.queryUserName) {
         url += "&user=" + this.queryUserName;
       }
-      this.$axios.get(url).then(response => {
+      this.$axios.get(url).then((response) => {
         for (var i = 0; i < response.data.results.length; i++) {
           response.data.results[i].submittime = moment(
             response.data.results[i].submit_time
@@ -240,7 +238,7 @@ export default {
         this.totalstatus = response.data.count;
         this.loading = false;
       });
-    }
+    },
   },
   data() {
     return {
@@ -251,7 +249,7 @@ export default {
         lineNumbers: true,
         readOnly: true,
         viewportMargin: Infinity,
-        lineWrapping: true
+        lineWrapping: true,
       },
       isadmin: false,
       tableData: [],
@@ -267,33 +265,33 @@ export default {
         user: "",
         result: "",
         problem: "",
-        language: ""
-      }
+        language: "",
+      },
     };
   },
   computed: {
-    ...mapState(["loggedIn", "userID", "username", "isSuperUser"])
+    ...mapState(["loggedIn", "userID", "username", "isSuperUser"]),
   },
   watch: {
-    loggedIn: function() {
+    loggedIn: function () {
       if (!this.loggedIn) {
         this.showMeOnly = false;
         this.queryUserName = "";
       }
     },
-    showMeOnly: function() {
+    showMeOnly: function () {
       if (this.showMeOnly) {
         this.queryUserName = this.userID;
       } else {
         this.queryUserName = "";
       }
     },
-    queryUserName: function() {
+    queryUserName: function () {
       this.getstatusdata();
-    }
+    },
   },
   created() {
     this.getstatusdata();
-  }
+  },
 };
 </script>

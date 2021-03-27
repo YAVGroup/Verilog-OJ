@@ -9,15 +9,21 @@
       <el-row>
         <el-card shadow="never">
           <el-row>
-            <h3 style="display: inline-block; margin: 3px 0px;">欢迎您向 Verilog OJ 贡献题目！</h3>
+            <h3 style="display: inline-block; margin: 3px 0px">
+              欢迎您向 Verilog OJ 贡献题目！
+            </h3>
           </el-row>
           <el-row>
             <div>
-              Verilog OJ 测试期间需要大家的反馈和配合。我们为新手上路的各位准备了常用的模板，帮助大家完成简单题目的创建。
+              Verilog OJ
+              测试期间需要大家的反馈和配合。我们为新手上路的各位准备了常用的模板，帮助大家完成简单题目的创建。
             </div>
             <div>
               更多信息您可以查看
-              <a href="https://github.com/YAVGroup/Verilog-OJ/blob/master/doc/operation/Problem_add_HOWTO.md">Verilog OJ 出题指南</a>。
+              <a
+                href="https://github.com/YAVGroup/Verilog-OJ/blob/master/doc/operation/Problem_add_HOWTO.md"
+                >Verilog OJ 出题指南</a
+              >。
             </div>
           </el-row>
         </el-card>
@@ -25,31 +31,48 @@
 
       <el-row>
         <el-card shadow="never">
-          <el-tabs tab-position="top"
-                   v-model="currentTabPageName"
-                   @tab-click="handleTabPageClick">
+          <el-tabs
+            tab-position="top"
+            v-model="currentTabPageName"
+            @tab-click="handleTabPageClick"
+          >
             <el-tab-pane label="基本信息" name="BasicInfoTab">
-
-              <el-form ref="basicInfoForm" 
-                       :model="basicInfoForm"
-                       label-width="160px"
-                       :rules="basisInfoRules">
+              <el-form
+                ref="basicInfoForm"
+                :model="basicInfoForm"
+                label-width="160px"
+                :rules="basisInfoRules"
+              >
                 <el-form-item label="题目名称" prop="name">
-                  <el-input v-model="basicInfoForm.name" maxlength="20" show-word-limit></el-input>
+                  <el-input
+                    v-model="basicInfoForm.name"
+                    maxlength="20"
+                    show-word-limit
+                  ></el-input>
                 </el-form-item>
                 <el-form-item label="启用截止时间">
-                  <el-switch v-model="basicInfoForm.deadlineEnabled"></el-switch>
+                  <el-switch
+                    v-model="basicInfoForm.deadlineEnabled"
+                  ></el-switch>
                 </el-form-item>
-                <el-form-item label="截止时间" v-if="basicInfoForm.deadlineEnabled">
+                <el-form-item
+                  label="截止时间"
+                  v-if="basicInfoForm.deadlineEnabled"
+                >
                   <el-col :span="11">
-                    <el-date-picker type="datetime"
-                                    placeholder="选择日期"
-                                    v-model="basicInfoForm.deadline_time"
-                                    style="width: 100%;"></el-date-picker>
+                    <el-date-picker
+                      type="datetime"
+                      placeholder="选择日期"
+                      v-model="basicInfoForm.deadline_time"
+                      style="width: 100%"
+                    ></el-date-picker>
                   </el-col>
                 </el-form-item>
                 <el-form-item label="难度">
-                  <el-select v-model="basicInfoForm.level" placeholder="请选择难度">
+                  <el-select
+                    v-model="basicInfoForm.level"
+                    placeholder="请选择难度"
+                  >
                     <el-option key="1" label="简单" :value="1"></el-option>
                     <el-option key="2" label="普通" :value="2"></el-option>
                     <el-option key="3" label="中等" :value="3"></el-option>
@@ -65,53 +88,76 @@
                       filterable
                       allow-create
                       default-first-option
-                      style="width: 100%;"
-                      placeholder="请选择或新增题目标签">
+                      style="width: 100%"
+                      placeholder="请选择或新增题目标签"
+                    >
                       <el-option
                         v-for="item in basicInfoForm.tagOptions"
                         :key="item"
                         :label="item"
-                        :value="item">
+                        :value="item"
+                      >
                       </el-option>
                     </el-select>
                   </el-col>
                 </el-form-item>
                 <el-form-item label="题目描述" prop="description">
-                  <el-input type="textarea" v-model="basicInfoForm.description"></el-input>
+                  <el-input
+                    type="textarea"
+                    v-model="basicInfoForm.description"
+                  ></el-input>
                 </el-form-item>
                 <el-form-item label="输入格式描述" prop="description_input">
-                  <el-input type="textarea" v-model="basicInfoForm.description_input"
-                            :autosize="{ minRows: 5, maxRows: 15}"></el-input>
+                  <el-input
+                    type="textarea"
+                    v-model="basicInfoForm.description_input"
+                    :autosize="{ minRows: 5, maxRows: 15 }"
+                  ></el-input>
                 </el-form-item>
                 <el-form-item label="输出格式描述" prop="description_output">
-                  <el-input type="textarea" v-model="basicInfoForm.description_output"
-                            :autosize="{ minRows: 5, maxRows: 15}"></el-input>
+                  <el-input
+                    type="textarea"
+                    v-model="basicInfoForm.description_output"
+                    :autosize="{ minRows: 5, maxRows: 15 }"
+                  ></el-input>
                 </el-form-item>
                 <el-form-item label="示例波形 (WaveJSON)">
-                  <el-input type="textarea" v-model="basicInfoForm.waveform"
-                            :autosize="{ minRows: 5, maxRows: 15}"></el-input>
+                  <el-input
+                    type="textarea"
+                    v-model="basicInfoForm.waveform"
+                    :autosize="{ minRows: 5, maxRows: 15 }"
+                  ></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="waveformPreview">示例波形预览</el-button>
-                  <el-button @click="importFromOtherProblem">从其他题目导入</el-button>
+                  <el-button type="primary" @click="waveformPreview"
+                    >示例波形预览</el-button
+                  >
+                  <el-button @click="importFromOtherProblem"
+                    >从其他题目导入</el-button
+                  >
                 </el-form-item>
               </el-form>
-            
-            <!-- Sample waveform preview -->
-            <el-dialog
-              title="示例波形预览"
-              :visible.sync="waveformPreviewDialogVisible"
-              width="60%">
-                <wavedrom waveId="1"
-                          :parentText="basicInfoForm.waveform"
-                          errorMessage="解析波形时出现错误，请确认您的 WaveJSON 格式正确"></wavedrom>
 
-              <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="waveformPreviewDialogVisible = false">关闭</el-button>
-              </span>
-            </el-dialog>
+              <!-- Sample waveform preview -->
+              <el-dialog
+                title="示例波形预览"
+                :visible.sync="waveformPreviewDialogVisible"
+                width="60%"
+              >
+                <wavedrom
+                  waveId="1"
+                  :parentText="basicInfoForm.waveform"
+                  errorMessage="解析波形时出现错误，请确认您的 WaveJSON 格式正确"
+                ></wavedrom>
 
-
+                <span slot="footer" class="dialog-footer">
+                  <el-button
+                    type="primary"
+                    @click="waveformPreviewDialogVisible = false"
+                    >关闭</el-button
+                  >
+                </span>
+              </el-dialog>
             </el-tab-pane>
             <el-tab-pane label="评测信息" name="JudgeInfoTab">
               <el-dialog
@@ -119,122 +165,183 @@
                 :visible.sync="templateSelectionDialogVisible"
                 :before-close="judgeWorkspaceAbortTemplateSelection"
                 :show-close="false"
-                width="30%">
-                <div v-for="(value, key) in judgeWorkspaceTemplates" v-bind:key="key">
-                  <el-radio :label="key" v-model="templateSelectionChosen">{{ value.name }}</el-radio>
-                  <el-row style="margin-top: 6px;">描述：{{ value.description }}</el-row>
+                width="30%"
+              >
+                <div
+                  v-for="(value, key) in judgeWorkspaceTemplates"
+                  v-bind:key="key"
+                >
+                  <el-radio :label="key" v-model="templateSelectionChosen">{{
+                    value.name
+                  }}</el-radio>
+                  <el-row style="margin-top: 6px"
+                    >描述：{{ value.description }}</el-row
+                  >
                 </div>
 
                 <span slot="footer" class="dialog-footer">
-                  <el-button type="primary" plain 
-                             @click="() => {this.judgeWorkspaceImport(this.templateSelectionChosen, false); templateSelectionDialogVisible = false;}"
-                             >导入全部</el-button>
-                  <el-button type="primary" plain 
-                             @click="() => {this.judgeWorkspaceImport(this.templateSelectionChosen, true); templateSelectionDialogVisible = false;}"
-                             >仅导入测试用例</el-button>
-                  <el-button plain @click="templateSelectionDialogVisible = false">取消</el-button>
+                  <el-button
+                    type="primary"
+                    plain
+                    @click="
+                      () => {
+                        this.judgeWorkspaceImport(
+                          this.templateSelectionChosen,
+                          false
+                        );
+                        templateSelectionDialogVisible = false;
+                      }
+                    "
+                    >导入全部</el-button
+                  >
+                  <el-button
+                    type="primary"
+                    plain
+                    @click="
+                      () => {
+                        this.judgeWorkspaceImport(
+                          this.templateSelectionChosen,
+                          true
+                        );
+                        templateSelectionDialogVisible = false;
+                      }
+                    "
+                    >仅导入测试用例</el-button
+                  >
+                  <el-button
+                    plain
+                    @click="templateSelectionDialogVisible = false"
+                    >取消</el-button
+                  >
                 </span>
               </el-dialog>
 
               <el-row>
                 <el-container>
                   <el-aside>
-                    <el-row style="margin: 20px;">
+                    <el-row style="margin: 20px">
                       <el-button-group>
                         <!-- Add {file, testcase} -->
-                        <el-button plain size="small" @click="judgeWorkspaceShowTemplateSelection">导入模板</el-button>
+                        <el-button
+                          plain
+                          size="small"
+                          @click="judgeWorkspaceShowTemplateSelection"
+                          >导入模板</el-button
+                        >
                       </el-button-group>
-                      
                     </el-row>
                     <el-row>
-                      <el-tree  :data="judgeInfoHierarchy"
-                                :props="{
-                                          children: 'children',
-                                          label: 'name'
-                                        }"
-                                :expand-on-click-node="false"
-                                default-expand-all
-                                highlight-current
-                                >
-                        <span class="judge-workspace-treenode" slot-scope="{ node, data }"
-                              @click="handleTreeHierarchyClick(node, data)">
+                      <el-tree
+                        :data="judgeInfoHierarchy"
+                        :props="{
+                          children: 'children',
+                          label: 'name',
+                        }"
+                        :expand-on-click-node="false"
+                        default-expand-all
+                        highlight-current
+                      >
+                        <span
+                          class="judge-workspace-treenode"
+                          slot-scope="{ node, data }"
+                          @click="handleTreeHierarchyClick(node, data)"
+                        >
                           <span>{{ node.label }}</span>
                           <span>
                             <el-button
                               type="text"
                               size="mini"
                               @click.stop="() => judgeWorkspaceAddFile(data)"
-                              v-if="(!! data.fileAppendable) && data.fileAppendable"
-                              >
+                              v-if="
+                                !!data.fileAppendable && data.fileAppendable
+                              "
+                            >
                               添加
                             </el-button>
                             <el-button
                               type="text"
                               size="mini"
-                              @click.stop="() => judgeWorkspaceDeleteFile(node, data)"
-                              v-if="(!! data.isFile) !== 'undefined' && data.isFile"
-                              >
+                              @click.stop="
+                                () => judgeWorkspaceDeleteFile(node, data)
+                              "
+                              v-if="
+                                !!data.isFile !== 'undefined' && data.isFile
+                              "
+                            >
                               删除
                             </el-button>
                             <el-button
                               type="text"
                               size="mini"
-                              @click.stop="() => judgeWorkspaceAddTestcase(data)"
-                              v-if="(!! data.testcaseAppendable) !== 'undefined' && data.testcaseAppendable"
-                              >
+                              @click.stop="
+                                () => judgeWorkspaceAddTestcase(data)
+                              "
+                              v-if="
+                                !!data.testcaseAppendable !== 'undefined' &&
+                                data.testcaseAppendable
+                              "
+                            >
                               添加
                             </el-button>
                             <el-button
                               type="text"
                               size="mini"
-                              @click.stop="() => judgeWorkspaceDeleteTestcase(node, data)"
-                              v-if="(!! data.isTestCase) !== 'undefined' && data.isTestCase"
-                              >
+                              @click.stop="
+                                () => judgeWorkspaceDeleteTestcase(node, data)
+                              "
+                              v-if="
+                                !!data.isTestCase !== 'undefined' &&
+                                data.isTestCase
+                              "
+                            >
                               删除
                             </el-button>
                           </span>
                         </span>
                       </el-tree>
                     </el-row>
-
-                    
                   </el-aside>
                   <el-main>
                     <el-row>
-                        <el-input placeholder="example.py" v-model="currentWorkspace.fileNode.fileName">
-                          <template slot="prepend">文件名</template>
-                          <template slot="append">{{ prettyModeName }}</template>
-                        </el-input>
-
-                      
+                      <el-input
+                        placeholder="example.py"
+                        v-model="currentWorkspace.fileNode.fileName"
+                      >
+                        <template slot="prepend">文件名</template>
+                        <template slot="append">{{ prettyModeName }}</template>
+                      </el-input>
                     </el-row>
                     <el-row>
-                      <codemirror ref="masterCm" v-model="currentWorkspace.fileNode.content"
-                                  :options="cmOptionsByFileName"
-                                  v-on:changes="handleEditorContentChange"></codemirror>
+                      <codemirror
+                        ref="masterCm"
+                        v-model="currentWorkspace.fileNode.content"
+                        :options="cmOptionsByFileName"
+                        v-on:changes="handleEditorContentChange"
+                      ></codemirror>
                     </el-row>
-
                   </el-main>
                 </el-container>
-
               </el-row>
-
-
             </el-tab-pane>
           </el-tabs>
           <!-- 这里的操作比较 dirty，是直接用 absolute 定位扔到那个位置，这里要注意叠放次序保证按钮在上（就是先写 el-tabs 后写 el-button），否则会按不到 -->
           <!-- Ref: https://segmentfault.com/q/1010000020057405 -->
-          <el-button type="success"
-                    size="medium"
-                    @click="submitAll"
-                    :loading="submitButtonBusy"
-                    style="font-weight: bold; position: absolute; right: 25px; top: 17px;">提交</el-button>
+          <el-button
+            type="success"
+            size="medium"
+            @click="submitAll"
+            :loading="submitButtonBusy"
+            style="
+              font-weight: bold;
+              position: absolute;
+              right: 25px;
+              top: 17px;
+            "
+            >提交</el-button
+          >
         </el-card>
       </el-row>
-
     </el-col>
-
-
   </el-row>
 </template>
 <style scope>
@@ -248,12 +355,12 @@ import qs from "qs";
 import { codemirror } from "vue-codemirror";
 // import statusmini from "@/components/utils/statusmini";
 // import prostatistice from "@/components/utils/prostatistice";
-import { Datetime } from 'vue-datetime'
+import { Datetime } from "vue-datetime";
 import wavedrom from "@/components/utils/wavedrom";
-import 'vue-datetime/dist/vue-datetime.css'
+import "vue-datetime/dist/vue-datetime.css";
 
-import { mapState } from 'vuex';
-import Userhyperlink from '../utils/userhyperlink.vue';
+import { mapState } from "vuex";
+import Userhyperlink from "../utils/userhyperlink.vue";
 
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
@@ -267,34 +374,32 @@ export default {
   name: "addproblem",
   components: {
     codemirror,
-    wavedrom
+    wavedrom,
   },
-  data () {
+  data() {
     return {
       basicInfoForm: {
-        name: '',
-        description: '',
-        description_input: '',
-        description_output: '',
+        name: "",
+        description: "",
+        description_input: "",
+        description_output: "",
         deadlineEnabled: false,
-        deadline_time: '',
-        waveform: '',
+        deadline_time: "",
+        waveform: "",
         level: 1,
         tags: [],
-        tagOptions: ['组合逻辑', '时序逻辑']
+        tagOptions: ["组合逻辑", "时序逻辑"],
       },
       basisInfoRules: {
-        name: [
-          { required: true, message: '请输入题目名称', trigger: 'blur'}
-        ],
+        name: [{ required: true, message: "请输入题目名称", trigger: "blur" }],
         description: [
-          { required: true, message: '请输入题目描述', trigger: 'blur'}
+          { required: true, message: "请输入题目描述", trigger: "blur" },
         ],
         description_input: [
-          { required: true, message: '请输入题目输入描述', trigger: 'blur'}
+          { required: true, message: "请输入题目输入描述", trigger: "blur" },
         ],
         description_output: [
-          { required: true, message: '请输入题目输出描述', trigger: 'blur'}
+          { required: true, message: "请输入题目输出描述", trigger: "blur" },
         ],
       },
       /**
@@ -302,61 +407,67 @@ export default {
        */
       judgeInfoHierarchy: [
         {
-          name: '题目',
-          type: 'Problem',
+          name: "题目",
+          type: "Problem",
           children: [
             {
-              name: '模板代码文件',
-              type: 'ProblemMeta',
-              patchKey: 'template_code_file',
+              name: "模板代码文件",
+              type: "ProblemMeta",
+              patchKey: "template_code_file",
               fileAppendable: true,
               isMultiple: false,
-              children: []
+              children: [],
             },
             {
-              name: '评测所用文件',
-              type: 'ProblemMeta',
-              patchKey: 'judge_files',
+              name: "评测所用文件",
+              type: "ProblemMeta",
+              patchKey: "judge_files",
               fileAppendable: true,
               isMultiple: true,
-              children: []
-            }
-          ]
+              children: [],
+            },
+          ],
         },
         {
           get name() {
-            return "测试用例 " + "(需要删除: " + this.serverTestcaseTobeDeleted.length + ")";
+            return (
+              "测试用例 " +
+              "(需要删除: " +
+              this.serverTestcaseTobeDeleted.length +
+              ")"
+            );
           },
-          type: 'TestCases',
+          type: "TestCases",
           testcaseAppendable: true,
           // Used purely for local identification, remote have no such mechanics
           testcaseNextID: 0,
           // To be deleted in server in next sync
           serverTestcaseTobeDeleted: [],
-          children: []
-        }
+          children: [],
+        },
       ],
       judgeWorkspaceTemplates: {},
       templateSelectionDialogVisible: false,
       templateSelectionChosen: "",
       currentWorkspace: {
-        fileNode: {       // one-off default for now
+        fileNode: {
+          // one-off default for now
           fileName: "",
           content: "在左侧创建文件以开始编辑。",
           contentChanged: () => {
             // No-op for this placebo
-          }
+          },
         },
-        enableNotification: false
+        enableNotification: false,
       },
       // BasicInfoTab, JudgeInfoTab
       currentTabPageName: "BasicInfoTab",
       submitButtonBusy: false,
-      waveformPreviewDialogVisible: false
+      waveformPreviewDialogVisible: false,
     };
   },
   computed: {
-    prettyModeName () {
+    prettyModeName() {
       let currentCmOptions = this.cmOptionsByFileName;
       if (currentCmOptions.mode == "null") {
         return "无高亮";
@@ -365,7 +476,7 @@ export default {
         return mode.substring(0, 1).toUpperCase() + mode.substring(1);
       }
     },
-    cmOptionsByFileName () {
+    cmOptionsByFileName() {
       let segments = this.currentWorkspace.fileNode.fileName.split(".");
       let mode = "";
       if (segments.length < 2) {
@@ -383,64 +494,59 @@ export default {
         readOnly: false,
       };
     },
-    inProblemEditMode () {
+    inProblemEditMode() {
       return this.$route.params.problemid != null;
     },
-    ...mapState([
-      'loggedIn',
-      'userID',
-      'username',
-      'isSuperUser'
-    ])
+    ...mapState(["loggedIn", "userID", "username", "isSuperUser"]),
   },
-  created () {
+  created() {
     if (this.$route.params.problemid != null) {
       this.fillBasicInfoByProblem(this.$route.params.problemid);
       this.fillJudgeInfoByProblem(this.$route.params.problemid);
     }
   },
   methods: {
-    waveformPreview () {
+    waveformPreview() {
       this.waveformPreviewDialogVisible = true;
     },
-    importFromOtherProblem () {
+    importFromOtherProblem() {
       this.$message.error("尚未实现！");
     },
-    getModeByExtension (extName) {
+    getModeByExtension(extName) {
       const mmap = {
         py: "python",
         v: "verilog",
-        sh: "shell"
+        sh: "shell",
       };
-      if (typeof mmap[extName] != 'undefined') {
+      if (typeof mmap[extName] != "undefined") {
         return mmap[extName];
       } else {
         return "null";
       }
     },
     // Ref: https://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked
-    handleTabPageClick (tabInst, event) {
+    handleTabPageClick(tabInst, event) {
       // console.log(tabInst, event);
-      if (tabInst.name == 'JudgeInfoTab') {
+      if (tabInst.name == "JudgeInfoTab") {
         this.$refs.masterCm.refresh();
       }
     },
-    handleTreeHierarchyClick (node, data) {
-      if (typeof data.isFile != 'undefined' && data.isFile) {
+    handleTreeHierarchyClick(node, data) {
+      if (typeof data.isFile != "undefined" && data.isFile) {
         this.currentWorkspace.enableNotification = false;
         this.$set(this.currentWorkspace, "fileNode", data);
         this.$nextTick(() => {
           this.currentWorkspace.enableNotification = true;
-        })
+        });
       }
     },
-    handleEditorContentChange (changeObj) {
+    handleEditorContentChange(changeObj) {
       if (this.currentWorkspace.enableNotification) {
         this.currentWorkspace.fileNode.contentChanged();
       }
     },
     // Judge File Related
-    judgeWorkspaceAddFile (data) {
+    judgeWorkspaceAddFile(data) {
       const newFile = {
         isFile: true,
         fileName: "newFile.txt",
@@ -451,19 +557,22 @@ export default {
         // https://stackoverflow.com/questions/51059477/defining-user-defined-getters-in-a-vue-component
         // ^ So no problem defining user getters
         get name() {
-          return this.fileName 
-                 + (this.serverFileID != null ? 
-                    " (ID: " + this.serverFileID + ")" : "")
-                 + (this.inSyncWithServer ? " (Sync)" : " (Not Sync)");
+          return (
+            this.fileName +
+            (this.serverFileID != null
+              ? " (ID: " + this.serverFileID + ")"
+              : "") +
+            (this.inSyncWithServer ? " (Sync)" : " (Not Sync)")
+          );
         },
         contentChanged: function () {
           this.inSyncWithServer = false;
-          if (typeof data.inSyncWithServer != 'undefined') {
+          if (typeof data.inSyncWithServer != "undefined") {
             data.inSyncWithServer = false;
           }
-        }
+        },
       };
-      if (typeof data.inSyncWithServer != 'undefined') {
+      if (typeof data.inSyncWithServer != "undefined") {
         data.inSyncWithServer = false;
       }
       data.children.push(newFile);
@@ -472,22 +581,21 @@ export default {
       }
       return newFile;
     },
-    judgeWorkspaceDeleteFile (node, data) {
+    judgeWorkspaceDeleteFile(node, data) {
       const parent = node.parent;
       const children = parent.data.children;
       // Compare Object means compare reference
-      const index = children.findIndex(d => d === data);
+      const index = children.findIndex((d) => d === data);
       children.splice(index, 1);
-      if (typeof parent.data.inSyncWithServer != 'undefined') {
+      if (typeof parent.data.inSyncWithServer != "undefined") {
         parent.data.inSyncWithServer = false;
       }
-
 
       if (!parent.data.isMultiple) {
         parent.data.fileAppendable = true;
       }
     },
-    judgeWorkspaceAddTestcase (data) {
+    judgeWorkspaceAddTestcase(data) {
       const newTestcase = {
         isTestCase: true,
         inSyncWithServer: false,
@@ -497,64 +605,79 @@ export default {
         localTestcaseID: data.testcaseNextID++,
         children: [],
         get name() {
-          return "Testcase #" + this.localTestcaseID
-                + (this.serverTestCaseID != null ? " (ID: " + this.serverTestCaseID.toString() + ")" : "")
-                + (this.inSyncWithServer ? " (Sync)" : " (Not Sync)");
-        }
+          return (
+            "Testcase #" +
+            this.localTestcaseID +
+            (this.serverTestCaseID != null
+              ? " (ID: " + this.serverTestCaseID.toString() + ")"
+              : "") +
+            (this.inSyncWithServer ? " (Sync)" : " (Not Sync)")
+          );
+        },
       };
       data.children.push(newTestcase);
       return newTestcase;
     },
-    judgeWorkspaceDeleteTestcase (node, data) {
+    judgeWorkspaceDeleteTestcase(node, data) {
       const parent = node.parent;
       const children = parent.data.children;
       // Compare Object means compare reference
-      const index = children.findIndex(d => d === data);
+      const index = children.findIndex((d) => d === data);
       children.splice(index, 1);
 
       if (data.serverTestCaseID != null) {
         parent.data.serverTestcaseTobeDeleted.push(data.serverTestCaseID);
       }
     },
-    judgeWorkspaceShowTemplateSelection () {
+    judgeWorkspaceShowTemplateSelection() {
       this.judgeWorkspaceGetTemplatesBrief().then(() => {
         this.templateSelectionDialogVisible = true;
       });
     },
-    judgeWorkspaceAbortTemplateSelection (done) {
+    judgeWorkspaceAbortTemplateSelection(done) {
       // no-op to force click "Cancel"
       return;
     },
-    judgeWorkspaceGetTemplatesBrief () {
+    judgeWorkspaceGetTemplatesBrief() {
       return this.$axios({
-        url: 'testcase-templates/index.json',
-        baseURL: process.env.BASE_URL
-      }).then(response => {
-        this.judgeWorkspaceTemplates = response.data;
-      }).catch(error => {
-        this.$message.error(
-          "获取模板时出现错误：" + JSON.stringify(error.response.data)
-        );
-      });
+        url: "testcase-templates/index.json",
+        baseURL: process.env.BASE_URL,
+      })
+        .then((response) => {
+          this.judgeWorkspaceTemplates = response.data;
+        })
+        .catch((error) => {
+          this.$message.error(
+            "获取模板时出现错误：" + JSON.stringify(error.response.data)
+          );
+        });
     },
-    judgeWorkspaceGetTemplate (templateName) {
+    judgeWorkspaceGetTemplate(templateName) {
       return this.$axios({
-        url: 'testcase-templates/' + this.judgeWorkspaceTemplates[templateName].url + "/index.json",
-        baseURL: process.env.BASE_URL
-      }).then(response => {
-        this.judgeWorkspaceTemplates[templateName]["content"] = response.data;
-      }).catch(error => {
-        this.$message.error(
-          "获取模板 " + templateName + " 时出现错误：" + JSON.stringify(error.response.data)
-        );
-      });
+        url:
+          "testcase-templates/" +
+          this.judgeWorkspaceTemplates[templateName].url +
+          "/index.json",
+        baseURL: process.env.BASE_URL,
+      })
+        .then((response) => {
+          this.judgeWorkspaceTemplates[templateName]["content"] = response.data;
+        })
+        .catch((error) => {
+          this.$message.error(
+            "获取模板 " +
+              templateName +
+              " 时出现错误：" +
+              JSON.stringify(error.response.data)
+          );
+        });
     },
     /**
      * judgeWorkspaceImport
      * testcaseOnly - add a new testcase, ignore others
      * TODO: use relative position
      */
-    judgeWorkspaceImport (templateName, testcaseOnly) {
+    judgeWorkspaceImport(templateName, testcaseOnly) {
       return this.judgeWorkspaceGetTemplate(templateName).then(() => {
         let problemPromises = [];
         if (!testcaseOnly) {
@@ -567,124 +690,139 @@ export default {
           problemPromises = [
             // template_code_file
             this.$axios({
-              url: 'testcase-templates/' 
-                    + this.judgeWorkspaceTemplates[templateName].url + "/"
-                    + this.judgeWorkspaceTemplates[templateName].content.template_code_file,
-              baseURL: process.env.BASE_URL
-            }).then(response => {
-              let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[0].children[0]);
-              fileInst.fileName = this.judgeWorkspaceTemplates[templateName].content.template_code_file;
+              url:
+                "testcase-templates/" +
+                this.judgeWorkspaceTemplates[templateName].url +
+                "/" +
+                this.judgeWorkspaceTemplates[templateName].content
+                  .template_code_file,
+              baseURL: process.env.BASE_URL,
+            }).then((response) => {
+              let fileInst = this.judgeWorkspaceAddFile(
+                this.judgeInfoHierarchy[0].children[0]
+              );
+              fileInst.fileName = this.judgeWorkspaceTemplates[
+                templateName
+              ].content.template_code_file;
               fileInst.content = response.data;
             }),
             // judge_files
-            ...this.judgeWorkspaceTemplates[templateName].content.judge_files.map(
-              (filename) => {
-                return this.$axios({
-                  url: 'testcase-templates/' 
-                        + this.judgeWorkspaceTemplates[templateName].url + "/"
-                        + filename,
-                  baseURL: process.env.BASE_URL
-                }).then(response => {
-                  let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[0].children[1]);
-                  fileInst.fileName = filename;
-                  fileInst.content = response.data;
-                })
-              }
-            )
+            ...this.judgeWorkspaceTemplates[
+              templateName
+            ].content.judge_files.map((filename) => {
+              return this.$axios({
+                url:
+                  "testcase-templates/" +
+                  this.judgeWorkspaceTemplates[templateName].url +
+                  "/" +
+                  filename,
+                baseURL: process.env.BASE_URL,
+              }).then((response) => {
+                let fileInst = this.judgeWorkspaceAddFile(
+                  this.judgeInfoHierarchy[0].children[1]
+                );
+                fileInst.fileName = filename;
+                fileInst.content = response.data;
+              });
+            }),
           ];
         }
-        
-        let testInst = this.judgeWorkspaceAddTestcase(this.judgeInfoHierarchy[1]);
+
+        let testInst = this.judgeWorkspaceAddTestcase(
+          this.judgeInfoHierarchy[1]
+        );
 
         const testcasePromises = [
           // testcase_files
-          ...this.judgeWorkspaceTemplates[templateName].content.testcase_files.map(
-            (filename) => {
-              return this.$axios({
-                url: 'testcase-templates/' 
-                      + this.judgeWorkspaceTemplates[templateName].url + "/"
-                      + filename,
-                baseURL: process.env.BASE_URL
-              }).then(response => {
-                let fileInst = this.judgeWorkspaceAddFile(testInst);
-                fileInst.fileName = filename;
-                fileInst.content = response.data;
-              })
-            }
-          )
+          ...this.judgeWorkspaceTemplates[
+            templateName
+          ].content.testcase_files.map((filename) => {
+            return this.$axios({
+              url:
+                "testcase-templates/" +
+                this.judgeWorkspaceTemplates[templateName].url +
+                "/" +
+                filename,
+              baseURL: process.env.BASE_URL,
+            }).then((response) => {
+              let fileInst = this.judgeWorkspaceAddFile(testInst);
+              fileInst.fileName = filename;
+              fileInst.content = response.data;
+            });
+          }),
         ];
-        
-        Promise.all([...problemPromises, ...testcasePromises]).then(() => {
-          this.$message.success("模板导入成功！");
-        }).catch((error) => {
-          this.$message.error("模板导入失败! " + error.response.data);
-        });
-      })
+
+        Promise.all([...problemPromises, ...testcasePromises])
+          .then(() => {
+            this.$message.success("模板导入成功！");
+          })
+          .catch((error) => {
+            this.$message.error("模板导入失败! " + error.response.data);
+          });
+      });
     },
 
     // Returns a Promise with problemID on fulfilled
-    submitBasicInfo () {
+    submitBasicInfo() {
       let basicInfo = {
         name: this.basicInfoForm.name,
-        deadline_time: this.basicInfoForm.deadlineEnabled ? 
-                        this.basicInfoForm.deadline_time :
-                        null,
+        deadline_time: this.basicInfoForm.deadlineEnabled
+          ? this.basicInfoForm.deadline_time
+          : null,
         level: this.basicInfoForm.level,
         tags: this.basicInfoForm.tags.join("|"),
         description: this.basicInfoForm.description,
         description_input: this.basicInfoForm.description_input,
         description_output: this.basicInfoForm.description_output,
-        app_data: this.basicInfoForm.waveform
+        app_data: this.basicInfoForm.waveform,
       };
 
       if (this.inProblemEditMode) {
         // should override existing ones
         let problemID = this.$route.params.problemid;
 
-        return this.$axios.patch(
-          "/problems/" + problemID + "/", {
+        return this.$axios
+          .patch("/problems/" + problemID + "/", {
             id: problemID,
-            ...basicInfo
-          }
-        ).then((response) => {
-          return response.data.id;   // return problemID on resolved
-        });
+            ...basicInfo,
+          })
+          .then((response) => {
+            return response.data.id; // return problemID on resolved
+          });
       } else {
-        return this.$axios.post(
-          "/problems/", {
-            ...basicInfo
-          }
-        ).then((response) => {
-          return response.data.id;   // return problemID on resolved
-        });
+        return this.$axios
+          .post("/problems/", {
+            ...basicInfo,
+          })
+          .then((response) => {
+            return response.data.id; // return problemID on resolved
+          });
       }
     },
     // returns Promise with fileID on fulfilled
-    submitFile (fileID, fileContent, fileName) {
+    submitFile(fileID, fileContent, fileName) {
       // TODO: Patch file instead of add - use /api/files/{}/
       let formData = new FormData();
       formData.append(
-        'file',
-        new Blob([fileContent], {type: "text/plain"}),
+        "file",
+        new Blob([fileContent], { type: "text/plain" }),
         fileName
-      )
-      return this.$axios.post("/files/", formData).then(
-        (response) => {
-          return response.data.id;
-        }
       );
+      return this.$axios.post("/files/", formData).then((response) => {
+        return response.data.id;
+      });
     },
 
     // returns Promise
     /**
      * TODO: use relative position
      */
-    submitJudgeWorkspace (problemID) {
+    submitJudgeWorkspace(problemID) {
       let problemPromises = [];
       let testcasePromises = [];
 
       // Problem files
-      (this.judgeInfoHierarchy[0].children).forEach(element => {
+      this.judgeInfoHierarchy[0].children.forEach((element) => {
         let name = element.name;
         let patchKey = element.patchKey;
         let isMultiple = element.isMultiple;
@@ -699,7 +837,7 @@ export default {
 
         let filesPromises = [];
 
-        element.children.forEach(fileDesc => {
+        element.children.forEach((fileDesc) => {
           filesPromises.push(
             new Promise((resolve, reject) => {
               // Already uploaded, so no need to do it twice
@@ -710,18 +848,17 @@ export default {
                   fileDesc.serverFileID,
                   fileDesc.content,
                   fileDesc.fileName
-                ).then(
-                  (fileID) => {
+                )
+                  .then((fileID) => {
                     fileDesc.serverFileID = fileID;
                     fileDesc.inSyncWithServer = true;
                     resolve(fileID);
-                  }
-                ).catch((error) => {
-                  reject(error);
-                })
+                  })
+                  .catch((error) => {
+                    reject(error);
+                  });
               }
             })
-            
           );
         });
 
@@ -735,13 +872,10 @@ export default {
               body[patchKey] = values[0];
             }
 
-            return this.$axios.patch(
-              "/problems/" + problemID + "/", body
-            );
+            return this.$axios.patch("/problems/" + problemID + "/", body);
           })
         );
       });
-
 
       // Testcase preparation
       let testcasePreparation = Promise.all([
@@ -749,18 +883,18 @@ export default {
           (testcaseID) => {
             return this.$axios.delete("/problem-testcases/" + testcaseID + "/");
           }
-        )
+        ),
       ]).then((val) => {
         this.judgeInfoHierarchy[1].serverTestcaseTobeDeleted = [];
         return val;
       });
 
       // Testcase files
-      (this.judgeInfoHierarchy[1].children).forEach((element) => {
+      this.judgeInfoHierarchy[1].children.forEach((element) => {
         // Submit all files
         let filesPromises = [];
 
-        element.children.forEach(fileDesc => {
+        element.children.forEach((fileDesc) => {
           filesPromises.push(
             new Promise((resolve, reject) => {
               // Already uploaded, so no need to do it twice
@@ -771,18 +905,17 @@ export default {
                   fileDesc.serverFileID,
                   fileDesc.content,
                   fileDesc.fileName
-                ).then(
-                  (fileID) => {
+                )
+                  .then((fileID) => {
                     fileDesc.serverFileID = fileID;
                     fileDesc.inSyncWithServer = true;
                     resolve(fileID);
-                  }
-                ).catch((error) => {
-                  reject(error);
-                })
+                  })
+                  .catch((error) => {
+                    reject(error);
+                  });
               }
             })
-            
           );
         });
 
@@ -790,173 +923,192 @@ export default {
         problemPromises.push(
           Promise.all(filesPromises).then((values) => {
             if (element.serverTestCaseID == null) {
-              return this.$axios.post(
-                "/problem-testcases/", {
-                  type: 'SIM',
+              return this.$axios
+                .post("/problem-testcases/", {
+                  type: "SIM",
                   testcase_files: values,
-                  problem: problemID
-                }
-              ).then((response) => {
-                element.serverTestCaseID = response.data.id;
-                element.inSyncWithServer = true;
-                return element.serverTestCaseID;
-              })
+                  problem: problemID,
+                })
+                .then((response) => {
+                  element.serverTestCaseID = response.data.id;
+                  element.inSyncWithServer = true;
+                  return element.serverTestCaseID;
+                });
             } else {
               // patch existing server testcase
               // TODO: use inSyncWithServer and maintain properly
-              return this.$axios.patch(
-                "/problem-testcases/" + element.serverTestCaseID + "/", {
+              return this.$axios
+                .patch("/problem-testcases/" + element.serverTestCaseID + "/", {
                   testcase_files: values,
-                  problem: problemID
-                }
-              ).then((response) => {
-                element.inSyncWithServer = true;
-              });
+                  problem: problemID,
+                })
+                .then((response) => {
+                  element.inSyncWithServer = true;
+                });
             }
           })
         );
       });
 
-      return Promise.all([...problemPromises, testcasePreparation, ...testcasePromises]);
+      return Promise.all([
+        ...problemPromises,
+        testcasePreparation,
+        ...testcasePromises,
+      ]);
     },
-    submitAll () {
+    submitAll() {
       console.log("submitAll() called.");
 
       this.submitButtonBusy = true;
       // validate forms
-      this.$refs["basicInfoForm"].validate().then(
-        () => {
-          this.submitBasicInfo().then(
-            (problemID) => {
-              // submit everything else
-              return this.submitJudgeWorkspace(problemID);
-            },
-            (error) => {
-              this.$message.error("提交基本信息失败：" + error);
-              console.log("ERROR:", error.response.data);
-            }
-          ).then(() => {
-            this.$message.success("提交成功！");
-          })
-        },
-        (error) => {
-          this.$message.error("校验基本信息失败：" + error);
-        }
-      ).finally(() => {
-        this.submitButtonBusy = false;
-      });
-
+      this.$refs["basicInfoForm"]
+        .validate()
+        .then(
+          () => {
+            this.submitBasicInfo()
+              .then(
+                (problemID) => {
+                  // submit everything else
+                  return this.submitJudgeWorkspace(problemID);
+                },
+                (error) => {
+                  this.$message.error("提交基本信息失败：" + error);
+                  console.log("ERROR:", error.response.data);
+                }
+              )
+              .then(() => {
+                this.$message.success("提交成功！");
+              });
+          },
+          (error) => {
+            this.$message.error("校验基本信息失败：" + error);
+          }
+        )
+        .finally(() => {
+          this.submitButtonBusy = false;
+        });
     },
-    fillBasicInfoByProblem (problemID) {
-      this.$axios.get("/problems/" + problemID).then(response => {
-        let problem = response.data;
-        
-        let formNewVal = {
-          name: problem.name,
-          description: problem.description,
-          description_input: problem.description_input,
-          description_output: problem.description_output,
-          deadlineEnabled: (problem.deadline_time != null),
-          deadline_time: problem.deadline_time,
-          waveform: problem.app_data,
-          level: problem.level,
-          tags: problem.tags.split("|").length == 1 ? [] : problem.tags.split("|")
-        };
+    fillBasicInfoByProblem(problemID) {
+      this.$axios
+        .get("/problems/" + problemID)
+        .then((response) => {
+          let problem = response.data;
 
-        this.basicInfoForm = formNewVal;
-      }).catch(error => {
-        this.$message.error(
-          "题目信息获取失败：" + JSON.stringify(error.response.data)
-        );
-      });
+          let formNewVal = {
+            name: problem.name,
+            description: problem.description,
+            description_input: problem.description_input,
+            description_output: problem.description_output,
+            deadlineEnabled: problem.deadline_time != null,
+            deadline_time: problem.deadline_time,
+            waveform: problem.app_data,
+            level: problem.level,
+            tags:
+              problem.tags.split("|").length == 1
+                ? []
+                : problem.tags.split("|"),
+          };
+
+          this.basicInfoForm = formNewVal;
+        })
+        .catch((error) => {
+          this.$message.error(
+            "题目信息获取失败：" + JSON.stringify(error.response.data)
+          );
+        });
     },
     /*
      * This only works with problem owned by the current logged user
      */
-    fillJudgeInfoByProblem (problemID) {
-      this.$axios.get("/problems/" + problemID).then(response => {
-        let problem = response.data;
-        
-        const downloadFile = (fileID) => {
-          return this.$axios.get("/files/" + fileID).then(response => {
-            // response['Content-Disposition'] = 'attachment; filename="%s"'
-            let content_disp = response.headers["content-disposition"];
+    fillJudgeInfoByProblem(problemID) {
+      this.$axios
+        .get("/problems/" + problemID)
+        .then((response) => {
+          let problem = response.data;
 
+          const downloadFile = (fileID) => {
+            return this.$axios.get("/files/" + fileID).then((response) => {
+              // response['Content-Disposition'] = 'attachment; filename="%s"'
+              let content_disp = response.headers["content-disposition"];
+
+              return {
+                fileName: content_disp.slice(22, content_disp.length - 1),
+                content: response.data,
+              };
+            });
+          };
+
+          // [ { id: 5, files: [1,2,3] } , ...]
+          let testcaseFiles = problem.testcases.map((testcase) => {
             return {
-              fileName: content_disp.slice(22, content_disp.length - 1),
-              content: response.data
+              id: testcase.id,
+              files: testcase.testcase_files,
             };
           });
-        };
 
-        // [ { id: 5, files: [1,2,3] } , ...]
-        let testcaseFiles = problem.testcases.map((testcase) => {
-          return {
-            id: testcase.id,
-            files: testcase.testcase_files
-          };
-        });
+          let judgeFiles = problem.judge_files;
+          let templateCodeFile = problem.template_code_file;
 
-        let judgeFiles = problem.judge_files;
-        let templateCodeFile = problem.template_code_file;
-
-        let problemPromises = [
-          // template_code_file
-          downloadFile(templateCodeFile).then((val) => {
-            let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[0].children[0]);
-            fileInst.fileName = val.fileName;
-            fileInst.content = val.content;
-            fileInst.serverFileID = templateCodeFile;
-            fileInst.inSyncWithServer = true;
-          }),
-          // judge_files
-          ...judgeFiles.map(
-            (fileID) => {
+          let problemPromises = [
+            // template_code_file
+            downloadFile(templateCodeFile).then((val) => {
+              let fileInst = this.judgeWorkspaceAddFile(
+                this.judgeInfoHierarchy[0].children[0]
+              );
+              fileInst.fileName = val.fileName;
+              fileInst.content = val.content;
+              fileInst.serverFileID = templateCodeFile;
+              fileInst.inSyncWithServer = true;
+            }),
+            // judge_files
+            ...judgeFiles.map((fileID) => {
               downloadFile(fileID).then((val) => {
-                let fileInst = this.judgeWorkspaceAddFile(this.judgeInfoHierarchy[0].children[1]);
+                let fileInst = this.judgeWorkspaceAddFile(
+                  this.judgeInfoHierarchy[0].children[1]
+                );
                 fileInst.fileName = val.fileName;
                 fileInst.content = val.content;
                 fileInst.serverFileID = fileID;
                 fileInst.inSyncWithServer = true;
-              })
-            }
-          )
-        
-        ];
+              });
+            }),
+          ];
 
-        // TODO: do this !!
-        let testcasePromises = [
-          ...problem.testcases.map((testcase) => {
-            let testInst = this.judgeWorkspaceAddTestcase(this.judgeInfoHierarchy[1]);
-            
-            return Promise.all([
-              ...testcase.testcase_files.map((fileID) => {
-                return downloadFile(fileID).then((val) => {
-                  let fileInst = this.judgeWorkspaceAddFile(testInst);
-                  fileInst.fileName = val.fileName;
-                  fileInst.content = val.content;
-                  fileInst.inSyncWithServer = true;
-                  fileInst.serverFileID = fileID;
-                })
-              })
-            ]).then((val) => {
-              testInst.inSyncWithServer = true;
-              testInst.serverTestCaseID = testcase.id;
-              return val;
-            })
-          })
-        ];
+          // TODO: do this !!
+          let testcasePromises = [
+            ...problem.testcases.map((testcase) => {
+              let testInst = this.judgeWorkspaceAddTestcase(
+                this.judgeInfoHierarchy[1]
+              );
 
-        return Promise.all([...problemPromises, ...testcasePromises]);
-      }).catch(error => {
-        this.$message.error(
-          "题目信息获取失败：" + JSON.stringify(error.response.data)
-        );
-      });
-    }
+              return Promise.all([
+                ...testcase.testcase_files.map((fileID) => {
+                  return downloadFile(fileID).then((val) => {
+                    let fileInst = this.judgeWorkspaceAddFile(testInst);
+                    fileInst.fileName = val.fileName;
+                    fileInst.content = val.content;
+                    fileInst.inSyncWithServer = true;
+                    fileInst.serverFileID = fileID;
+                  });
+                }),
+              ]).then((val) => {
+                testInst.inSyncWithServer = true;
+                testInst.serverTestCaseID = testcase.id;
+                return val;
+              });
+            }),
+          ];
+
+          return Promise.all([...problemPromises, ...testcasePromises]);
+        })
+        .catch((error) => {
+          this.$message.error(
+            "题目信息获取失败：" + JSON.stringify(error.response.data)
+          );
+        });
+    },
   },
-  destroyed () {
-  }
+  destroyed() {},
 };
 </script>
 
@@ -1018,7 +1170,8 @@ export default {
   font-size: 15px;
 }
 
-.active, .collapsible:hover {
+.active,
+.collapsible:hover {
   background-color: #555;
 }
 
@@ -1037,5 +1190,4 @@ export default {
   font-size: 14px;
   padding-right: 8px;
 }
-
 </style>

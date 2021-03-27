@@ -8,7 +8,8 @@ Vue.use(ElementUI);
 describe("homepage", () => {
   const wrapper = mount(homepage);
 
-  var msg = '本服务综合了不同难度的数字电路设计问题，适合各种水平的数字电路学习者。您输入的 Verilog 模块将会通过一系列向量，并与标准模块对应的输出来评价您实现的正确性';
+  var msg =
+    "本服务综合了不同难度的数字电路设计问题，适合各种水平的数字电路学习者。您输入的 Verilog 模块将会通过一系列向量，并与标准模块对应的输出来评价您实现的正确性";
   it("renders the correct markup: " + msg, () => {
     expect(wrapper.html()).toContain(msg);
     expect(wrapper.text()).toMatch(msg);

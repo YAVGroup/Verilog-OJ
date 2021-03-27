@@ -7,56 +7,76 @@
           <el-row :gutter="18" id="title">
             <el-col :span="20">
               <el-input v-if="is_edit" v-model="title"></el-input>
-              <div v-else v-html="title" :key="title">
-              </div>
+              <div v-else v-html="title" :key="title"></div>
             </el-col>
             <el-col :span="2">
-              <el-button type="success"
-                         @click="problemedit"
-                         style="font-weight:bold;margin-left:10px;">Edit</el-button>
+              <el-button
+                type="success"
+                @click="problemedit"
+                style="font-weight: bold; margin-left: 10px"
+                >Edit</el-button
+              >
             </el-col>
           </el-row>
           <el-row :gutter="18" id="ddl" v-show="have_ddl">Deadline</el-row>
           <el-row :gutter="18" class="problem-descriptions" v-show="have_ddl">
-            <el-input v-if="is_edit" type="textarea" v-model="ddl_time"></el-input>
-            <div v-else v-html="ddl" :key="ddl">
-            </div>
+            <el-input
+              v-if="is_edit"
+              type="textarea"
+              v-model="ddl_time"
+            ></el-input>
+            <div v-else v-html="ddl" :key="ddl"></div>
           </el-row>
-          
 
           <!--题目描述、输入、输出-->
-          <el-row :gutter="18"
-                  class="problem-description-title">Description</el-row>
+          <el-row :gutter="18" class="problem-description-title"
+            >Description</el-row
+          >
           <el-row :gutter="18" class="problem-descriptions">
             <el-input v-if="is_edit" type="textarea" v-model="des"></el-input>
-            <div v-else class="problem-descriptions"
-                 v-html="des"
-                 :key="des"></div>
+            <div
+              v-else
+              class="problem-descriptions"
+              v-html="des"
+              :key="des"
+            ></div>
           </el-row>
 
-          <el-row :gutter="18"
-                  class="problem-description-title">Input</el-row>
+          <el-row :gutter="18" class="problem-description-title">Input</el-row>
           <el-row :gutter="18" class="problem-descriptions">
             <el-input v-if="is_edit" type="textarea" v-model="input"></el-input>
             <div v-else v-html="input"></div>
           </el-row>
-          <el-row :gutter="18"
-                  class="problem-description-title">Output</el-row>
+          <el-row :gutter="18" class="problem-description-title">Output</el-row>
           <el-row :gutter="18" class="problem-descriptions">
-            <el-input v-if="is_edit" type="textarea" v-model="output"></el-input>
+            <el-input
+              v-if="is_edit"
+              type="textarea"
+              v-model="output"
+            ></el-input>
             <div v-else v-html="output"></div>
           </el-row>
 
           <!--这里放样例波形图-->
-          <el-row :gutter="18"
-                  class="problem-description-title">Sample waveform</el-row>
-          <el-row :gutter="18"
-                  id="sample_waveform" class="problem-descriptions">
-            <el-input v-if="is_edit" v-model="waveform" type="textarea"></el-input>
+          <el-row :gutter="18" class="problem-description-title"
+            >Sample waveform</el-row
+          >
+          <el-row
+            :gutter="18"
+            id="sample_waveform"
+            class="problem-descriptions"
+          >
+            <el-input
+              v-if="is_edit"
+              v-model="waveform"
+              type="textarea"
+            ></el-input>
             <div v-else>
-              <wavedrom waveId="1"
-                        :parentText="waveform"
-                        errorMessage="Sorry, no sample waveform available"></wavedrom>
+              <wavedrom
+                waveId="1"
+                :parentText="waveform"
+                errorMessage="Sorry, no sample waveform available"
+              ></wavedrom>
             </div>
           </el-row>
         </el-card>
@@ -67,25 +87,32 @@
           <!--提交界面-->
           <el-row :gutter="15">
             <el-col :span="3">
-              <div id="des"
-                   style="padding: 5px 10px;">Language:</div>
+              <div id="des" style="padding: 5px 10px">Language:</div>
             </el-col>
             <el-col :span="3">
-              <el-select v-model="language"
-                         placeholder="请选择"
-                         @change="changetemplate">
+              <el-select
+                v-model="language"
+                placeholder="请选择"
+                @change="changetemplate"
+              >
                 <languageselect></languageselect>
               </el-select>
             </el-col>
             <el-col :span="2">
-              <el-button type="success"
-                         @click="submit"
-                         style="font-weight:bold;margin-left:10px;">Submit</el-button>
+              <el-button
+                type="success"
+                @click="submit"
+                style="font-weight: bold; margin-left: 10px"
+                >Submit</el-button
+              >
             </el-col>
             <el-col :span="2">
-              <el-button type="danger"
-                         @click="code = ''"
-                         style="font-weight:bold;margin-left:30px;">Reset</el-button>
+              <el-button
+                type="danger"
+                @click="code = ''"
+                style="font-weight: bold; margin-left: 30px"
+                >Reset</el-button
+              >
             </el-col>
             <!-- <el-col :span="2">
               <el-button type="info"
@@ -95,8 +122,7 @@
 
           <!--代码编辑-->
           <el-row>
-            <codemirror v-model="code"
-                        :options="cmOptions"></codemirror>
+            <codemirror v-model="code" :options="cmOptions"></codemirror>
           </el-row>
         </el-card>
       </el-row>
@@ -118,40 +144,40 @@
               <div>{{author}}</div>
             </el-collapse-item> -->
             <!---->
-            <el-collapse-item name="2"
-                              id="des">
+            <el-collapse-item name="2" id="des">
               <template slot="title">
-                <font color="deepskyblue"
-                      size="4">Date:</font>
+                <font color="deepskyblue" size="4">Date:</font>
               </template>
-              <div>{{addtime}}</div>
+              <div>{{ addtime }}</div>
             </el-collapse-item>
             <!---->
-            <el-collapse-item name="7"
-                              id="des">
+            <el-collapse-item name="7" id="des">
               <template slot="title">
-                <font color="deepskyblue"
-                      size="4">Level:</font>
+                <font color="deepskyblue" size="4">Level:</font>
               </template>
-              <el-tag size="medium"
-                      :type="problemlevel(level)"
-                      disable-transitions
-                      hit>{{ level }}</el-tag>
+              <el-tag
+                size="medium"
+                :type="problemlevel(level)"
+                disable-transitions
+                hit
+                >{{ level }}</el-tag
+              >
             </el-collapse-item>
             <!---->
-            <el-collapse-item name="6"
-                              id="des">
+            <el-collapse-item name="6" id="des">
               <template slot="title">
-                <font color="deepskyblue"
-                      size="4">Tags:</font>
+                <font color="deepskyblue" size="4">Tags:</font>
               </template>
-              <el-tag id="tags"
-                      v-for="(name,index) in tagnames"
-                      :key="index"
-                      size="medium"
-                      type="info"
-                      disable-transitions
-                      hit>{{ name }}</el-tag>
+              <el-tag
+                id="tags"
+                v-for="(name, index) in tagnames"
+                :key="index"
+                size="medium"
+                type="info"
+                disable-transitions
+                hit
+                >{{ name }}</el-tag
+              >
             </el-collapse-item>
           </el-collapse>
         </el-card>
@@ -165,26 +191,39 @@
         <el-card>
           <h3>提交记录</h3>
           <el-table
-            :default-sort="{prop: 'id', order: 'descending'}"
+            :default-sort="{ prop: 'id', order: 'descending' }"
             :data="submissions"
             style="width: 100%"
             :row-class-name="tableRowClassName"
             @row-click="rowClick"
-            size="mini">
-
+            size="mini"
+          >
             <el-table-column prop="id" label="ID" :width="70"></el-table-column>
 
             <el-table-column prop="result" label="Status" :width="180">
               <template slot-scope="scope">
-                <el-tag size="mini" :type="statuetype(scope.row.result)" disable-transitions hit>
+                <el-tag
+                  size="mini"
+                  :type="statuetype(scope.row.result)"
+                  disable-transitions
+                  hit
+                >
                   {{ scope.row.result }}
-                  <i class="el-icon-loading" v-show="statuejudge(scope.row.result)"></i>
+                  <i
+                    class="el-icon-loading"
+                    v-show="statuejudge(scope.row.result)"
+                  ></i>
                 </el-tag>
               </template>
             </el-table-column>
             <el-table-column prop="submittime" align="right">
               <template slot="header">
-                <el-button size="mini" @click="submissions_refresh" type="primary">刷新</el-button>
+                <el-button
+                  size="mini"
+                  @click="submissions_refresh"
+                  type="primary"
+                  >刷新</el-button
+                >
               </template>
             </el-table-column>
           </el-table>
@@ -221,15 +260,15 @@ export default {
     // statusmini,
     // prostatistice,
     languageselect,
-    wavedrom
+    wavedrom,
   },
-  data () {
+  data() {
     return {
       cmOptions: {
         tabSize: 4,
-        mode:"verilog",
+        mode: "verilog",
         theme: "base16-light",
-        lineNumbers: true
+        lineNumbers: true,
       },
       title: "",
       des: "",
@@ -244,7 +283,6 @@ export default {
       activeNames: ["1", "2", "3", "4", "5", "6"],
       level: "Easy",
       ddl_time: "",
-
 
       code: "",
       language: "Verilog",
@@ -268,7 +306,7 @@ export default {
       // submitid: -1
     };
   },
-  created () {
+  created() {
     this.id = this.$route.params.problemid;
     if (!this.id) {
       this.$message.error("参数错误" + "(" + this.ID + ")");
@@ -276,21 +314,23 @@ export default {
     }
     this.$axios
       .get("/problems/" + this.id + "/")
-      .then(response => {
+      .then((response) => {
         this.des = response.data.description;
         this.input = response.data.description_input;
         this.output = response.data.description_output;
         this.waveform = response.data.app_data;
         // this.author = response.data.author;
-        this.addtime = response.data.create_time =
-          moment(response.data.create_time).format("YYYY-MM-DD HH:mm:ss");
+        this.addtime = response.data.create_time = moment(
+          response.data.create_time
+        ).format("YYYY-MM-DD HH:mm:ss");
 
         this.code = "";
         if (response.data.template_code_file != null) {
-          this.$axios.get("/files/" + response.data.template_code_file + "/")
-          .then(response => {
-            this.code = response.data;
-          })
+          this.$axios
+            .get("/files/" + response.data.template_code_file + "/")
+            .then((response) => {
+              this.code = response.data;
+            });
         }
 
         // var li = response.data.template.split("*****")
@@ -303,11 +343,9 @@ export default {
         //   .get("/problemdata/" + this.ID + "/")
         //   .then(response => {
         if (response.data["level"] == "1") response.data["level"] = "Easy";
-        if (response.data["level"] == "2")
-          response.data["level"] = "Medium";
+        if (response.data["level"] == "2") response.data["level"] = "Medium";
         if (response.data["level"] == "3") response.data["level"] = "Hard";
-        if (response.data["level"] == "4")
-          response.data["level"] = "VeryHard";
+        if (response.data["level"] == "4") response.data["level"] = "VeryHard";
         if (response.data["level"] == "5")
           response.data["level"] = "ExtremelyHard";
         // response.data.level = "Easy";
@@ -364,7 +402,11 @@ export default {
         } else {
           this.ddl_time = response.data.deadline_time;
           let ddlTime = moment(response.data.deadline_time);
-          this.ddl = ddlTime.format("YYYY-MM-DD hh:mm:ss") + " (" + ddlTime.endOf('day').fromNow() + ")";
+          this.ddl =
+            ddlTime.format("YYYY-MM-DD hh:mm:ss") +
+            " (" +
+            ddlTime.endOf("day").fromNow() +
+            ")";
           //this.ddl = response.data.deadline_time;
           this.have_ddl = true;
         }
@@ -376,10 +418,11 @@ export default {
         this.submissions_refresh();
 
         this.$refs.prosta.setdata(this.$data);
-
       })
-      .catch(error => {
-        this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
+      .catch((error) => {
+        this.$message.error(
+          "服务器错误！" + "(" + JSON.stringify(error.response.data) + ")"
+        );
       });
   },
   methods: {
@@ -398,11 +441,11 @@ export default {
       }
     },
   */
-    onCopy (e) {
+    onCopy(e) {
       this.$message.success("复制成功！");
     },
     // 复制失败
-    onError (e) {
+    onError(e) {
       this.$message.error("复制失败：" + e);
     },
 
@@ -428,7 +471,7 @@ export default {
       if (row.result == "System Error") return "warning-row";
       return "";
     },
-    statuetype: function(type) {
+    statuetype: function (type) {
       if (type == "Pending") return "info";
       if (type == "Judging") return "";
       if (type == "Wrong Answer") return "danger";
@@ -442,7 +485,7 @@ export default {
       if (type == "System Error") return "danger";
       return "danger";
     },
-    statuejudge: function(type) {
+    statuejudge: function (type) {
       if (type == "Pending") return true;
       if (type == "Judging") return true;
       return false;
@@ -450,20 +493,15 @@ export default {
 
     rowClick(row, col, e) {
       this.$router.push({
-        name: 'submission',
-        params: {submissionid: row.id}
-      })
+        name: "submission",
+        params: { submissionid: row.id },
+      });
     },
 
-    submissions_refresh(){
+    submissions_refresh() {
       this.$axios
-        .get(
-          "/submissions/?user=" +
-            this.username +
-            "&problem=" +
-            this.problem
-        )
-        .then(response => {
+        .get("/submissions/?user=" + this.username + "&problem=" + this.problem)
+        .then((response) => {
           for (var i = 0; i < response.data.length; i++) {
             response.data[i]["submittime"] = moment(
               response.data[i]["submit_time"]
@@ -473,29 +511,29 @@ export default {
         });
     },
 
-    problemedit: function(){
-      if(this.is_edit==false) {
+    problemedit: function () {
+      if (this.is_edit == false) {
         this.is_edit = true;
         return;
-      }
-      else if(!sessionStorage.userid){
+      } else if (!sessionStorage.userid) {
         this.$message.error("请先登录！");
         return;
-      }
-      else{
+      } else {
         this.is_edit = false;
-        return this.$axios.patch(
-          "/problems/"+this.id+"/",{
+        return this.$axios
+          .patch("/problems/" + this.id + "/", {
             name: this.title,
             deadline_time: this.ddl_time,
             description: this.dec,
             description_input: this.input,
             description_output: this.output,
-            app_data: this.wavefrom
-            }
-        ).catch(error => {
-          this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
-        });
+            app_data: this.wavefrom,
+          })
+          .catch((error) => {
+            this.$message.error(
+              "服务器错误！" + "(" + JSON.stringify(error.response.data) + ")"
+            );
+          });
       }
     },
 
@@ -521,35 +559,40 @@ export default {
       this.$confirm("确定提交吗？", "提交", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        this.$message({
-          type: "success",
-          message: "提交中..."
-        });
+        type: "warning",
+      })
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "提交中...",
+          });
 
-        var formData = new FormData();
-        var blob = new Blob([this.code], {type: "text/plain"});
-        formData.append('file', blob, 'code.v');
-        return this.$axios.post("/files/", formData);
-      }).then(response => {
-        const fileid = response.data.id;
-        return this.$axios.post("/submit", {
-          'problem': this.id,
-          'submit_files': [fileid],
+          var formData = new FormData();
+          var blob = new Blob([this.code], { type: "text/plain" });
+          formData.append("file", blob, "code.v");
+          return this.$axios.post("/files/", formData);
+        })
+        .then((response) => {
+          const fileid = response.data.id;
+          return this.$axios.post("/submit", {
+            problem: this.id,
+            submit_files: [fileid],
+          });
+        })
+        .then((response) => {
+          this.$router.push({
+            name: "submission",
+            params: { submissionid: response.data.id },
+          });
+        })
+        .catch((error) => {
+          this.$message.error(
+            "提交失败：" + JSON.stringify(error.response.data)
+          );
         });
-      }).then(response => {
-        this.$router.push({
-          name: 'submission',
-          params: {submissionid: response.data.id}
-        });
-      }).catch(error => {
-        this.$message.error("提交失败：" + JSON.stringify(error.response.data));
-      });
     },
   },
-  destroyed () {
-  }
+  destroyed() {},
 };
 </script>
 

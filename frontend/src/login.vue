@@ -3,18 +3,26 @@
     <el-form :model="form" @keyup.native.enter="loginClick">
       <el-row :gutter="10">
         <el-col :span="3">
-          <div style="text-align:center;margin:5px;">User</div>
+          <div style="text-align: center; margin: 5px">User</div>
         </el-col>
         <el-col :span="12">
-          <el-input v-model="form.username" autocomplete="off" :autofocus="true"></el-input>
+          <el-input
+            v-model="form.username"
+            autocomplete="off"
+            :autofocus="true"
+          ></el-input>
         </el-col>
       </el-row>
       <el-row :gutter="10">
         <el-col :span="3">
-          <div style="text-align:center;margin:5px;">Password</div>
+          <div style="text-align: center; margin: 5px">Password</div>
         </el-col>
         <el-col :span="12">
-          <el-input type="password" v-model="form.password" autocomplete="off"></el-input>
+          <el-input
+            type="password"
+            v-model="form.password"
+            autocomplete="off"
+          ></el-input>
         </el-col>
       </el-row>
     </el-form>
@@ -23,7 +31,6 @@
       <el-button @click="dialogLoginVisible = false">Cancel</el-button>
       <el-button type="primary" @click="loginClick">OK</el-button>
     </div>
-    
   </el-dialog>
 </template>
 
@@ -35,8 +42,8 @@ export default {
       dialogLoginVisible: false,
       form: {
         username: "",
-        password: ""
-      }
+        password: "",
+      },
     };
   },
   methods: {
@@ -44,7 +51,7 @@ export default {
       this.dialogLoginVisible = true;
     },
     loginClick() {
-      this.$store.dispatch('logIn', {
+      this.$store.dispatch("logIn", {
         username: this.form.username,
         password: this.form.password,
         // Note on JS newbie:
@@ -53,27 +60,27 @@ export default {
         success_cb: () => {
           this.$message({
             message: "登录成功！",
-            type: "success"
+            type: "success",
           });
           this.dialogLoginVisible = false;
         },
         fail_cb: (error) => {
           if (error.response != undefined)
-            this.$message.error("登录失败：" + JSON.stringify(error.response.data));
-          else
-            this.$message.error("抱歉，似乎出了点问题");
-        }
-      })
+            this.$message.error(
+              "登录失败：" + JSON.stringify(error.response.data)
+            );
+          else this.$message.error("抱歉，似乎出了点问题");
+        },
+      });
     },
     casLoginClick() {
       window.location.href = process.env.VUE_APP_API_ROOT + "/user/ustc-login";
-
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style  scoped>
+<style scoped>
 .el-row {
   margin-bottom: 20px;
 }

@@ -6,7 +6,7 @@ import ElementUI from "element-ui";
 Vue.use(ElementUI);
 
 describe("probsearch", () => {
-  var msg = '快速搜索';
+  var msg = "快速搜索";
   const wrapper = mount(probsearch);
 
   it("renders the correct markup: " + msg, () => {

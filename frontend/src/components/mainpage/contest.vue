@@ -5,15 +5,19 @@
         <el-input
           v-model="searchform.title"
           placeholder="Title..."
-          style="float:left;width:200px;"
+          style="float: left; width: 200px"
           @change="searchcontest"
           @keyup.native.enter="searchcontest"
-        ><el-button slot="append" icon="el-icon-search" @click="searchcontest"></el-button>
+          ><el-button
+            slot="append"
+            icon="el-icon-search"
+            @click="searchcontest"
+          ></el-button>
         </el-input>
         <el-select
           v-model="searchform.type"
           placeholder="Choose type..."
-          style="float:right;width:200px;"
+          style="float: right; width: 200px"
           @change="searchcontest"
         >
           <el-option key="-1" label="All" value=""></el-option>
@@ -27,11 +31,15 @@
       <el-table
         :data="tableData"
         @cell-click="contestclick"
-        :default-sort="{prop: 'id', order: 'descending'}"
+        :default-sort="{ prop: 'id', order: 'descending' }"
         size="small"
       >
         <el-table-column prop="id" label="ID" :width="100"></el-table-column>
-        <el-table-column prop="title" label="Title" :width="300"></el-table-column>
+        <el-table-column
+          prop="title"
+          label="Title"
+          :width="300"
+        ></el-table-column>
         <el-table-column prop="level" label="Level">
           <template slot-scope="scope1">
             <el-tag
@@ -40,7 +48,8 @@
               :type="contestlevel(scope1.row.level)"
               disable-transitions
               hit
-            >{{ scope1.row.level }}</el-tag>
+              >{{ scope1.row.level }}</el-tag
+            >
           </template>
         </el-table-column>
         <el-table-column prop="begintime" label="Begin Time"></el-table-column>
@@ -54,7 +63,8 @@
               disable-transitions
               hit
               :type="contestauth(scope.row.auth)"
-            >{{ scope.row.auth }}</el-tag>
+              >{{ scope.row.auth }}</el-tag
+            >
           </template>
         </el-table-column>
         <el-table-column prop="creator" label="Owner"></el-table-column>
@@ -85,25 +95,25 @@ export default {
       loading: true,
       searchform: {
         type: "",
-        title: ""
-      }
+        title: "",
+      },
     };
   },
   methods: {
-    contestclick: function(row, column, cell, event) {
+    contestclick: function (row, column, cell, event) {
       this.$router.push({
         name: "contestdetail",
-        params: { contestID: row.id }
+        params: { contestID: row.id },
       });
     },
-    contestlevel: function(type) {
+    contestlevel: function (type) {
       if (type == "Easy") return "info";
       if (type == "Medium") return "success";
       if (type == "Hard") return "";
       if (type == "VeryHard") return "warning";
       if (type == "ExtremelyHard") return "danger";
     },
-    contestauth: function(type) {
+    contestauth: function (type) {
       if (type == "Public") return "success";
       if (type == "Protect") return "warning";
       if (type == "Private") return "danger";
@@ -121,7 +131,7 @@ export default {
             "&type=" +
             this.searchform.type
         )
-        .then(response => {
+        .then((response) => {
           for (var i = 0; i < response.data.results.length; i++) {
             if (response.data.results[i]["level"] == "1")
               response.data.results[i]["level"] = "Easy";
@@ -153,7 +163,7 @@ export default {
           this.tableData = response.data.results;
           this.totalcontest = response.data.count;
         })
-        .catch(error => {
+        .catch((error) => {
           this.$message.error(
             "服务器错误！" + "(" + JSON.stringify(error.response.data) + ")"
           );
@@ -173,7 +183,7 @@ export default {
             "&type=" +
             this.searchform.type
         )
-        .then(response => {
+        .then((response) => {
           for (var i = 0; i < response.data.results.length; i++) {
             if (response.data.results[i]["level"] == "1")
               response.data.results[i]["level"] = "Easy";
@@ -205,7 +215,7 @@ export default {
           this.tableData = response.data.results;
           this.totalcontest = response.data.count;
         })
-        .catch(error => {
+        .catch((error) => {
           this.$message.error(
             "服务器错误！" + "(" + JSON.stringify(error.response.data) + ")"
           );
@@ -225,7 +235,7 @@ export default {
             "&type=" +
             this.searchform.type
         )
-        .then(response => {
+        .then((response) => {
           for (var i = 0; i < response.data.results.length; i++) {
             if (response.data.results[i]["level"] == "1")
               response.data.results[i]["level"] = "Easy";
@@ -258,17 +268,17 @@ export default {
           this.tableData = response.data.results;
           this.totalcontest = response.data.count;
         })
-        .catch(error => {
+        .catch((error) => {
           this.$message.error(
             "服务器错误！" + "(" + JSON.stringify(error.response.data) + ")"
           );
         });
-    }
+    },
   },
   created() {
     this.$axios
       .get("/contestinfo/?limit=30&offset=0")
-      .then(response => {
+      .then((response) => {
         for (var i = 0; i < response.data.results.length; i++) {
           if (response.data.results[i]["level"] == "1")
             response.data.results[i]["level"] = "Easy";
@@ -302,12 +312,12 @@ export default {
         this.totalcontest = response.data.count;
         this.loading = false;
       })
-      .catch(error => {
+      .catch((error) => {
         this.$message.error(
           "服务器错误！" + "(" + JSON.stringify(error.response.data) + ")"
         );
       });
-  }
+  },
 };
 </script>
 

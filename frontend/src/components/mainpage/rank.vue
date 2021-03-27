@@ -2,18 +2,26 @@
   <el-card v-loading="loading">
     <el-row :gutter="15">
       <el-carousel :autoplay="false" arrow="never" trigger="click" type="card">
-        <el-carousel-item v-for="(item,index) in carouselData" :key="index">
+        <el-carousel-item v-for="(item, index) in carouselData" :key="index">
           <center>
             <h2>{{ item.username }}</h2>
             <h2>{{ item.des }}</h2>
             <h3>Rating: {{ item.rating }}</h3>
-            <img :src="'https://www.lpoj.cn/'+(8-index)+'.png'" class="image">
+            <img
+              :src="'https://www.lpoj.cn/' + (8 - index) + '.png'"
+              class="image"
+            />
           </center>
         </el-carousel-item>
       </el-carousel>
     </el-row>
     <el-row>
-      <el-table :data="tableData" @cell-click="userclick" size="small" :row-style="ratingcolor">
+      <el-table
+        :data="tableData"
+        @cell-click="userclick"
+        size="small"
+        :row-style="ratingcolor"
+      >
         <el-table-column prop="username" label="User"></el-table-column>
         <el-table-column prop="des" label="Mood"></el-table-column>
         <el-table-column prop="score" label="Score"></el-table-column>
@@ -45,7 +53,7 @@ export default {
       totaluser: 10,
       tableData: [],
       carouselData: [],
-      loading: true
+      loading: true,
     };
   },
   methods: {
@@ -64,14 +72,14 @@ export default {
     userclick(row, column, cell, event) {
       this.$router.push({
         name: "user",
-        query: { username: row.username }
+        query: { username: row.username },
       });
     },
 
     getData(limit, offset) {
       this.$axios
         .get("/userdata/?limit=" + limit + "&offset=" + offset)
-        .then(response => {
+        .then((response) => {
           //console.log(response.data.results[0])
           for (var i = 0; i < response.data.results.length; i++) {
             //console.log(response.data.results[i]["ac"])
@@ -92,7 +100,7 @@ export default {
           this.totaluser = response.data.count;
           this.loading = false;
         })
-        .catch(error => {
+        .catch((error) => {
           this.$message.error(
             "服务器错误！" + "(" + JSON.stringify(error.response.data) + ")"
           );
@@ -105,11 +113,11 @@ export default {
     handleCurrentChange(val) {
       this.currentpage = val;
       this.getData(this.pagesize, (this.currentpage - 1) * this.pagesize);
-    }
+    },
   },
   created() {
     this.getData(50, 0);
-  }
+  },
 };
 </script>
 

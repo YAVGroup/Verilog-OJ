@@ -6,13 +6,13 @@ import ElementUI from "element-ui";
 Vue.use(ElementUI);
 
 describe("wavedrom", () => {
-  var msg = '<div id=\"wavedrom-error\" style=\"\">';
-  const wrapper = mount(wavedrom,{
+  var msg = '<div id="wavedrom-error" style="">';
+  const wrapper = mount(wavedrom, {
     props: {
       waveId: String,
       parentText: String,
-      errorMessage: String
-    }
+      errorMessage: String,
+    },
   });
 
   it("renders the correct markup: " + msg, () => {

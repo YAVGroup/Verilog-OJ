@@ -1,14 +1,12 @@
 <template>
   <div>
-  <el-row>
-    &nbsp;
-  </el-row>
-  <el-row :gutter="15">
-    <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6" class="placeholder">
-      <!-- placeholder only -->
-      &nbsp;
-    </el-col>
-    <el-col :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
+    <el-row> &nbsp; </el-row>
+    <el-row :gutter="15">
+      <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6" class="placeholder">
+        <!-- placeholder only -->
+        &nbsp;
+      </el-col>
+      <el-col :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
         <!-- 上方选页
         <el-pagination @size-change="handleSizeChange"
                        @current-change="handleCurrentChange"
@@ -17,68 +15,77 @@
                        :page-size="pagesize"
                        layout="total, sizes, prev, pager, next, jumper"
                        :total="totalproblem"></el-pagination> -->
-        <el-button round icon="el-icon-document-add"
-                   style="float: right;"
-                   @click="newProblem"
-                   size="medium">
+        <el-button
+          round
+          icon="el-icon-document-add"
+          style="float: right"
+          @click="newProblem"
+          size="medium"
+        >
           添加题目
         </el-button>
         <!--表格-->
-        <el-table :data="tableData"
-                  :row-class-name="tableRowClassName"
-                  @cell-mouse-enter="changestatistices"
-                  @cell-click="problemclick"
-                  size="medium">
-          <el-table-column prop="id"
-                           label="ID"
-                           :width="50"></el-table-column>
-          <el-table-column prop="name"
-                           label="题名"></el-table-column>
-          <el-table-column prop="level"
-                           label="难度"
-                           :width="100">
+        <el-table
+          :data="tableData"
+          :row-class-name="tableRowClassName"
+          @cell-mouse-enter="changestatistices"
+          @cell-click="problemclick"
+          size="medium"
+        >
+          <el-table-column prop="id" label="ID" :width="50"></el-table-column>
+          <el-table-column prop="name" label="题名"></el-table-column>
+          <el-table-column prop="level" label="难度" :width="100">
             <template slot-scope="scope1">
-              <el-tag id="leveltag"
-                      size="medium"
-                      :type="problemlevel(scope1.row.level)"
-                      disable-transitions
-                      hit>{{ scope1.row.level }}</el-tag>
+              <el-tag
+                id="leveltag"
+                size="medium"
+                :type="problemlevel(scope1.row.level)"
+                disable-transitions
+                hit
+                >{{ scope1.row.level }}</el-tag
+              >
             </template>
           </el-table-column>
-          <el-table-column prop="rate"
-                           label="通过 / 提交"
-                           :width="100"></el-table-column>
-          <el-table-column prop="tags"
-                           label="Tag">
+          <el-table-column
+            prop="rate"
+            label="通过 / 提交"
+            :width="100"
+          ></el-table-column>
+          <el-table-column prop="tags" label="Tag">
             <template slot-scope="scope">
-              <el-tag id="protag"
-                      v-for="(name,index) in scope.row.tags"
-                      :key="index"
-                      size="medium"
-                      disable-transitions
-                      hit>{{ name }}</el-tag>
+              <el-tag
+                id="protag"
+                v-for="(name, index) in scope.row.tags"
+                :key="index"
+                size="medium"
+                disable-transitions
+                hit
+                >{{ name }}</el-tag
+              >
             </template>
           </el-table-column>
-          <el-table-column prop="total_grade"
-                           label="总分"
-                           :width="70"></el-table-column>
+          <el-table-column
+            prop="total_grade"
+            label="总分"
+            :width="70"
+          ></el-table-column>
         </el-table>
         <!--下方选页-->
-        <el-row>
-          &nbsp;
-        </el-row>
+        <el-row> &nbsp; </el-row>
         <center>
-          <el-pagination @size-change="handleSizeChange"
-                         @current-change="handleCurrentChange"
-                         :current-page="currentpage"
-                         :page-sizes="[15, 20, 30, 50]"
-                         :page-size="pagesize"
-                         layout="total, sizes, prev, pager, next, jumper"
-                         :total="totalproblem"></el-pagination>
+          <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="currentpage"
+            :page-sizes="[15, 20, 30, 50]"
+            :page-size="pagesize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="totalproblem"
+          ></el-pagination>
         </center>
-    </el-col>
-    <!--右侧栏-->
-    <!-- <el-col :span="6"> -->
+      </el-col>
+      <!--右侧栏-->
+      <!-- <el-col :span="6"> -->
       <!--Statistics-->
       <!-- <el-row :gutter="15">
         <el-col>
@@ -111,8 +118,31 @@
           </el-card>
         </el-col>
       </el-row> -->
-    <!-- </el-col> -->
-  </el-row>
+      <!-- </el-col> -->
+    </el-row>
+    <el-dialog title="添加题目" :visible.sync="addProblemDialog" width="60%">
+      <el-row>
+        <el-col :offset="2" :span="9" style="text-align: center">
+          <el-button type="success" size="medium" class="choice" plain
+            ><i class="el-icon-guide" style="font-size: 40pt"></i
+            ><br /><br />组合逻辑向导</el-button
+          >
+          快速创建题目，适合判断组合逻辑电路
+        </el-col>
+        <el-col :offset="2" :span="9" style="text-align: center">
+          <el-button type="primary" size="medium" class="choice" plain>
+            <i
+              class="el-icon-edit-outline"
+              style="font-size: 40pt"
+              @click="openEditor"
+            ></i
+            ><br /><br />
+            打开编辑器
+          </el-button>
+          使用编辑器，适用于复杂的判题条件
+        </el-col>
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 
@@ -123,13 +153,28 @@ export default {
   components: {
     // prostatistice
   },
-  data () {
+  data() {
     return {
       currentpage: 1,
       pagesize: 15,
       totalproblem: 10,
       tableData: [],
-      tagnames: ['ALU','decoder','FIFO','ip','MUX','sort','testbench','tutorial','VGA','门级','RTL级','行为级','七段数码管','寄存器堆'],
+      tagnames: [
+        "ALU",
+        "decoder",
+        "FIFO",
+        "ip",
+        "MUX",
+        "sort",
+        "testbench",
+        "tutorial",
+        "VGA",
+        "门级",
+        "RTL级",
+        "行为级",
+        "七段数码管",
+        "寄存器堆",
+      ],
       ac: 100,
       mle: 100,
       tle: 100,
@@ -140,15 +185,23 @@ export default {
       se: 100,
       title: "Statistics",
       currenttag: "",
-      searchtext: ""
+      searchtext: "",
+      addProblemDialog: false,
     };
   },
   methods: {
     // 重新获取题目列表信息
     refresh() {
-      this.$axios.get(
-        "/problems/?limit=" + this.pagesize + "&offset=" + (this.currentpage-1)*this.pagesize + "&search=" + this.searchtext
-      ).then(response => {
+      this.$axios
+        .get(
+          "/problems/?limit=" +
+            this.pagesize +
+            "&offset=" +
+            (this.currentpage - 1) * this.pagesize +
+            "&search=" +
+            this.searchtext
+        )
+        .then((response) => {
           for (var i = 0; i < response.data.length; i++) {
             // mapping = {
             //   1: "Easy",
@@ -159,12 +212,10 @@ export default {
             // };
             // response.data[i].level = mapping[response.data[i].level];
 
-            if (response.data[i].level == "1")
-              response.data[i].level = "Easy";
+            if (response.data[i].level == "1") response.data[i].level = "Easy";
             if (response.data[i].level == "2")
               response.data[i].level = "Medium";
-            if (response.data[i].level == "3")
-              response.data[i].level = "Hard";
+            if (response.data[i].level == "3") response.data[i].level = "Hard";
             if (response.data[i].level == "4")
               response.data[i].level = "VeryHard";
             if (response.data[i].level == "5")
@@ -172,32 +223,38 @@ export default {
             // response.data[i].level = "Easy";
 
             response.data[i].ac = response.data[i].ac_users.length;
-            response.data[i].submitted = response.data[i].submitted_users.length;
-            response.data[i].rate = response.data[i].ac + " / " + response.data[i].submitted;
+            response.data[i].submitted =
+              response.data[i].submitted_users.length;
+            response.data[i].rate =
+              response.data[i].ac + " / " + response.data[i].submitted;
 
-            if (!response.data[i].tags)
-              response.data[i].tags = ["无"];
-            else
-              response.data[i].tags = response.data[i].tags.split("|");
+            if (!response.data[i].tags) response.data[i].tags = ["无"];
+            else response.data[i].tags = response.data[i].tags.split("|");
             // response.data[i].tags = ["无"];
           }
 
           this.tableData = response.data;
           this.totalproblem = response.data.length;
-      }).catch(error => {
-        this.$message.error("服务器错误：" + JSON.stringify(error.response.data));
-      });
+        })
+        .catch((error) => {
+          this.$message.error(
+            "服务器错误：" + JSON.stringify(error.response.data)
+          );
+        });
     },
-    newProblem () {
+    newProblem() {
+      this.addProblemDialog = true;
+    },
+    openEditor: function () {
       this.$router.push({
-        name: "addproblem"
+        name: "addproblem",
       });
     },
-    searchtitle () {
+    searchtitle() {
       this.currentpage = 1;
       this.refresh();
     },
-    tagclick (name) {
+    tagclick(name) {
       if (this.currenttag.indexOf(name) >= 0) {
         this.$refs[name][0].type = "default";
         let li = this.currenttag.split("+");
@@ -218,15 +275,15 @@ export default {
       this.currentpage = 1;
       this.refresh();
     },
-    handleSizeChange (val) {
+    handleSizeChange(val) {
       this.pagesize = val;
       this.refresh();
     },
-    handleCurrentChange (val) {
+    handleCurrentChange(val) {
       this.currentpage = val;
       this.refresh();
     },
-    tableRowClassName ({ row, rowIndex }) {
+    tableRowClassName({ row, rowIndex }) {
       var acpro = this.$store.state.acpro;
       if (acpro)
         if (acpro.indexOf(row.problem + "") != -1) {
@@ -267,11 +324,11 @@ export default {
     problemclick: function (row, column, cell, event) {
       this.$router.push({
         name: "problemdetail",
-        params: { problemid: row.id }
+        params: { problemid: row.id },
       });
-    }
+    },
   },
-  mounted () {
+  mounted() {
     this.refresh();
 
     // this.$axios.get("/problemtag/").then(response => {
@@ -281,7 +338,6 @@ export default {
   },
 };
 </script>
-
 
 <style scope>
 #leveltag {
@@ -305,5 +361,11 @@ export default {
 }
 .el-table .acrow {
   background: #c7ffb8;
+}
+.choice {
+  width: 100%;
+  padding: 40px;
+  font-size: 12pt;
+  margin-bottom: 20px;
 }
 </style>

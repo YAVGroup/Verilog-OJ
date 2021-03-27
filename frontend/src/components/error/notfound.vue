@@ -1,8 +1,6 @@
 <template>
   <div>
-    <el-row>
-
-    </el-row>
+    <el-row> </el-row>
     <el-row>
       <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6" class="placeholder">
         <!-- placeholder only -->
@@ -13,25 +11,16 @@
       </el-col>
     </el-row>
   </div>
-
 </template>
 
 <script>
-
-
 export default {
-  components: {
-
-  },
+  components: {},
   name: "notfound",
   data() {
-    return {
-      
-    };
-  }
+    return {};
+  },
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

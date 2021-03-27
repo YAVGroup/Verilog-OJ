@@ -7,7 +7,7 @@ Vue.use(ElementUI);
 
 describe("register", () => {
   const wrapper = mount(contestannounce, {
-    data () {
+    data() {
       return {
         dialogRegisterVisible: true,
         form: {
@@ -16,13 +16,13 @@ describe("register", () => {
           confirm: "",
           last_name: "",
           first_name: "",
-          email: ""
-        }
+          email: "",
+        },
       };
     },
   });
 
-  var msg = '请重复密码';
+  var msg = "请重复密码";
   it("renders the correct markup: " + msg, () => {
     expect(wrapper.html()).toContain(msg);
     // expect(wrapper.text()).toMatch(msg);
@@ -32,9 +32,9 @@ describe("register", () => {
     expect(wrapper.find("button").exists()).toBe(true);
   });
 
-  it('button should show correct answer', () => {
-    const button = wrapper.find('button')
-    button.trigger('click')
-    expect(wrapper.text()).toMatch('确认密码');
-  })
+  it("button should show correct answer", () => {
+    const button = wrapper.find("button");
+    button.trigger("click");
+    expect(wrapper.text()).toMatch("确认密码");
+  });
 });

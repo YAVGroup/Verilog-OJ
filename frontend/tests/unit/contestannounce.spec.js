@@ -8,7 +8,7 @@ Vue.use(ElementUI);
 describe("login", () => {
   const wrapper = mount(contestannounce);
 
-  var msg = '<div class=\"el-card__body\"></div>';
+  var msg = '<div class="el-card__body"></div>';
   it("renders the correct markup: " + msg, () => {
     expect(wrapper.html()).toContain(msg);
     // expect(wrapper.text()).toMatch(msg);

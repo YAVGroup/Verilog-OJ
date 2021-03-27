@@ -12,10 +12,8 @@
             <a @click="goToNews(item.id)">{{ item.title }}</a>
           </li>
         </ul>
-
       </el-col>
     </el-row>
-
   </div>
 </template>
 
@@ -27,24 +25,23 @@ export default {
       news: [],
     };
   },
-  methods:{
+  methods: {
     goToNews: function (index) {
       this.$router.push({
         name: "newsdetail",
-        params: { newsid: index }
+        params: { newsid: index },
       });
-    }
+    },
   },
   created() {
-    this.$axios.get('/news/').then(response => {
+    this.$axios.get("/news/").then((response) => {
       this.news = response.data;
-    })
-  }
+    });
+  },
 };
 </script>
 
 <style scoped>
-
 .news-item {
   /* background-color: #fafafb; */
   list-style: none;
@@ -52,7 +49,8 @@ export default {
   margin: 0px 0px 0px 0px;
 }
 
-.news-item a:link, .news-item a:visited {
+.news-item a:link,
+.news-item a:visited {
   color: #333;
   text-decoration: none;
 }
@@ -64,7 +62,7 @@ export default {
 
 .home-title {
   font-size: 20px;
-  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
 }
-
 </style>

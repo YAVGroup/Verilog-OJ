@@ -10,8 +10,9 @@
         :type="item"
         effect="plain"
         size="medium"
-        style="margin: 2px;"
-        @click="handleTagClick(item)">
+        style="margin: 2px"
+        @click="handleTagClick(item)"
+      >
         {{ item }}
       </el-tag>
     </div>
@@ -24,44 +25,38 @@ export default {
   props: {
     tags: {
       type: [String],
-      default: ""
+      default: "",
     },
     emptyHint: {
       type: [String],
-      default: "无"
-    }
+      default: "无",
+    },
   },
-  data () {
-    return {
-      
-    }
+  data() {
+    return {};
   },
   methods: {
     handleTagClick: function (tagName) {
       // console.log(tagName);
-      this.$emit('tagClicked', tagName);
+      this.$emit("tagClicked", tagName);
     },
     goToUser: function (index) {
       this.$router.push({
         name: "user",
-        params: { userid: this.userID }
+        params: { userid: this.userID },
       });
-    }
+    },
   },
   computed: {
     tagSplit: function () {
-      if (this.tags != "")
-        return this.tags.split("|");
-      else
-        return ["无"];
+      if (this.tags != "") return this.tags.split("|");
+      else return ["无"];
     },
     tagEmpty: function () {
       return this.tags == "";
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

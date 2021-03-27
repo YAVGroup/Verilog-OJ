@@ -1,12 +1,17 @@
 <template>
   <el-card shadow="always">
-    <h3>{{title}}</h3>
+    <h3>{{ title }}</h3>
     <el-row :gutter="10">
       <el-col :span="3">
         <b>AC:</b>
       </el-col>
       <el-col :span="21">
-        <el-progress :text-inside="true" :stroke-width="18" :percentage="ac" status="success"></el-progress>
+        <el-progress
+          :text-inside="true"
+          :stroke-width="18"
+          :percentage="ac"
+          status="success"
+        ></el-progress>
       </el-col>
     </el-row>
 
@@ -15,7 +20,12 @@
         <b>WA:</b>
       </el-col>
       <el-col :span="21">
-        <el-progress :text-inside="true" :stroke-width="18" :percentage="wa" status="exception"></el-progress>
+        <el-progress
+          :text-inside="true"
+          :stroke-width="18"
+          :percentage="wa"
+          status="exception"
+        ></el-progress>
       </el-col>
     </el-row>
     <el-row :gutter="10">
@@ -23,7 +33,12 @@
         <b>PE:</b>
       </el-col>
       <el-col :span="21">
-        <el-progress :text-inside="true" :stroke-width="18" :percentage="pe" color="#FF9800"></el-progress>
+        <el-progress
+          :text-inside="true"
+          :stroke-width="18"
+          :percentage="pe"
+          color="#FF9800"
+        ></el-progress>
       </el-col>
     </el-row>
     <el-row :gutter="10">
@@ -31,7 +46,12 @@
         <b>TLE:</b>
       </el-col>
       <el-col :span="21">
-        <el-progress :text-inside="true" :stroke-width="18" :percentage="tle" color="#FF9800"></el-progress>
+        <el-progress
+          :text-inside="true"
+          :stroke-width="18"
+          :percentage="tle"
+          color="#FF9800"
+        ></el-progress>
       </el-col>
     </el-row>
     <el-row :gutter="10">
@@ -39,7 +59,12 @@
         <b>RTE:</b>
       </el-col>
       <el-col :span="21">
-        <el-progress :text-inside="true" :stroke-width="18" :percentage="rte" color="#FF9800"></el-progress>
+        <el-progress
+          :text-inside="true"
+          :stroke-width="18"
+          :percentage="rte"
+          color="#FF9800"
+        ></el-progress>
       </el-col>
     </el-row>
     <el-row :gutter="10">
@@ -47,7 +72,12 @@
         <b>MLE:</b>
       </el-col>
       <el-col :span="21">
-        <el-progress :text-inside="true" :stroke-width="18" :percentage="mle" color="#795548"></el-progress>
+        <el-progress
+          :text-inside="true"
+          :stroke-width="18"
+          :percentage="mle"
+          color="#795548"
+        ></el-progress>
       </el-col>
     </el-row>
 
@@ -56,7 +86,12 @@
         <b>CE:</b>
       </el-col>
       <el-col :span="21">
-        <el-progress :text-inside="true" :stroke-width="18" :percentage="ce" color="#FFC107"></el-progress>
+        <el-progress
+          :text-inside="true"
+          :stroke-width="18"
+          :percentage="ce"
+          color="#FFC107"
+        ></el-progress>
       </el-col>
     </el-row>
 
@@ -65,7 +100,12 @@
         <b>SE:</b>
       </el-col>
       <el-col :span="21">
-        <el-progress :text-inside="true" :stroke-width="18" :percentage="se" status="exception"></el-progress>
+        <el-progress
+          :text-inside="true"
+          :stroke-width="18"
+          :percentage="se"
+          status="exception"
+        ></el-progress>
       </el-col>
     </el-row>
   </el-card>
@@ -87,21 +127,20 @@ export default {
       title: "Statistics",
     };
   },
-  created() {
-  },
+  created() {},
   methods: {
-    setdata(d){
-        this.ac=d.ac
-        this.mle=d.mle
-        this.tle=d.tle
-        this.rte=d.rte
-        this.pe=d.pe
-        this.ce=d.ce
-        this.wa=d.wa
-        this.se=d.se
-        this.title=d.title
-    }
-  }
+    setdata(d) {
+      this.ac = d.ac;
+      this.mle = d.mle;
+      this.tle = d.tle;
+      this.rte = d.rte;
+      this.pe = d.pe;
+      this.ce = d.ce;
+      this.wa = d.wa;
+      this.se = d.se;
+      this.title = d.title;
+    },
+  },
 };
 </script>
 

@@ -10,53 +10,53 @@ export default {
   props: {
     userID: {
       type: [Number, String],
-      default: ""
+      default: "",
     },
     username: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
   },
-  data () {
+  data() {
     return {
-      userDisplay: ""
-    }
+      userDisplay: "",
+    };
   },
-  methods:{
+  methods: {
     goToUser: function (index) {
       this.$router.push({
         name: "user",
-        params: { userid: this.userID }
+        params: { userid: this.userID },
       });
-    }
+    },
   },
   watch: {
-    userID (val) {
+    userID(val) {
       // sentinel for not loaded
       if (val != "") {
         if (this.username == "") {
           // no username given, attempt to fetch
           // WARN: better return from serializer, instead of several single requests
 
-          this.$axios.get(
-              "/users/" + this.userID + "/"
-            ).then(response => {
+          this.$axios
+            .get("/users/" + this.userID + "/")
+            .then((response) => {
               this.userDisplay = response.data.username;
-            }).catch(error => {
+            })
+            .catch((error) => {
               this.$message.error(
-                "在获取 UID=" + this.userID + " 的用户信息时出现错误：" + JSON.stringify(error.response.data)
+                "在获取 UID=" +
+                  this.userID +
+                  " 的用户信息时出现错误：" +
+                  JSON.stringify(error.response.data)
               );
             });
         }
       }
-    }
+    },
   },
-  created () {
-
-  }
+  created() {},
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

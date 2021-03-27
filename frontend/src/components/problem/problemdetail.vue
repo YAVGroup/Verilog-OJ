@@ -1,8 +1,6 @@
 <template>
   <div>
-    <el-row>
-      &nbsp;
-    </el-row>
+    <el-row> &nbsp; </el-row>
     <el-row :gutter="15">
       <el-col :xs="0" :sm="1" :md="2" :lg="2" :xl="4" class="placeholder">
         <!-- placeholder only -->
@@ -10,101 +8,158 @@
       </el-col>
       <el-col :xs="24" :sm="22" :md="20" :lg="20" :xl="16">
         <el-col :span="16">
-            <el-row>
-              <el-card shadow="never">
-                <!--标题、DDL-->
-                <!-- <el-row :gutter="18"> -->
-                <div id="title">
-                  <div style="display: inline-block; margin-top: 6px; margin-left: 10px;">{{ title }}</div>
-                  <div style="float: right; margin-right: 5px; ">
-                    <el-button-group>
-                      <el-button plain circle 
-                        size="medium" icon="el-icon-edit" @click="problemEdit" :disabled="!(loggedIn && userID == owner)"></el-button>
-                      <el-button plain circle 
-                        size="medium" icon="el-icon-delete" @click="problemDelete" :disabled="!(loggedIn && userID == owner)"></el-button>
-                    </el-button-group>
-                  </div>
+          <el-row>
+            <el-card shadow="never">
+              <!--标题、DDL-->
+              <!-- <el-row :gutter="18"> -->
+              <div id="title">
+                <div
+                  style="
+                    display: inline-block;
+                    margin-top: 6px;
+                    margin-left: 10px;
+                  "
+                >
+                  {{ title }}
                 </div>
-                <el-divider></el-divider>
-                <el-row :gutter="18" id="ddl" v-show="have_ddl">截止时间</el-row>
-                <el-row :gutter="18" class="problem-descriptions" v-show="have_ddl">
-                  {{ ddl }}
-                </el-row>
-                
+                <div style="float: right; margin-right: 5px">
+                  <el-button-group>
+                    <el-button
+                      plain
+                      circle
+                      size="medium"
+                      icon="el-icon-edit"
+                      @click="problemEdit"
+                      :disabled="!(loggedIn && userID == owner)"
+                    ></el-button>
+                    <el-button
+                      plain
+                      circle
+                      size="medium"
+                      icon="el-icon-delete"
+                      @click="problemDelete"
+                      :disabled="!(loggedIn && userID == owner)"
+                    ></el-button>
+                  </el-button-group>
+                </div>
+              </div>
+              <el-divider></el-divider>
+              <el-row :gutter="18" id="ddl" v-show="have_ddl">截止时间</el-row>
+              <el-row
+                :gutter="18"
+                class="problem-descriptions"
+                v-show="have_ddl"
+              >
+                {{ ddl }}
+              </el-row>
 
-                <!--题目描述、输入、输出-->
-                <el-row :gutter="18"
-                        class="problem-description-title">题目描述</el-row>
-                <el-row :gutter="18" class="problem-descriptions">
-                  <div class="problem-descriptions">{{ des }}</div>
-                </el-row>
+              <!--题目描述、输入、输出-->
+              <el-row :gutter="18" class="problem-description-title"
+                >题目描述</el-row
+              >
+              <el-row :gutter="18" class="problem-descriptions">
+                <div class="problem-descriptions">{{ des }}</div>
+              </el-row>
 
-                <el-row :gutter="18"
-                        class="problem-description-title">输入格式</el-row>
-                <el-row :gutter="18" class="problem-descriptions">
-                  <div class="problem-descriptions">{{ input }}</div>
-                </el-row>
-                <el-row :gutter="18"
-                        class="problem-description-title">输出格式</el-row>
-                <el-row :gutter="18" class="problem-descriptions">
-                  <div class="problem-descriptions">{{ output }}</div>
-                </el-row>
+              <el-row :gutter="18" class="problem-description-title"
+                >输入格式</el-row
+              >
+              <el-row :gutter="18" class="problem-descriptions">
+                <div class="problem-descriptions">{{ input }}</div>
+              </el-row>
+              <el-row :gutter="18" class="problem-description-title"
+                >输出格式</el-row
+              >
+              <el-row :gutter="18" class="problem-descriptions">
+                <div class="problem-descriptions">{{ output }}</div>
+              </el-row>
 
-                <!--这里放样例波形图-->
-                <el-row :gutter="18"
-                        class="problem-description-title">示例波形</el-row>
-                <el-row :gutter="18"
-                        id="sample_waveform" class="problem-descriptions">
-                  <wavedrom waveId="1"
-                            :parentText="waveform"
-                            errorMessage="Sorry, no sample waveform available"></wavedrom>
-                </el-row>
-              </el-card>
-            </el-row>
+              <!--这里放样例波形图-->
+              <el-row :gutter="18" class="problem-description-title"
+                >示例波形</el-row
+              >
+              <el-row
+                :gutter="18"
+                id="sample_waveform"
+                class="problem-descriptions"
+              >
+                <wavedrom
+                  waveId="1"
+                  :parentText="waveform"
+                  errorMessage="Sorry, no sample waveform available"
+                ></wavedrom>
+              </el-row>
+            </el-card>
+          </el-row>
 
-            <el-row>
-              <el-card shadow="never">
-                <!--提交界面-->
-                <el-row :gutter="15">
-                    <i style="padding: 5px 10px;" class="el-icon-edit"></i>
-                    <div style="display: inline-block; font-size: 20px; ">代码编辑</div>
+          <el-row>
+            <el-card shadow="never">
+              <!--提交界面-->
+              <el-row :gutter="15">
+                <i style="padding: 5px 10px" class="el-icon-edit"></i>
+                <div style="display: inline-block; font-size: 20px">
+                  代码编辑
+                </div>
 
-                    <div v-if="!loggedIn" style="display: inline-block; float: right;">
-                      <el-tooltip class="item" effect="dark" content="登陆以进行提交" placement="top">
-                        <!-- https://github.com/ElemeFE/element/issues/8557 -->
-                        <div style="font-weight: bold; margin-right: 10px; float: right;">
-                          <el-button type="success"
-                                    size="medium"
-                                    @click="submit"
-                                    disabled
-                                    >提交</el-button>
-                        </div>
-                      </el-tooltip>
-                      <el-button type="danger"
-                                size="medium"
-                                @click="code = ''"
-                                style="font-weight: bold; margin-right: 10px; float: right;">清空</el-button>
+                <div
+                  v-if="!loggedIn"
+                  style="display: inline-block; float: right"
+                >
+                  <el-tooltip
+                    class="item"
+                    effect="dark"
+                    content="登陆以进行提交"
+                    placement="top"
+                  >
+                    <!-- https://github.com/ElemeFE/element/issues/8557 -->
+                    <div
+                      style="
+                        font-weight: bold;
+                        margin-right: 10px;
+                        float: right;
+                      "
+                    >
+                      <el-button
+                        type="success"
+                        size="medium"
+                        @click="submit"
+                        disabled
+                        >提交</el-button
+                      >
                     </div>
-                    <div style="display: inline-block; float: right;" v-else>
-                      <el-button type="success"
-                                size="medium"
-                                @click="submit"
-                                style="font-weight: bold; margin-right: 10px; float: right;">提交</el-button>
-                      <el-button type="danger"
-                                size="medium"
-                                @click="code = ''"
-                                style="font-weight: bold; margin-right: 10px; float: right;">清空</el-button>
-                    </div>
+                  </el-tooltip>
+                  <el-button
+                    type="danger"
+                    size="medium"
+                    @click="code = ''"
+                    style="font-weight: bold; margin-right: 10px; float: right"
+                    >清空</el-button
+                  >
+                </div>
+                <div style="display: inline-block; float: right" v-else>
+                  <el-button
+                    type="success"
+                    size="medium"
+                    @click="submit"
+                    style="font-weight: bold; margin-right: 10px; float: right"
+                    >提交</el-button
+                  >
+                  <el-button
+                    type="danger"
+                    size="medium"
+                    @click="code = ''"
+                    style="font-weight: bold; margin-right: 10px; float: right"
+                    >清空</el-button
+                  >
+                </div>
+              </el-row>
 
-                </el-row>
-
-                <!--代码编辑-->
-                <el-row>
-                  <codemirror v-model="code"
-                              :options="cmOptions"></codemirror>
-                </el-row>
-              </el-card>
-            </el-row>
+              <!--代码编辑-->
+              <el-row>
+                <codemirror v-model="code" :options="cmOptions"></codemirror>
+              </el-row>
+            </el-card>
+          </el-row>
         </el-col>
         <!--侧栏-->
         <el-col :span="8">
@@ -136,10 +191,24 @@
           <!--提交记录-->
           <el-row>
             <el-card shadow="never">
-              <div style="box-sizing: border-box; padding-bottom: 8px; display: inline-block;" >提交记录</div>
-              <el-button size="mini" @click="submissionsRefresh" style="float: right;" :disabled="!loggedIn">刷新</el-button>
+              <div
+                style="
+                  box-sizing: border-box;
+                  padding-bottom: 8px;
+                  display: inline-block;
+                "
+              >
+                提交记录
+              </div>
+              <el-button
+                size="mini"
+                @click="submissionsRefresh"
+                style="float: right"
+                :disabled="!loggedIn"
+                >刷新</el-button
+              >
               <el-table
-                :default-sort="{prop: 'id', order: 'descending'}"
+                :default-sort="{ prop: 'id', order: 'descending' }"
                 :data="submissions"
                 style="width: 100%"
                 :row-class-name="tableRowClassName"
@@ -147,10 +216,18 @@
                 v-loading="!loggedIn"
                 element-loading-text="登陆以查看本题提交记录"
                 element-loading-spinner="el-icon-info"
-                size="mini">
-
-                <el-table-column prop="id" label="ID" :width="60"></el-table-column>
-                <el-table-column prop="pretty_time" label="日期" :width="60"></el-table-column>
+                size="mini"
+              >
+                <el-table-column
+                  prop="id"
+                  label="ID"
+                  :width="60"
+                ></el-table-column>
+                <el-table-column
+                  prop="pretty_time"
+                  label="日期"
+                  :width="60"
+                ></el-table-column>
 
                 <el-table-column prop="result" label="状态">
                   <!-- <template slot-scope="scope">
@@ -165,10 +242,8 @@
           </el-row>
         </el-col>
       </el-col>
-
     </el-row>
   </div>
-
 </template>
 
 <style scope>
@@ -191,7 +266,7 @@ import wavedrom from "@/components/utils/wavedrom";
 import userhyperlink from "@/components/utils/userhyperlink";
 import taglist from "@/components/utils/taglist";
 
-import { mapState } from 'vuex';
+import { mapState } from "vuex";
 import { prettyDate } from "@/utils/timeUtil";
 
 export default {
@@ -202,15 +277,15 @@ export default {
     // prostatistice,
     wavedrom,
     userhyperlink,
-    taglist
+    taglist,
   },
-  data () {
+  data() {
     return {
       cmOptions: {
         tabSize: 4,
         mode: "verilog",
         theme: "base16-light",
-        lineNumbers: true
+        lineNumbers: true,
       },
       title: "",
       des: "",
@@ -228,10 +303,10 @@ export default {
       code: "",
       submissions: [],
 
-      waveform: ""
+      waveform: "",
     };
   },
-  created () {
+  created() {
     this.id = this.$route.params.problemid;
     if (!this.id) {
       this.$message.error("参数错误" + "(" + this.id + ")");
@@ -239,21 +314,23 @@ export default {
     }
     this.$axios
       .get("/problems/" + this.id + "/")
-      .then(response => {
+      .then((response) => {
         this.des = response.data.description;
         this.input = response.data.description_input;
         this.output = response.data.description_output;
         this.waveform = response.data.app_data;
         this.owner = response.data.owner;
-        this.addtime = response.data.create_time =
-          moment(response.data.create_time).format("YYYY-MM-DD HH:mm:ss");
+        this.addtime = response.data.create_time = moment(
+          response.data.create_time
+        ).format("YYYY-MM-DD HH:mm:ss");
 
         this.code = "";
         if (response.data.template_code_file != null) {
-          this.$axios.get("/files/" + response.data.template_code_file + "/")
-          .then(response => {
-            this.code = response.data;
-          })
+          this.$axios
+            .get("/files/" + response.data.template_code_file + "/")
+            .then((response) => {
+              this.code = response.data;
+            });
         }
 
         this.tags = response.data["tags"];
@@ -264,26 +341,31 @@ export default {
         } else {
           this.ddl_time = response.data.deadline_time;
           let ddlTime = moment(response.data.deadline_time);
-          this.ddl = ddlTime.format("YYYY-MM-DD hh:mm:ss") + " (" + ddlTime.endOf('day').fromNow() + ")";
+          this.ddl =
+            ddlTime.format("YYYY-MM-DD hh:mm:ss") +
+            " (" +
+            ddlTime.endOf("day").fromNow() +
+            ")";
           this.have_ddl = true;
         }
 
         this.title = response.data.name;
         this.level = response.data.level;
 
-        if (this.loggedIn)
-          this.submissionsRefresh();
+        if (this.loggedIn) this.submissionsRefresh();
       })
-      .catch(error => {
-        this.$message.error("服务器错误！" + "(" + JSON.stringify(error.response.data) + ")");
+      .catch((error) => {
+        this.$message.error(
+          "服务器错误！" + "(" + JSON.stringify(error.response.data) + ")"
+        );
       });
   },
   methods: {
-    onCopy (e) {
+    onCopy(e) {
       this.$message.success("复制成功！");
     },
     // 复制失败
-    onError (e) {
+    onError(e) {
       this.$message.error("复制失败：" + e);
     },
 
@@ -309,7 +391,7 @@ export default {
       if (row.result == "System Error") return "warning-row";
       return "";
     },
-    statuetype: function(type) {
+    statuetype: function (type) {
       if (type == "Pending") return "info";
       if (type == "Judging") return "";
       if (type == "Wrong Answer") return "danger";
@@ -323,7 +405,7 @@ export default {
       if (type == "System Error") return "danger";
       return "danger";
     },
-    statuejudge: function(type) {
+    statuejudge: function (type) {
       if (type == "Pending") return true;
       if (type == "Judging") return true;
       return false;
@@ -331,26 +413,23 @@ export default {
 
     rowClick(row, col, e) {
       this.$router.push({
-        name: 'submission',
-        params: {submissionid: row.id}
-      })
+        name: "submission",
+        params: { submissionid: row.id },
+      });
     },
 
-    submissionsRefresh(){
+    submissionsRefresh() {
       if (!this.loggedIn) {
         this.$message.error("请登陆后查看自己的提交！");
         return;
       }
       this.$axios
-        .get(
-          "/submissions/?user=" +
-            this.userID +
-            "&problem=" +
-            this.id
-        )
-        .then(response => {
+        .get("/submissions/?user=" + this.userID + "&problem=" + this.id)
+        .then((response) => {
           for (var i = 0; i < response.data.length; i++) {
-            response.data[i]["pretty_time"] = prettyDate(response.data[i]["submit_time"]);
+            response.data[i]["pretty_time"] = prettyDate(
+              response.data[i]["submit_time"]
+            );
           }
           this.submissions = response.data;
         });
@@ -359,7 +438,7 @@ export default {
     problemEdit: function () {
       this.$router.push({
         name: "problemedit",
-        params: { problemid: this.id }
+        params: { problemid: this.id },
       });
     },
     problemDelete: function () {
@@ -368,36 +447,40 @@ export default {
         return;
       }
 
-      if(this.userID != this.owner) {
+      if (this.userID != this.owner) {
         this.$message.error("不是题目创建者，没有对应权限");
         return;
       }
 
-      this.$confirm('此操作将永久删除该题目, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$axios.delete(
-            "/problems/" +
-              this.id + "/"
-          ).then(response => {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
+      this.$confirm("此操作将永久删除该题目, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$axios
+            .delete("/problems/" + this.id + "/")
+            .then((response) => {
+              this.$message({
+                type: "success",
+                message: "删除成功!",
+              });
+              this.$router.push({
+                name: "problem",
+              });
+            })
+            .catch((error) => {
+              this.$message.error(
+                "删除失败：" + JSON.stringify(error.response.data)
+              );
             });
-            this.$router.push({
-              name: 'problem'
-            });
-          }).catch(error => {
-            this.$message.error("删除失败：" + JSON.stringify(error.response.data));
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
           });
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        });          
-      });
+        });
     },
 
     submit: function () {
@@ -414,43 +497,43 @@ export default {
       this.$confirm("确定提交吗？", "提交", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        this.$message({
-          type: "success",
-          message: "提交中..."
-        });
+        type: "warning",
+      })
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "提交中...",
+          });
 
-        var formData = new FormData();
-        var blob = new Blob([this.code], {type: "text/plain"});
-        formData.append('file', blob, 'code.v');
-        return this.$axios.post("/files/", formData);
-      }).then(response => {
-        const fileid = response.data.id;
-        return this.$axios.post("/submit", {
-          'problem': this.id,
-          'submit_files': [fileid],
+          var formData = new FormData();
+          var blob = new Blob([this.code], { type: "text/plain" });
+          formData.append("file", blob, "code.v");
+          return this.$axios.post("/files/", formData);
+        })
+        .then((response) => {
+          const fileid = response.data.id;
+          return this.$axios.post("/submit", {
+            problem: this.id,
+            submit_files: [fileid],
+          });
+        })
+        .then((response) => {
+          this.$router.push({
+            name: "submission",
+            params: { submissionid: response.data.id },
+          });
+        })
+        .catch((error) => {
+          this.$message.error(
+            "提交失败：" + JSON.stringify(error.response.data)
+          );
         });
-      }).then(response => {
-        this.$router.push({
-          name: 'submission',
-          params: {submissionid: response.data.id}
-        });
-      }).catch(error => {
-        this.$message.error("提交失败：" + JSON.stringify(error.response.data));
-      });
     },
   },
   computed: {
-    ...mapState([
-      'loggedIn',
-      'userID',
-      'username',
-      'isSuperUser'
-    ])
+    ...mapState(["loggedIn", "userID", "username", "isSuperUser"]),
   },
-  destroyed () {
-  }
+  destroyed() {},
 };
 </script>
 

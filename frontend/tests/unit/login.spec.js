@@ -12,13 +12,13 @@ describe("login", () => {
         dialogLoginVisible: true,
         form: {
           username: "",
-          password: ""
-        }
+          password: "",
+        },
       };
-    }
+    },
   });
 
-  var msg = '统一身份认证登录';
+  var msg = "统一身份认证登录";
   it("renders the correct markup: " + msg, () => {
     expect(wrapper.html()).toContain(msg);
     expect(wrapper.text()).toMatch(msg);

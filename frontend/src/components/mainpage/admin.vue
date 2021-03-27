@@ -1,8 +1,5 @@
 <template>
-  <el-tabs type="border-card"
-           v-show="canshow"
-           v-loading="loading">
-
+  <el-tabs type="border-card" v-show="canshow" v-loading="loading">
     <el-tab-pane label="添加题目">
       <adminaddproblem></adminaddproblem>
     </el-tab-pane>
@@ -58,21 +55,19 @@ export default {
     // adminrejudge,
     // adminclassmanage,
   },
-  data () {
+  data() {
     return {
       type: 1,
       canshow: false,
-      loading: true
+      loading: true,
     };
   },
-  methods: {
-
-  },
-  created () {
+  methods: {},
+  created() {
     this.canshow = true;
   },
-  mounted () {
-    this.loading = false
+  mounted() {
+    this.loading = false;
   },
 };
 </script>

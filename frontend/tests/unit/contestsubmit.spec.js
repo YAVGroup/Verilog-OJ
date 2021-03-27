@@ -6,7 +6,7 @@ import ElementUI from "element-ui";
 Vue.use(ElementUI);
 
 describe("contestsubmit", () => {
-  it('has a created hook', () => {
-    expect(typeof contestsubmit.created).toBe('function')
-  })
+  it("has a created hook", () => {
+    expect(typeof contestsubmit.created).toBe("function");
+  });
 });

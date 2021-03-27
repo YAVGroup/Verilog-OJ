@@ -7,12 +7,12 @@ Vue.use(ElementUI);
 
 describe("adminaddproblem", () => {
   const wrapper = mount(adminaddproblem);
-  
+
   // it('has a created hook', () => {
   //   expect(typeof adminaddproblem.created).toBe('function')
   // })
 
-  var msg = '添加题目';
+  var msg = "添加题目";
   it("renders the correct markup: " + msg, () => {
     expect(wrapper.html()).toContain(msg);
     // expect(wrapper.text()).toMatch(msg);
