@@ -27,7 +27,7 @@ export default new Router({
       path: "/",
       name: "homepage",
       component: () =>
-        import(/* webpackChunkName: "main" */ "@/components/main"),
+        import( /* webpackChunkName: "main" */ "@/components/main"),
     },
 
     // News
@@ -36,7 +36,8 @@ export default new Router({
       name: "newsdetail",
       component: () =>
         import(
-          /* webpackChunkName: "main" */ "@/components/mainpage/newsdetail"
+          /* webpackChunkName: "main" */
+          "@/components/mainpage/newsdetail"
         ),
     },
 
@@ -45,13 +46,13 @@ export default new Router({
       path: "/user/:userid",
       name: "user",
       component: () =>
-        import(/* webpackChunkName: "user" */ "@/components/mainpage/user"),
+        import( /* webpackChunkName: "user" */ "@/components/mainpage/user"),
     },
     {
       path: "/setting",
       name: "setting",
       component: () =>
-        import(/* webpackChunkName: "user" */ "@/components/mainpage/setting"),
+        import( /* webpackChunkName: "user" */ "@/components/mainpage/setting"),
     },
 
     // 题目列表和题目细节
@@ -60,7 +61,8 @@ export default new Router({
       name: "problem",
       component: () =>
         import(
-          /* webpackChunkName: "problem" */ "@/components/mainpage/problem"
+          /* webpackChunkName: "problem" */
+          "@/components/mainpage/problem"
         ),
     },
 
@@ -70,7 +72,8 @@ export default new Router({
       name: "problemedit",
       component: () =>
         import(
-          /* webpackChunkName: "problem" */ "@/components/problem/problemedit"
+          /* webpackChunkName: "problem" */
+          "@/components/problem/problemedit"
         ),
     },
 
@@ -79,7 +82,8 @@ export default new Router({
       name: "addproblem",
       component: () =>
         import(
-          /* webpackChunkName: "problem" */ "@/components/problem/problemedit"
+          /* webpackChunkName: "problem" */
+          "@/components/problem/problemedit"
         ),
     },
 
@@ -88,7 +92,8 @@ export default new Router({
       name: "problemdetail",
       component: () =>
         import(
-          /* webpackChunkName: "problem" */ "@/components/problem/problemdetail"
+          /* webpackChunkName: "problem" */
+          "@/components/problem/problemdetail"
         ),
     },
 
@@ -98,7 +103,8 @@ export default new Router({
       name: "statue",
       component: () =>
         import(
-          /* webpackChunkName: "problem" */ "@/components/mainpage/statue"
+          /* webpackChunkName: "problem" */
+          "@/components/mainpage/statue"
         ),
     },
     {
@@ -106,8 +112,16 @@ export default new Router({
       name: "submission",
       component: () =>
         import(
-          /* webpackChunkName: "problem" */ "@/components/mainpage/submission"
+          /* webpackChunkName: "problem" */
+          "@/components/mainpage/submission"
         ),
+    },
+
+    // 组合逻辑向导
+    {
+      path: "/guide/combinational",
+      name: "combGuide",
+      component: () => import("@/components/guide/combinational")
     },
 
     // 管理员界面
@@ -115,14 +129,14 @@ export default new Router({
       path: "/admin",
       name: "admin",
       component: () =>
-        import(/* webpackChunkName: "admin" */ "@/components/mainpage/admin"),
+        import( /* webpackChunkName: "admin" */ "@/components/mainpage/admin"),
     },
 
     // 404 Page
     {
       path: "*",
       component: () =>
-        import(/* webpackChunkName: "err" */ "@/components/error/notfound"),
+        import( /* webpackChunkName: "err" */ "@/components/error/notfound"),
     },
     //   {
     //     path: '/contest',

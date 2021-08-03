@@ -198,7 +198,7 @@ export default {
   },
   methods: {
     openCombGuide() {
-      console.log("pushed");
+      this.$router.push({ name: "combGuide" });
     },
     // 重新获取题目列表信息
     refresh() {
