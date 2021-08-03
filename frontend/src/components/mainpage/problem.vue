@@ -123,19 +123,26 @@
     <el-dialog title="添加题目" :visible.sync="addProblemDialog" width="60%">
       <el-row>
         <el-col :offset="2" :span="9" style="text-align: center">
-          <el-button type="success" size="medium" class="choice" plain
+          <el-button
+            type="success"
+            size="medium"
+            class="choice"
+            plain
+            @click="openCombGuide"
             ><i class="el-icon-guide" style="font-size: 40pt"></i
             ><br /><br />组合逻辑向导</el-button
           >
           快速创建题目，适合判断组合逻辑电路
         </el-col>
         <el-col :offset="2" :span="9" style="text-align: center">
-          <el-button type="primary" size="medium" class="choice" plain>
-            <i
-              class="el-icon-edit-outline"
-              style="font-size: 40pt"
-              @click="openEditor"
-            ></i
+          <el-button
+            type="primary"
+            size="medium"
+            class="choice"
+            plain
+            @click="openEditor"
+          >
+            <i class="el-icon-edit-outline" style="font-size: 40pt"></i
             ><br /><br />
             打开编辑器
           </el-button>
@@ -190,6 +197,9 @@ export default {
     };
   },
   methods: {
+    openCombGuide() {
+      console.log("pushed");
+    },
     // 重新获取题目列表信息
     refresh() {
       this.$axios
