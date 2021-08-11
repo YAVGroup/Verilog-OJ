@@ -58,7 +58,9 @@
                 >题目描述</el-row
               >
               <el-row :gutter="18" class="problem-descriptions">
-                <div class="problem-descriptions">{{ des }}</div>
+                <div class="problem-descriptions">
+                  <markdownIt :mdSource="des"></markdownIt>
+                </div>
               </el-row>
 
               <el-row :gutter="18" class="problem-description-title"
@@ -263,6 +265,7 @@ require("codemirror/theme/base16-dark.css");
 require("codemirror/mode/verilog/verilog");
 
 import wavedrom from "@/components/utils/wavedrom";
+import markdownIt from "@/components/utils/markdownIt";
 import userhyperlink from "@/components/utils/userhyperlink";
 import taglist from "@/components/utils/taglist";
 
@@ -278,6 +281,7 @@ export default {
     wavedrom,
     userhyperlink,
     taglist,
+    markdownIt,
   },
   data() {
     return {
@@ -581,7 +585,7 @@ export default {
   left: 30px;
   font-size: 16px;
   margin-right: 50px;
-  word-break: break-all;
+  /* word-break: break-all; */
   white-space: pre-line;
 }
 .el-row {
