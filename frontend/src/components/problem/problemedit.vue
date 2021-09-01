@@ -102,11 +102,13 @@
                   </el-col>
                 </el-form-item>
                 <el-form-item label="题目描述" prop="description">
-                  <el-input
+                  <!-- <el-input
                     type="textarea"
                     v-model="basicInfoForm.description"
-                  ></el-input>
+                  ></el-input> -->
+                  <el-button @click="editInTuiEditor()">在 TuiEditor 中编辑</el-button>
                 </el-form-item>
+                
                 <el-form-item label="输入格式描述" prop="description_input">
                   <el-input
                     type="textarea"
@@ -138,6 +140,8 @@
                 </el-form-item>
               </el-form>
 
+
+
               <!-- Sample waveform preview -->
               <el-dialog
                 title="示例波形预览"
@@ -154,6 +158,30 @@
                   <el-button
                     type="primary"
                     @click="waveformPreviewDialogVisible = false"
+                    >关闭</el-button
+                  >
+                </span>
+              </el-dialog>
+
+              <!-- TuiEditor Markdown editing -->
+              <el-dialog
+                title="题目描述编辑 (TuiEditor)"
+                :visible.sync="tuiEditorDialogVisible"
+                width="60%"
+              >
+                <tuiEditor
+                  ref="toastuiEditor" 
+                  :initialValue="basicInfoForm.description"
+                  :options="tuiEditorDefaultOptions"
+                  height="600px"
+                  initialEditType="wysiwyg"
+                  previewStyle="vertical"
+                />
+
+                <span slot="footer" class="dialog-footer">
+                  <el-button
+                    type="primary"
+                    @click="closeTuiEditor()"
                     >关闭</el-button
                   >
                 </span>
@@ -362,6 +390,9 @@ import "vue-datetime/dist/vue-datetime.css";
 import { mapState } from "vuex";
 import Userhyperlink from "../utils/userhyperlink.vue";
 
+import { Editor } from '@toast-ui/vue-editor';
+import '@toast-ui/editor/dist/toastui-editor.css';
+
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
 require("codemirror/theme/base16-dark.css");
@@ -375,6 +406,7 @@ export default {
   components: {
     codemirror,
     wavedrom,
+    tuiEditor: Editor
   },
   data() {
     return {
@@ -464,6 +496,22 @@ export default {
       currentTabPageName: "BasicInfoTab",
       submitButtonBusy: false,
       waveformPreviewDialogVisible: false,
+      tuiEditorDialogVisible: false,
+      tuiEditorDefaultOptions: {
+        minHeight: '200px',
+        language: 'en-US',
+        useCommandShortcut: true,
+        usageStatistics: true,
+        hideModeSwitch: false,
+        toolbarItems: [
+          ['heading', 'bold', 'italic', 'strike'],
+          ['hr', 'quote'],
+          ['ul', 'ol', 'task', 'indent', 'outdent'],
+          ['table', 'image', 'link'],
+          ['code', 'codeblock'],
+          ['scrollSync'],
+        ]
+      },
     };
   },
   computed: {
@@ -506,6 +554,14 @@ export default {
     }
   },
   methods: {
+    editInTuiEditor() {
+      this.tuiEditorDialogVisible = true;
+    },
+    closeTuiEditor() {
+      let mdData = this.$refs.toastuiEditor.invoke('getMarkdown');
+      this.basicInfoForm.description = mdData;
+      this.tuiEditorDialogVisible = false;
+    },
     waveformPreview() {
       this.waveformPreviewDialogVisible = true;
     },
