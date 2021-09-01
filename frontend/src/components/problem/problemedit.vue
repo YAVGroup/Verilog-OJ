@@ -107,6 +107,9 @@
                     v-model="basicInfoForm.description"
                   ></el-input> -->
                   <el-button @click="editInTuiEditor()">在 TuiEditor 中编辑</el-button>
+                  <div style="display: inline-block; margin-left: 20px;">
+                    描述大小：{{ prettySize(getByteLength(this.basicInfoForm.description)) }}
+                  </div>
                 </el-form-item>
                 
                 <el-form-item label="输入格式描述" prop="description_input">
@@ -561,6 +564,26 @@ export default {
       let mdData = this.$refs.toastuiEditor.invoke('getMarkdown');
       this.basicInfoForm.description = mdData;
       this.tuiEditorDialogVisible = false;
+    },
+    getByteLength(str) {
+      // https://stackoverflow.com/questions/5515869/string-length-in-bytes-in-javascript/23329386#23329386
+      // returns the byte length of an utf8 string
+      let s = str.length;
+      for (let i=str.length-1; i>=0; i--) {
+        let code = str.charCodeAt(i);
+        if (code > 0x7f && code <= 0x7ff) s++;
+        else if (code > 0x7ff && code <= 0xffff) s+=2;
+        if (code >= 0xDC00 && code <= 0xDFFF) i--; //trail surrogate
+      }
+      return s;
+    },
+    prettySize(size) {
+      let unit = 'B';
+        let units = [ 'B', 'KiB', 'MiB', 'GiB', 'TiB' ];
+        while ( (unit = units.shift()) && size > 1024 ) {
+            size = size / 1024;
+        }
+        return (unit === 'B' ? size : size.toFixed(2)) + ' ' + unit;
     },
     waveformPreview() {
       this.waveformPreviewDialogVisible = true;
