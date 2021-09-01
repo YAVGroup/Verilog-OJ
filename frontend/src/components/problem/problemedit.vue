@@ -1033,7 +1033,9 @@ export default {
         ...problemPromises,
         testcasePreparation,
         ...testcasePromises,
-      ]);
+      ]).then((arrayOfResults) => {
+          return problemID;
+      });
     },
     submitAll() {
       console.log("submitAll() called.");
@@ -1055,8 +1057,12 @@ export default {
                   console.log("ERROR:", error.response.data);
                 }
               )
-              .then(() => {
+              .then((problemID) => {
                 this.$message.success("提交成功！");
+                this.$router.push({
+                  name: "problemdetail",
+                  params: { problemid: problemID }
+                });
               });
           },
           (error) => {
