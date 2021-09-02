@@ -29,7 +29,7 @@ class SubmissionViewSet(ReadOnlyModelViewSet):
     """
     获取提交信息
     """
-    queryset = Submission.objects.all()
+    queryset = Submission.objects.all().order_by('-id')
     #serializer_class = SubmissionSerializer
     # TODO: 提交信息的查看权限问题
     pagination_class = LimitOffsetPagination
