@@ -244,7 +244,7 @@ export default {
           }
 
           this.tableData = response.data.results;
-          this.totalproblem = response.data.results.length;
+          this.totalproblem = response.data.count;
         })
         .catch((error) => {
           this.$message.error(
