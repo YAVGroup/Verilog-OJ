@@ -3,6 +3,7 @@ from rest_framework.viewsets import ModelViewSet
 from .models import Problem, TestCase
 from .serializers import ProblemSerializer, TestCaseSerializer, ProblemAdvancedListSerializer
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from user import permissions
 
@@ -11,8 +12,9 @@ class ProblemViewSet(ModelViewSet):
     获取和修改题目信息
     """
     queryset = Problem.objects.all()
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
     filter_fields = ('id','owner', 'level')
+    search_fields = ('name', 'level', 'tags')
     pagination_class = LimitOffsetPagination
     #serializer_class = ProblemSerializer
 

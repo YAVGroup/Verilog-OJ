@@ -85,15 +85,15 @@
         </center>
       </el-col>
       <!--右侧栏-->
-      <!-- <el-col :span="6"> -->
+      <el-col :span="6">
       <!--Statistics-->
-      <!-- <el-row :gutter="15">
+      <el-row :gutter="15">
         <el-col>
           <prostatistice ref="prosta"></prostatistice>
         </el-col>
-      </el-row> -->
+      </el-row>
       <!--搜索框-->
-      <!-- <el-row>
+      <el-row>
         <el-card shadow="always">
           <el-input placeholder="Search..."
                     v-model="searchtext"
@@ -103,9 +103,9 @@
                        @click="searchtitle"></el-button>
           </el-input>
         </el-card>
-      </el-row> -->
+      </el-row>
       <!--tag filter-->
-      <!-- <el-row :gutter="15">
+      <el-row :gutter="15">
         <el-col>
           <el-card shadow="always">
             <h4>Tags (Click to filter)</h4>
@@ -117,8 +117,8 @@
                        :ref="name">{{ name }}</el-button>
           </el-card>
         </el-col>
-      </el-row> -->
-      <!-- </el-col> -->
+      </el-row>
+      </el-col>
     </el-row>
     <el-dialog title="添加题目" :visible.sync="addProblemDialog" width="60%">
       <el-row>
@@ -207,9 +207,9 @@ export default {
           "/problems/?limit=" +
             this.pagesize +
             "&offset=" +
-            (this.currentpage - 1) * this.pagesize
-            // "&search=" +
-            // this.searchtext
+            (this.currentpage - 1) * this.pagesize +
+            "&search=" +
+            this.searchtext
         )
         .then((response) => {
           for (var i = 0; i < response.data.results.length; i++) {
