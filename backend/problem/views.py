@@ -2,6 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from .models import Problem, TestCase
 from .serializers import ProblemSerializer, TestCaseSerializer, ProblemAdvancedListSerializer
+from rest_framework.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from user import permissions
 
@@ -12,6 +13,7 @@ class ProblemViewSet(ModelViewSet):
     queryset = Problem.objects.all()
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('id','owner', 'level')
+    pagination_class = LimitOffsetPagination
     #serializer_class = ProblemSerializer
 
     def get_serializer_class(self):

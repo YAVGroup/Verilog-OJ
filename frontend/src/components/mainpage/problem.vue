@@ -207,12 +207,12 @@ export default {
           "/problems/?limit=" +
             this.pagesize +
             "&offset=" +
-            (this.currentpage - 1) * this.pagesize +
-            "&search=" +
-            this.searchtext
+            (this.currentpage - 1) * this.pagesize
+            // "&search=" +
+            // this.searchtext
         )
         .then((response) => {
-          for (var i = 0; i < response.data.length; i++) {
+          for (var i = 0; i < response.data.results.length; i++) {
             // mapping = {
             //   1: "Easy",
             //   2: "Medium",
@@ -220,31 +220,31 @@ export default {
             //   4: "VeryHard",
             //   5: "ExtremelyHard"
             // };
-            // response.data[i].level = mapping[response.data[i].level];
+            // response.data.results[i].level = mapping[response.data.results[i].level];
 
-            if (response.data[i].level == "1") response.data[i].level = "Easy";
-            if (response.data[i].level == "2")
-              response.data[i].level = "Medium";
-            if (response.data[i].level == "3") response.data[i].level = "Hard";
-            if (response.data[i].level == "4")
-              response.data[i].level = "VeryHard";
-            if (response.data[i].level == "5")
-              response.data[i].level = "ExtremelyHard";
-            // response.data[i].level = "Easy";
+            if (response.data.results[i].level == "1") response.data.results[i].level = "Easy";
+            if (response.data.results[i].level == "2")
+              response.data.results[i].level = "Medium";
+            if (response.data.results[i].level == "3") response.data.results[i].level = "Hard";
+            if (response.data.results[i].level == "4")
+              response.data.results[i].level = "VeryHard";
+            if (response.data.results[i].level == "5")
+              response.data.results[i].level = "ExtremelyHard";
+            // response.data.results[i].level = "Easy";
 
-            response.data[i].ac = response.data[i].ac_users.length;
-            response.data[i].submitted =
-              response.data[i].submitted_users.length;
-            response.data[i].rate =
-              response.data[i].ac + " / " + response.data[i].submitted;
+            response.data.results[i].ac = response.data.results[i].ac_users.length;
+            response.data.results[i].submitted =
+              response.data.results[i].submitted_users.length;
+            response.data.results[i].rate =
+              response.data.results[i].ac + " / " + response.data.results[i].submitted;
 
-            if (!response.data[i].tags) response.data[i].tags = ["无"];
-            else response.data[i].tags = response.data[i].tags.split("|");
-            // response.data[i].tags = ["无"];
+            if (!response.data.results[i].tags) response.data.results[i].tags = ["无"];
+            else response.data.results[i].tags = response.data.results[i].tags.split("|");
+            // response.data.results[i].tags = ["无"];
           }
 
-          this.tableData = response.data;
-          this.totalproblem = response.data.length;
+          this.tableData = response.data.results;
+          this.totalproblem = response.data.results.length;
         })
         .catch((error) => {
           this.$message.error(
@@ -343,7 +343,7 @@ export default {
 
     // this.$axios.get("/problemtag/").then(response => {
     //   for (var i = 0; i < response.data.length; i++)
-    //     this.tagnames.push(response.data[i]["tagname"]);
+    //     this.tagnames.push(response.data.results[i]["tagname"]);
     // });
   },
 };
