@@ -11,6 +11,7 @@
     "build-report": "vue-cli-service build --report"
   },
   "dependencies": {
+    "@toast-ui/vue-editor": "^3.0.3",
     "axios": "^0.21.1",
     "codemirror": "^5.62.2",
     "core-js": "^3.16.0",
