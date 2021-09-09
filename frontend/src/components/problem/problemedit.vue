@@ -106,12 +106,16 @@
                     type="textarea"
                     v-model="basicInfoForm.description"
                   ></el-input> -->
-                  <el-button @click="editInTuiEditor()">在 TuiEditor 中编辑</el-button>
-                  <div style="display: inline-block; margin-left: 20px;">
-                    描述大小：{{ prettySize(getByteLength(this.basicInfoForm.description)) }}
+                  <el-button @click="editInTuiEditor()"
+                    >在 TuiEditor 中编辑</el-button
+                  >
+                  <div style="display: inline-block; margin-left: 20px">
+                    描述大小：{{
+                      prettySize(getByteLength(this.basicInfoForm.description))
+                    }}
                   </div>
                 </el-form-item>
-                
+
                 <el-form-item label="输入格式描述" prop="description_input">
                   <el-input
                     type="textarea"
@@ -143,8 +147,6 @@
                 </el-form-item>
               </el-form>
 
-
-
               <!-- Sample waveform preview -->
               <el-dialog
                 title="示例波形预览"
@@ -173,7 +175,7 @@
                 width="60%"
               >
                 <tuiEditor
-                  ref="toastuiEditor" 
+                  ref="toastuiEditor"
                   :initialValue="basicInfoForm.description"
                   :options="tuiEditorDefaultOptions"
                   height="600px"
@@ -182,9 +184,7 @@
                 />
 
                 <span slot="footer" class="dialog-footer">
-                  <el-button
-                    type="primary"
-                    @click="closeTuiEditor()"
+                  <el-button type="primary" @click="closeTuiEditor()"
                     >关闭</el-button
                   >
                 </span>
@@ -393,8 +393,8 @@ import "vue-datetime/dist/vue-datetime.css";
 import { mapState } from "vuex";
 import Userhyperlink from "../utils/userhyperlink.vue";
 
-import { Editor } from '@toast-ui/vue-editor';
-import '@toast-ui/editor/dist/toastui-editor.css';
+import { Editor } from "@toast-ui/vue-editor";
+import "@toast-ui/editor/dist/toastui-editor.css";
 
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
@@ -409,7 +409,7 @@ export default {
   components: {
     codemirror,
     wavedrom,
-    tuiEditor: Editor
+    tuiEditor: Editor,
   },
   data() {
     return {
@@ -501,19 +501,19 @@ export default {
       waveformPreviewDialogVisible: false,
       tuiEditorDialogVisible: false,
       tuiEditorDefaultOptions: {
-        minHeight: '200px',
-        language: 'en-US',
+        minHeight: "200px",
+        language: "en-US",
         useCommandShortcut: true,
         usageStatistics: true,
         hideModeSwitch: false,
         toolbarItems: [
-          ['heading', 'bold', 'italic', 'strike'],
-          ['hr', 'quote'],
-          ['ul', 'ol', 'task', 'indent', 'outdent'],
-          ['table', 'image', 'link'],
-          ['code', 'codeblock'],
-          ['scrollSync'],
-        ]
+          ["heading", "bold", "italic", "strike"],
+          ["hr", "quote"],
+          ["ul", "ol", "task", "indent", "outdent"],
+          ["table", "image", "link"],
+          ["code", "codeblock"],
+          ["scrollSync"],
+        ],
       },
     };
   },
@@ -561,7 +561,7 @@ export default {
       this.tuiEditorDialogVisible = true;
     },
     closeTuiEditor() {
-      let mdData = this.$refs.toastuiEditor.invoke('getMarkdown');
+      let mdData = this.$refs.toastuiEditor.invoke("getMarkdown");
       this.basicInfoForm.description = mdData;
       this.tuiEditorDialogVisible = false;
     },
@@ -569,21 +569,21 @@ export default {
       // https://stackoverflow.com/questions/5515869/string-length-in-bytes-in-javascript/23329386#23329386
       // returns the byte length of an utf8 string
       let s = str.length;
-      for (let i=str.length-1; i>=0; i--) {
+      for (let i = str.length - 1; i >= 0; i--) {
         let code = str.charCodeAt(i);
         if (code > 0x7f && code <= 0x7ff) s++;
-        else if (code > 0x7ff && code <= 0xffff) s+=2;
-        if (code >= 0xDC00 && code <= 0xDFFF) i--; //trail surrogate
+        else if (code > 0x7ff && code <= 0xffff) s += 2;
+        if (code >= 0xdc00 && code <= 0xdfff) i--; //trail surrogate
       }
       return s;
     },
     prettySize(size) {
-      let unit = 'B';
-        let units = [ 'B', 'KiB', 'MiB', 'GiB', 'TiB' ];
-        while ( (unit = units.shift()) && size > 1024 ) {
-            size = size / 1024;
-        }
-        return (unit === 'B' ? size : size.toFixed(2)) + ' ' + unit;
+      let unit = "B";
+      let units = ["B", "KiB", "MiB", "GiB", "TiB"];
+      while ((unit = units.shift()) && size > 1024) {
+        size = size / 1024;
+      }
+      return (unit === "B" ? size : size.toFixed(2)) + " " + unit;
     },
     waveformPreview() {
       this.waveformPreviewDialogVisible = true;
@@ -780,9 +780,10 @@ export default {
               let fileInst = this.judgeWorkspaceAddFile(
                 this.judgeInfoHierarchy[0].children[0]
               );
-              fileInst.fileName = this.judgeWorkspaceTemplates[
-                templateName
-              ].content.template_code_file;
+              fileInst.fileName =
+                this.judgeWorkspaceTemplates[
+                  templateName
+                ].content.template_code_file;
               fileInst.content = response.data;
             }),
             // judge_files
@@ -1034,7 +1035,7 @@ export default {
         testcasePreparation,
         ...testcasePromises,
       ]).then((arrayOfResults) => {
-          return problemID;
+        return problemID;
       });
     },
     submitAll() {
@@ -1061,7 +1062,7 @@ export default {
                 this.$message.success("提交成功！");
                 this.$router.push({
                   name: "problemdetail",
-                  params: { problemid: problemID }
+                  params: { problemid: problemID },
                 });
               });
           },
