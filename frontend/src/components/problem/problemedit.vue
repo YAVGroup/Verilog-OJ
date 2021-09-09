@@ -173,6 +173,7 @@
                 title="题目描述编辑 (TuiEditor)"
                 :visible.sync="tuiEditorDialogVisible"
                 width="60%"
+                @close="closeTuiEditor"
               >
                 <tuiEditor
                   ref="toastuiEditor"
