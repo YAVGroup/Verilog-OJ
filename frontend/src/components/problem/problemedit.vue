@@ -872,7 +872,7 @@ export default {
           });
       } else {
         return this.$axios
-          .post("/problems/", {
+          .post("/addproblem", {
             ...basicInfo,
           })
           .then((response) => {
