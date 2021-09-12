@@ -30,7 +30,7 @@
                       size="medium"
                       icon="el-icon-edit"
                       @click="problemEdit"
-                      :disabled="!(loggedIn && userID == owner)"
+                      :disabled="!(loggedIn && (userID == owner || isSuperUser))"
                     ></el-button>
                     <el-button
                       plain
@@ -38,7 +38,7 @@
                       size="medium"
                       icon="el-icon-delete"
                       @click="problemDelete"
-                      :disabled="!(loggedIn && userID == owner)"
+                      :disabled="!(loggedIn && (userID == owner || isSuperUser))"
                     ></el-button>
                   </el-button-group>
                 </div>

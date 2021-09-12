@@ -1092,7 +1092,7 @@ export default {
             level: problem.level,
             tags:
               problem.tags.split("|").length == 1
-                ? []
+                ? [problem.tags]
                 : problem.tags.split("|"),
           };
 
