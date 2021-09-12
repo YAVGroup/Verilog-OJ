@@ -8,12 +8,12 @@ from .serializers import ProblemSerializer, TestCaseSerializer, ProblemAdvancedL
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from user import permissions
 
 class ProblemView(APIView):
     "提交题目"
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)
     
     def post(self, request, *args):
         self.check_permissions(request)
