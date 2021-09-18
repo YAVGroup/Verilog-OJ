@@ -1,4 +1,4 @@
-import subprocess, datetime
+import subprocess, datetime, json
 import tempfile, os, shutil, logging, traceback
 import judge.executor.annotated_subprocess as asubprocess
 
@@ -55,12 +55,36 @@ class DockerExecutor(BaseExecutor):
         logger.info(f"Called with {cmd}")
         return subprocess.check_output(cmd, shell=True).decode().strip()
 
+    def check_alive(self, child_docker_id):
+        cmd = f"docker inspect {child_docker_id}"
+        logger.info(f"Check alive with {cmd}")
+        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        out_cmd, _ = process.communicate()
+
+        json_obj = json.loads(out_cmd)
+        if len(json_obj) == 0:
+            logger.info(f"{child_docker_id} is no longer alive")
+            return False
+        else:
+            logger.info(f"{child_docker_id} is still alive")
+            return True
+        
+
     def start_docker(self, child_docker_id, timeout):
         """Returns the timestamped aggregate log"""
         cmd = f"timeout -s 9 {timeout} docker start -i {child_docker_id}"
         logger.info(f"Called with {cmd}")
         process = asubprocess.Popen(cmd, shell=True)
-        return process.communicate()
+        annotated_log = process.communicate()
+        
+        is_alive = self.check_alive(child_docker_id)
+        if is_alive:
+            cmd = f"docker kill {child_docker_id}"
+            logger.info(f"Kill running docker with {cmd}")
+            process = subprocess.Popen(cmd, shell=True)
+            process.communicate()
+        
+        return annotated_log
 
     def prepare(self):
         self.move_status("JUDGING")
