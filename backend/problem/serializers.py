@@ -12,7 +12,7 @@ class TestCaseSerializer(serializers.ModelSerializer):
 class ProblemListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Problem
-        fields = ['id', 'name', 'create_time', 'deadline_time', 'level', 'tags']
+        fields = ['id', 'logic_id', 'name', 'create_time', 'deadline_time', 'level', 'tags']
 
 class ProblemAdvancedListSerializer(serializers.ModelSerializer):
     total_grade = serializers.IntegerField(source='get_total_grade', read_only=True)
@@ -20,7 +20,7 @@ class ProblemAdvancedListSerializer(serializers.ModelSerializer):
     ac_users = serializers.ListField(source='get_ac_users', read_only=True)
     class Meta:
         model = Problem
-        fields = ['id', 'name', 'create_time', 'deadline_time', 'level', 'tags',
+        fields = ['id', 'logic_id', 'name', 'create_time', 'deadline_time', 'level', 'tags',
             'total_grade', 'submitted_users', 'ac_users']
 
 class ProblemSerializer(serializers.ModelSerializer):
