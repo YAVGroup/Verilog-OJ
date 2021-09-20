@@ -50,7 +50,9 @@ export default {
       this.jumpToProblem(item.id);
     },
     prettyName: function (i) {
-      return String(this.allProblems[i].id) + " | " + this.allProblems[i].name;
+      let prettyId = this.allProblems[i].logic_id != null ? 
+                    String(this.allProblems[i].logic_id) : "N/A";
+      return prettyId + " | " + this.allProblems[i].name;
     },
     getAdvice: function (prefix) {
       let ret = [];
@@ -63,8 +65,10 @@ export default {
       }
 
       for (let i = 0; i < this.allProblems.length; i++) {
+        let prettyId = this.allProblems[i].logic_id != null ? 
+            String(this.allProblems[i].logic_id) : "N/A";
         let suggestions = [
-          String(this.allProblems[i].id),
+          prettyId,
           this.allProblems[i].name,
         ];
         for (let j = 0; j < suggestions.length; j++) {
@@ -87,6 +91,7 @@ export default {
           for (let i = 0; i < allDataLen; i++) {
             this.allProblems[i] = {
               id: response.data[i].id,
+              logic_id: response.data[i].logic_id,
               name: response.data[i].name,
             };
           }

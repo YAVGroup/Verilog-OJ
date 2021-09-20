@@ -31,12 +31,12 @@ class ProblemView(APIView):
             return Response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
 class ProblemViewSet(ModelViewSet):
     """
     获取和修改题目信息
     """
-    queryset = Problem.objects.all()
+    queryset = Problem.objects.all().order_by('logic_id')
+
     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
     filter_fields = ('id','owner', 'level')
     search_fields = ('name', 'level', 'tags')

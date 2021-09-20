@@ -32,7 +32,7 @@
           @cell-click="problemclick"
           size="medium"
         >
-          <el-table-column prop="id" label="ID" :width="50"></el-table-column>
+          <el-table-column prop="logic_id" label="ID" :width="50"></el-table-column>
           <el-table-column prop="name" label="题名"></el-table-column>
           <el-table-column prop="level" label="难度" :width="100">
             <template slot-scope="scope1">

@@ -3,8 +3,10 @@ from user.models import User
 from file.models import File
 
 DEFAULT_USER_ID = 1
+
 class Problem(models.Model):
-    id = models.AutoField(primary_key=True, help_text='题目ID')
+    id = models.AutoField(primary_key=True)
+    logic_id = models.IntegerField(null=True, help_text='题目ID')
     name = models.CharField(max_length=20, help_text='题目名字')
     create_time = models.DateTimeField(auto_now_add=True, help_text='题目的创建时间')
     deadline_time = models.DateTimeField(null=True, blank=True, help_text='题目的截止时间')
