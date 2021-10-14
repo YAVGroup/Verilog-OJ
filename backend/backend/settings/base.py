@@ -155,4 +155,4 @@ WEBPATH_PREFIX = 'oj/'
 
 # CAS Related
 USTC_CAS_URL = 'https://passport.ustc.edu.cn'
-USTC_CAS_APP_LOGIN_URL = 'https://vlab.ustc.edu.cn{}'
+USTC_CAS_APP_LOGIN_URL = 'https://verilogoj.ustc.edu.cn{}'
