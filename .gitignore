@@ -20,3 +20,6 @@ backend/storage
 
 # backend static file
 backend/static
+
+# backup files
+maintenance/backup-files-volume-*.tar
