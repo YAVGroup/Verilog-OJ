@@ -24,7 +24,7 @@ class User(AbstractUser):
         
         submitted_problems = set()
         for submission in self.get_submissions():
-            submitted_problems.add(submission.problem.id)
+            submitted_problems.add(submission.problem.logic_id)
         return list(submitted_problems)
     
     def get_ac_problems(self):
@@ -34,7 +34,7 @@ class User(AbstractUser):
         ac_problems = set()
         for submission in self.get_submissions():
             if submission.is_ac():
-                ac_problems.add(submission.problem.id)
+                ac_problems.add(submission.problem.logic_id)
         return list(ac_problems)
 
     def get_ac_submission(self):
@@ -45,7 +45,7 @@ class User(AbstractUser):
         for submission in self.get_submissions():
             if submission.is_ac() and submission.problem.id not in ac_problems:
                 ac_submission.add(submission.id)
-                ac_problems.add(submission.problem.id)
+                ac_problems.add(submission.problem.logic_id)
         return list(ac_submission)
     
     def get_total_score(self):
