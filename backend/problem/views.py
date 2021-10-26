@@ -38,7 +38,7 @@ class ProblemViewSet(ModelViewSet):
     queryset = Problem.objects.all().order_by('logic_id')
 
     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
-    filter_fields = ('id','owner', 'level')
+    filter_fields = ('id','logic_id','owner', 'level')
     search_fields = ('name', 'level', 'tags')
     pagination_class = LimitOffsetPagination
     #serializer_class = ProblemSerializer
