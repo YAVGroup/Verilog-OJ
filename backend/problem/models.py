@@ -1,6 +1,7 @@
 from django.db import models
 from user.models import User
 from file.models import File
+from django.db.models import F
 
 DEFAULT_USER_ID = 1
 
@@ -42,21 +43,17 @@ class Problem(models.Model):
     def get_submitted_users(self):
         "获得提交了该题目的用户（仅id）"
         from submission.models import Submission
-        submissions = Submission.objects.filter(problem=self)
-        users = set()
-        for submission in submissions:
-            users.add(submission.user.id)
-        return list(users)
+        user_ids = Submission.objects.filter(problem=self).values('user').distinct().values('id')
+
+        return user_ids
     
     def get_ac_users(self):
         "获得AC了该题目的用户（仅id）"
-        from submission.models import Submission
-        submissions = Submission.objects.filter(problem=self)
-        users = set()
-        for submission in submissions:
-            if submission.is_ac():
-                users.add(submission.user.id)
-        return list(users)
+        from submission.models import Submission, SubmissionResult
+        success_id = SubmissionResult.objects.filter(possible_failure="NONE").values('submission').values('id')
+        user_ids = Submission.objects.filter(problem=self).filter(id__in=success_id).values('user').distinct().values('id')
+        
+        return user_ids
     
     def get_submissions(self):
         "获得所有提交"
