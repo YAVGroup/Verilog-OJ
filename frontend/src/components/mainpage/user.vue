@@ -72,11 +72,15 @@ export default {
   },
   methods: {
     problemclick(id) {
-      console.log("problemclick " + id);
-      this.$router.push({
-        name: "problemdetail",
-        params: { problemid: id },
-      });
+      this.$axios.get(
+          "/problems/" +
+            "/?logic_id=" + id 
+        ).then((response) => {
+          var problem_id = response.data[0].id
+          this.$router.push({
+            name: "problemdetail",
+            params: { problemid: problem_id },
+        })})
     },
     updateUserInfo: function () {
       // if (this.userid) {
