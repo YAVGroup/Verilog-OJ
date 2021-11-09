@@ -14,7 +14,8 @@ class UserSerializer(serializers.ModelSerializer):
     submitted_problems = serializers.ListField(source='get_submitted_problems', read_only=True)
     ac_problems = serializers.ListField(source='get_ac_problems', read_only=True)
     total_score = serializers.IntegerField(source='get_total_score', read_only=True)
-    
+    undone_problems = serializers.ListField(source='get_undone_problems', read_only=True)
+
     class Meta:
         model = User
         exclude = ['is_staff', 'is_active', 'groups', 'user_permissions'] # 这些字段现在暂时用不上
@@ -28,7 +29,8 @@ class UserPublicSerializer(serializers.ModelSerializer):
     submitted_problems = serializers.ListField(source='get_submitted_problems', read_only=True)
     ac_problems = serializers.ListField(source='get_ac_problems', read_only=True)
     total_score = serializers.IntegerField(source='get_total_score', read_only=True)
-    
+    undone_problems = serializers.ListField(source='get_undone_problems', read_only=True)
+
     class Meta:
         model = User
         exclude = ['password', 'is_staff', 'is_active', 'is_mail_authenticated', 'groups', 'user_permissions']

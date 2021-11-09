@@ -1,9 +1,9 @@
 {
-  "name": "frontend",
-  "version": "3.4.0",
+  "name": "OJfrontend",
+  "version": "1.0.0",
   "private": true,
-  "description": "LPOJ",
-  "author": "LP_Cong <504603913@qq.com>",
+  "description": "frontend of VerilogOJ",
+  "author": "libreliu <libreliu@foxmail.com>",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -15,7 +15,7 @@
     "axios": "^0.21.4",
     "codemirror": "^5.62.3",
     "core-js": "^3.17.2",
-    "element-ui": "~2.12.0",
+    "element-ui": "~2.15.0",
     "html-webpack-plugin": "^3.2.0",
     "js-cookie": "^2.2.1",
     "luxon": "^1.28.0",

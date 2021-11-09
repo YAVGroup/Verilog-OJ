@@ -1,48 +1,62 @@
 <template>
-  <el-card shadow="always" id="card">
-    <center>
-      <h1 :style="color">{{ name }}</h1>
-      <!-- <h1 :style="color">{{ username }}</h1> -->
-      <!-- <h4 :style="color">{{ email }}</h4> -->
-      <h4 :style="color">{{ student_id }}</h4>
-    </center>
-
+  <div>
+    <el-row> &nbsp; </el-row>
     <el-row>
-      <el-col :span="8">
-        <center>
-          <h2 :style="color">Submitted</h2>
-          <h3 :style="color">{{ submitted }}</h3>
-        </center>
+      <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6" class="placeholder">
+        <!-- placeholder only -->
+        &nbsp;
       </el-col>
-      <el-col :span="8">
-        <center>
-          <h2 :style="color">AC</h2>
-          <h3 :style="color">{{ ac }}</h3>
-        </center>
-      </el-col>
-      <el-col :span="8">
-        <center>
-          <h2 :style="color">Score</h2>
-          <h3 :style="color">{{ score }}</h3>
-        </center>
+      <el-col :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
+        <el-card shadow="never">
+          <el-row class="main-title">
+            <i class="el-icon-user"></i>
+            {{ name }} 的主页
+          </el-row>
+          <el-divider></el-divider>
+          <el-descriptions>
+            <el-descriptions-item label="UID">{{ userid }}</el-descriptions-item>
+            <el-descriptions-item label="用户名">{{ username }}</el-descriptions-item>
+            <el-descriptions-item label="姓名">{{ name }}</el-descriptions-item>
+            <el-descriptions-item label="学号">{{student_id}}</el-descriptions-item>
+            <el-descriptions-item label="管理员">{{is_superuser ? "是" : "否"}}</el-descriptions-item>
+            <el-descriptions-item label="总分">{{score}}</el-descriptions-item>
+          </el-descriptions>
+          <el-divider></el-divider>
+          <el-row>
+            {{ name }} 在本站通过了 {{ numACProblems }} 道题目。
+          </el-row>
+          <el-button
+            id="tag"
+            v-for="ac_problem in ac_problems"
+            :key="ac_problem.id"
+            size="small"
+            @click="problemclick(ac_problem.id)"
+            type="success"
+            style="width: 50px"
+            >{{ ac_problem.logic_id }}</el-button
+          >
+          <el-divider></el-divider>
+          <el-row>
+            截至目前，{{ name }} 还有 {{ numUndoneProblems }} 道题目没有做完。
+          </el-row>
+          <el-button
+            id="tag"
+            v-for="undone_problem in undone_problems"
+            :key="undone_problem.id"
+            size="small"
+            @click="problemclick(undone_problem.id)"
+            :type="checkSubmitted(undone_problem.id) ? 'info' : ''"
+            style="width: 50px"
+            >{{ undone_problem.logic_id }}</el-button
+          >
+        </el-card>
+        
+
+
       </el-col>
     </el-row>
+  </div>
 
-    <center>
-      <h2 :style="color">AC Problems</h2>
-      <br />
-    </center>
-    <el-button
-      id="tag"
-      v-for="ac_problem_id in ac_problems"
-      :key="ac_problem_id"
-      size="small"
-      @click="problemclick(ac_problem_id)"
-      type="success"
-      style="width: 70px"
-      >{{ ac_problem_id }}</el-button
-    >
-  </el-card>
 </template>
 
 <script>
@@ -53,17 +67,32 @@ export default {
       username: "",
       name: "",
       student_id: "",
-      ac: "", // AC的题目数
       submitted: "", // 提交的题目数
       score: "", // 提交的题目分数总和
       ac_problems: [], // AC的题目列表
-      color: "",
+      submitted_problems: [],
+      undone_problems: [],
+      is_superuser: false,
     };
   },
   computed: {
     userid: function () {
       return this.$route.params.userid;
     },
+    numACProblems: function () {
+      return this.ac_problems.length;
+    },
+    numUndoneProblems: function () {
+      return this.undone_problems.length;
+    },
+    allSubmittedProblemId: function () {
+      let submittedId = [];
+      for (let i = 0; i < this.submitted_problems.length; i++) {
+        submittedId.push(this.submitted_problems[i].id);
+      }
+
+      return submittedId;
+    }
   },
   watch: {
     userid: function () {
@@ -71,16 +100,14 @@ export default {
     },
   },
   methods: {
+    checkSubmitted(id) {
+      return this.allSubmittedProblemId.includes(id);
+    },
     problemclick(id) {
-      this.$axios.get(
-          "/problems/" +
-            "/?logic_id=" + id 
-        ).then((response) => {
-          var problem_id = response.data[0].id
-          this.$router.push({
-            name: "problemdetail",
-            params: { problemid: problem_id },
-        })})
+      this.$router.push({
+        name: "problemdetail",
+        params: { problemid: id },
+      });
     },
     updateUserInfo: function () {
       // if (this.userid) {
@@ -90,19 +117,17 @@ export default {
           this.username = response.data.username;
           if (response.data.last_name == "" && response.data.first_name == "")
             this.name = this.username;
-          else this.name = response.data.last_name + response.data.first_name;
+          else this.name = response.data.last_name + " " + response.data.first_name;
           this.email = response.data.email;
           if (response.data.student_id == null) this.student_id = "";
           else this.student_id = response.data.student_id;
 
           this.ac_problems = response.data.ac_problems;
-          this.ac = this.ac_problems.length;
-          this.submitted = response.data.submitted_problems.length;
+          this.undone_problems = response.data.undone_problems;
+          this.submitted_problems = response.data.submitted_problems;
           this.score = response.data.total_score;
 
-          if (response.data.is_superuser)
-            this.color = "color: red; font-weight: bold;";
-          else this.color = "color: black; font-weight: bold";
+          this.is_superuser = response.data.is_superuser;
         })
         .catch((error) => {
           this.$message.error(
