@@ -24,3 +24,4 @@ backend/static
 # backup files
 maintenance/backup-files-volume-*.tar
 maintenance/backup-db-volume-*.tar
+maintenance/backup-db-*.sql
