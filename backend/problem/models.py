@@ -43,7 +43,7 @@ class Problem(models.Model):
     def get_submitted_users(self):
         "获得提交了该题目的用户（仅id）"
         from submission.models import Submission
-        user_ids = Submission.objects.filter(problem=self).values('user').distinct().values('id')
+        user_ids = Submission.objects.filter(problem=self).values('user').distinct().values('user_id')
 
         return user_ids
     
@@ -51,7 +51,7 @@ class Problem(models.Model):
         "获得AC了该题目的用户（仅id）"
         from submission.models import Submission, SubmissionResult
         success_id = SubmissionResult.objects.filter(possible_failure="NONE", status="DONE").values('submission').values('id')
-        user_ids = Submission.objects.filter(problem=self, id__in=success_id).values('user').distinct().values('id')
+        user_ids = Submission.objects.filter(problem=self, id__in=success_id).values('user').distinct().values('user_id')
         
         return user_ids
     

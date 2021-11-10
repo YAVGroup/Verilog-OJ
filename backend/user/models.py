@@ -34,7 +34,7 @@ class User(AbstractUser):
         from problem.models import Problem
         from submission.models import Submission, SubmissionResult
         
-        success_id = SubmissionResult.objects.filter(possible_failure="NONE", status="DONE").values('submission').values('id')
+        success_id = SubmissionResult.objects.filter(possible_failure="NONE", status="DONE").values('submission').values('submission_id')
 
         ac_problems_id = Submission.objects.filter(id__in=success_id, user=self.id).values('problem').distinct()
 
@@ -46,7 +46,7 @@ class User(AbstractUser):
         from problem.models import Problem
         from submission.models import Submission, SubmissionResult
 
-        success_id = SubmissionResult.objects.filter(possible_failure="NONE", status="DONE").values('submission').values('id')
+        success_id = SubmissionResult.objects.filter(possible_failure="NONE", status="DONE").values('submission').values('submission_id')
 
         ac_problems_id = Submission.objects.filter(id__in=success_id, user=self.id).values('problem').distinct()
 
