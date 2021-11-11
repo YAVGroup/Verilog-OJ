@@ -23,9 +23,9 @@ class User(AbstractUser):
         from problem.models import Problem
         from submission.models import Submission, SubmissionResult
         
-        submission_id = Submission.objects.filter(user=self.id).values('problem').distinct()
+        submission_id = Submission.objects.filter(user=self.id).values('problem').distinct().values('problem_id')
 
-        submitted_problems = Problem.objects.filter(id__in=submission_id).values('id', 'logic_id', 'name')
+        submitted_problems = Problem.objects.filter(id__in=submission_id).values('id', 'logic_id', 'name').order_by('logic_id')
 
         return submitted_problems
     
@@ -36,9 +36,9 @@ class User(AbstractUser):
         
         success_id = SubmissionResult.objects.filter(possible_failure="NONE", status="DONE").values('submission').values('submission_id')
 
-        ac_problems_id = Submission.objects.filter(id__in=success_id, user=self.id).values('problem').distinct()
+        ac_problems_id = Submission.objects.filter(id__in=success_id, user=self.id).values('problem').distinct().values('problem_id')
 
-        ac_problems = Problem.objects.filter(id__in=ac_problems_id).values('id', 'logic_id', 'name')
+        ac_problems = Problem.objects.filter(id__in=ac_problems_id).values('id', 'logic_id', 'name').order_by('logic_id')
 
         return ac_problems
     
@@ -48,9 +48,9 @@ class User(AbstractUser):
 
         success_id = SubmissionResult.objects.filter(possible_failure="NONE", status="DONE").values('submission').values('submission_id')
 
-        ac_problems_id = Submission.objects.filter(id__in=success_id, user=self.id).values('problem').distinct()
+        ac_problems_id = Submission.objects.filter(id__in=success_id, user=self.id).values('problem').distinct().values('problem_id')
 
-        undone_problems = Problem.objects.exclude(id__in=ac_problems_id).values('id', 'logic_id', 'name')
+        undone_problems = Problem.objects.exclude(id__in=ac_problems_id).values('id', 'logic_id', 'name').order_by('logic_id')
         
         return undone_problems
 
