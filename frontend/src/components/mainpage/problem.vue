@@ -33,6 +33,13 @@
           size="medium"
         >
           <el-table-column prop="logic_id" label="ID" :width="50"></el-table-column>
+          <el-table-column prop="status" label="状态" :width="80">
+            <template slot-scope="scope1">
+                <i v-if="scope1.row.status=='1'" class="el-icon-info" style="color: red"></i>
+                <i v-else-if="scope1.row.status=='2'" class="el-icon-remove"></i>
+                <i v-else class="el-icon-success"  style="color: green"></i>
+            </template>
+          </el-table-column>
           <el-table-column prop="name" label="题名"></el-table-column>
           <el-table-column prop="level" label="难度" :width="100">
             <template slot-scope="scope1">
@@ -156,6 +163,8 @@
 <script>
 //prostatistice;
 // import prostatistice from "@/components/utils/prostatistice";
+import { mapState } from "vuex";
+
 export default {
   components: {
     // prostatistice
@@ -182,6 +191,7 @@ export default {
         "七段数码管",
         "寄存器堆",
       ],
+      test: "A",
       ac: 100,
       mle: 100,
       tle: 100,
@@ -194,15 +204,52 @@ export default {
       currenttag: "",
       searchtext: "",
       addProblemDialog: false,
+      ac_problems: [], // AC的题目列表
+      submitted_problems: [],
+      undone_problems: [],
     };
+  },
+  computed: {
+    ...mapState(["loggedIn", "userID", "username", "isSuperUser"]),
   },
   methods: {
     openCombGuide() {
       this.$router.push({ name: "combGuide" });
     },
+    isInArray: function(arr, value) {
+        for(var i=0; i< arr.length; i++) {
+            if(value === arr[i]["user_id"]) {
+                return true;
+            }
+        }
+        return false;
+    },
     // 重新获取题目列表信息
     refresh() {
-      this.$axios
+    //   this.$axios
+    //     .get("/users/" + this.userID + "/")
+    //     .then((response) => {
+    //       this.username = response.data.username;
+    //       if (response.data.last_name == "" && response.data.first_name == "")
+    //         this.name = this.username;
+    //       else this.name = response.data.last_name + " " + response.data.first_name;
+    //       this.email = response.data.email;
+    //       if (response.data.student_id == null) this.student_id = "";
+    //       else this.student_id = response.data.student_id;
+
+    //       this.ac_problems = response.data.ac_problems;
+    //       this.undone_problems = response.data.undone_problems;
+    //       this.submitted_problems = response.data.submitted_problems;
+    //       this.score = response.data.total_score;
+
+    //       this.is_superuser = response.data.is_superuser;
+    //     })
+    //     .catch((error) => {
+    //       this.$message.error(
+    //         "服务器错误：" + JSON.stringify(error.response.data)
+    //       );
+    //     });
+        this.$axios
         .get(
           "/problems/?limit=" +
             this.pagesize +
@@ -221,7 +268,14 @@ export default {
             //   5: "ExtremelyHard"
             // };
             // response.data.results[i].level = mapping[response.data.results[i].level];
-
+            if (this.isInArray(response.data.results[i].ac_users, this.userID)) {
+                response.data.results[i].status = 1;
+            } else if (this.isInArray(response.data.results[i].submitted_users, this.userID)) {
+                response.data.results[i].status = 2;
+            } else {
+                response.data.results[i].status = 3;
+            }
+            // response.data.results[i].status = response.data.results[i].level;
             if (response.data.results[i].level == "1") response.data.results[i].level = "Easy";
             if (response.data.results[i].level == "2")
               response.data.results[i].level = "Medium";
