@@ -88,10 +88,39 @@ class VcdComparator:
         
         # Since value change dump theoretically only generates data when changes
         # so direct diffing should work
-        for i, val in enumerate(ref['data']):
-            if ud['data'][i] != val:
+        index_ref = 0
+        index_ud = 0
+        time1 = 0
+        time2 = 0
+        val1 = ref['data'][0][1]
+        val2 = ud['data'][0][1]
+
+        while (index_ref+1) <= len(ref['data']) or (index_ud+1) <= len(ud['data']):
+            time1 = ref['data'][index_ref][0]
+            time2 = ud['data'][index_ud][0]
+            if time1 < time2:
+                val1 = ref['data'][index_ref][1]
+            elif time1 > time2:
+                val2 = ud['data'][index_ud][1]
+            else:
+                val1 = ref['data'][index_ref][1]
+                val2 = ud['data'][index_ud][1]
+
+            if val1 != val2:
                 raise VcdSignalComparationError("Signal {} have difference on time {} (ref={}, ud={})".format(
-                    ref['name'], val[0], val, ud['data'][i]))
+                    ref['name'], time1, ref['data'][index_ref], ud['data'][index_ud]))
+
+            if time1 < time2:
+                index_ref += 1
+            elif time1 == time2:
+                index_ref += 1
+                index_ud += 1
+            else:
+                index_ud += 1
+
+        if time1 != time2:
+            raise VcdSignalComparationError("Signal {} have difference on time {} (ref={}, ud={})".format(
+                ref['name'], time1, ref['data'][index_ref], ud['data'][index_ud]))  
 
     def dump_hierarchy(self, data_obj):
         # TODO: only dump names
@@ -206,7 +235,8 @@ class VcdConverter:
                 else:
                     new_wave = self.parseValue(sig_inst['data'][cur_step_ptr][1])
                     if new_wave == cur_wave:
-                        waves[i] += "."
+                        for i in range(0, width):
+                            waves[i] += "."
                     else:
                         # do bitwise comparation
                         if cur_wave == "SOMETHING_NEVER_HAPPEN":
@@ -275,7 +305,8 @@ class VcdConverter:
                 else:
                     new_wave = self.parseValue(sig_inst['data'][cur_step_ptr][1])
                     if new_wave == cur_wave:
-                        waves[i] += "."
+                        for i in range(0, width):
+                            waves[i] += "."
                     else:
                         # do bitwise comparation
                         if cur_wave == "SOMETHING_NEVER_HAPPEN":
