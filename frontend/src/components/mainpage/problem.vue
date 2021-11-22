@@ -171,7 +171,6 @@ export default {
   },
   data() {
     return {
-      currentpage: 1,
       pagesize: 15,
       totalproblem: 10,
       tableData: [],
@@ -206,6 +205,9 @@ export default {
 
     };
   },
+  created() {
+      this.currentpage = this.$route.params.pageid;
+  },
   computed: {
     ...mapState(["loggedIn", "userID", "username", "isSuperUser"]),
   },
@@ -223,6 +225,8 @@ export default {
     },
     // 重新获取题目列表信息
     refresh() {
+        this.currentpage = this.$route.params.pageid;
+
         this.$axios
         .get(
           "/problems/?limit=" +
@@ -243,11 +247,11 @@ export default {
             // };
             // response.data.results[i].level = mapping[response.data.results[i].level];
             if (this.isInArray(response.data.results[i].ac_users, this.userID)) {
-                response.data.results[i].status = 1;
-            } else if (this.isInArray(response.data.results[i].submitted_users, this.userID)) {
-                response.data.results[i].status = 2;
-            } else {
                 response.data.results[i].status = 3;
+            } else if (this.isInArray(response.data.results[i].submitted_users, this.userID)) {
+                response.data.results[i].status = 1;
+            } else {
+                response.data.results[i].status = 2;
             }
             // response.data.results[i].status = response.data.results[i].level;
             if (response.data.results[i].level == "1") response.data.results[i].level = "Easy";
@@ -289,7 +293,10 @@ export default {
       });
     },
     searchtitle() {
-      this.currentpage = 1;
+      this.$router.push({
+        name: "problem",
+        params: { pageid: 1 },
+      });
       this.refresh();
     },
     tagclick(name) {
@@ -310,7 +317,11 @@ export default {
         this.currenttag = li.join("+");
       }
       this.searchtext = this.currenttag;
-      this.currentpage = 1;
+      this.currentpage = 0;
+      this.$router.push({
+        name: "problem",
+        params: { pageid: 1 },
+      });
       this.refresh();
     },
     handleSizeChange(val) {
@@ -318,7 +329,10 @@ export default {
       this.refresh();
     },
     handleCurrentChange(val) {
-      this.currentpage = val;
+      this.$router.push({
+        name: "problem",
+        params: { pageid: val },
+      });
       this.refresh();
     },
     tableRowClassName({ row, rowIndex }) {

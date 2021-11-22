@@ -57,7 +57,7 @@ export default new Router({
 
     // 题目列表和题目细节
     {
-      path: "/problem",
+      path: "/problempage/:pageid",
       name: "problem",
       component: () =>
         import(

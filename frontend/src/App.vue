@@ -10,7 +10,7 @@
       <el-menu-item index="/">
         <i class="el-icon-star-off"></i>Home</el-menu-item
       >
-      <el-menu-item index="/problem">
+      <el-menu-item index="/problempage/1">
         <i class="el-icon-menu"></i>Problem</el-menu-item
       >
       <el-menu-item index="/statue">
