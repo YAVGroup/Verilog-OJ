@@ -246,9 +246,9 @@ export default {
             //   5: "ExtremelyHard"
             // };
             // response.data.results[i].level = mapping[response.data.results[i].level];
-            if (this.isInArray(response.data.results[i].ac_users, this.userID)) {
+            if (this.loggedIn && this.isInArray(response.data.results[i].ac_users, this.userID)) {
                 response.data.results[i].status = 3;
-            } else if (this.isInArray(response.data.results[i].submitted_users, this.userID)) {
+            } else if (this.loggedIn && this.isInArray(response.data.results[i].submitted_users, this.userID)) {
                 response.data.results[i].status = 1;
             } else {
                 response.data.results[i].status = 2;
