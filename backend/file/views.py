@@ -1,11 +1,13 @@
 from django.http import FileResponse
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser,IsAuthenticated
 from judge.judger_auth import IsJudger
 
 from .models import File
 from .serializers import FileSerializer
+from .permissions import  IsOwnerOrReadOnly
+
 
 class FileViewSet(GenericViewSet, CreateModelMixin, ListModelMixin):
     """
@@ -13,14 +15,21 @@ class FileViewSet(GenericViewSet, CreateModelMixin, ListModelMixin):
     """
     queryset = File.objects.all()
     serializer_class = FileSerializer
+    # permission_classes = (IsOwnerOrReadOnly | IsJudger,)
+
+    # permission_classes = [IsOwnerOrReadOnly | IsJudger, ] 
+
     
     def retrieve(self, request, *args, **kwargs):
         # 重写了GET文件，此时可以直接
-        instance = self.get_object()
+        self.permission_classes = ( IsOwnerOrReadOnly | IsJudger,)
+
+        instance = self.get_object()        
         file_handle = instance.file.open()
         response = FileResponse(file_handle)
         response['Content-Length'] = instance.file.size
         response['Content-Disposition'] = 'attachment; filename="%s"' % instance.name
+
         return response
     
     def list(self, request, *args, **kwargs):
