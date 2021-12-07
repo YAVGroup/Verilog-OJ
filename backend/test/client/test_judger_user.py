@@ -247,7 +247,7 @@ class JudgerAPITester(django.test.TestCase):
         self.assertContains(resp, "/oj/api/submission-results/", status_code=200)
 
         resp = c.post('/oj/api/submission-results/1/')
-        self.assertContains(resp, "detail", status_code=403)
+        self.assertContains(resp, "detail", status_code=405)
 
     def test_submission_get_user_test(self):
     # 测试查看提交信息
