@@ -22,5 +22,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
                 return True
             else:
                 return False
+        elif obj.name == "code_ref.v":
+            return False
         else:
             return True
