@@ -1,7 +1,7 @@
 from django.http import FileResponse
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.permissions import IsAdminUser,IsAuthenticated
+from user.permissions import IsAdminUser
 from judge.judger_auth import IsJudger
 
 from .models import File
@@ -22,7 +22,7 @@ class FileViewSet(GenericViewSet, CreateModelMixin, ListModelMixin):
     
     def retrieve(self, request, *args, **kwargs):
         # 重写了GET文件，此时可以直接
-        self.permission_classes = ( IsOwnerOrReadOnly | IsJudger,)
+        self.permission_classes = (  IsOwnerOrReadOnly | IsJudger | IsAdminUser,)
 
         instance = self.get_object()        
         file_handle = instance.file.open()

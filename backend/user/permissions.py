@@ -19,3 +19,11 @@ class OthersGetOnlyPermission(BasePermission):
             return True
         else:
             return request.user and (request.user == obj or request.user.is_superuser)
+
+class IsAdminUser(BasePermission):
+    """
+        是否有admin页面权限
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return bool(request.user and request.user.is_staff)
