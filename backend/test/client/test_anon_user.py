@@ -102,7 +102,7 @@ class AnonUserAPITester(django.test.TestCase):
         resp = c.post('/oj/api/submission-results/',
             {"grade": 1, "log":"asdf", "app_data":"asdf", "submission": 1, "testcase": 1, "possible_failure": "NA"})
 
-        self.assertEqual(resp.status_code, 401)
+        self.assertEqual(resp.status_code, 405)
 
     def test_problem_get(self):
         c = APIClient()
