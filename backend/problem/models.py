@@ -50,7 +50,7 @@ class Problem(models.Model):
     def get_ac_users(self):
         "获得AC了该题目的用户（仅id）"
         from submission.models import Submission, SubmissionResult
-        success_id = SubmissionResult.objects.filter(possible_failure="NONE", status="DONE").values('submission').values('id')
+        success_id = SubmissionResult.objects.filter(possible_failure="NONE", status="DONE").values('submission').values('submission_id')
         user_ids = Submission.objects.filter(problem=self, id__in=success_id).values('user').distinct().values('user_id')
         
         return user_ids
