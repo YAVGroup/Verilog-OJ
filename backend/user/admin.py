@@ -3,48 +3,71 @@ from .models import User
 from django.http import HttpResponse
 import io, csv
 from submission.models import Submission, SubmissionResult
-
+from problem.models import Problem
+from django.utils import timezone
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username','student_id', 'problem_count', 'ac_count','total_score')
+    list_display = ('username','student_id', 'problems_done', 'ac_problems_count','total_score')
     actions = ['export_csv']
     
-    def problem_count(self,obj):
+    def problems_done(self,obj):
         return len(obj.get_submitted_problems())
 
-    def ac_count(self,obj):
+    def ac_problems_count(self,obj):
         return len(obj.get_ac_problems())
 
     def total_score(self, obj):
         return obj.get_total_score()
 
 
-    def export_csv(self,request,queryset):
-        usr_all = []
-
-        for user_info in queryset:
-            usr = {}
-            usr['student_id'] = user_info.student_id
-            usr['username'] = user_info.username
-
-            user_ac = user_info.get_ac_submission()
-            if len(user_ac) > 0:
-                for p_inst in user_ac:
-                    submit = Submission.objects.filter(id = p_inst)
-                    usr[submit[0].problem.name] = submit[0].get_total_grade()
-            usr_all.append(usr)
-                
+    def export_csv(self, request, queryset):
         writer = io.StringIO()
         csv_writer = csv.writer(writer)
-        for row in usr_all:
+        total_problems = Problem.objects.all().count()
+        time_now = str(timezone.now())
+
+        # csv_writer.writerow(
+        #     [
+        #         f"Exported at {time_now} with {total_problems} problem(s) in database",
+        #         "",
+        #         "",
+        #         "",
+        #         "",
+        #         ""
+        #     ]
+        # )
+
+        csv_writer.writerow(
+            [
+                "Username",
+                "USTC-CAS ID",
+                "# of problems submitted",
+                "# of problems undone",
+                "# of problems accepted",
+                "Total score"
+            ]
+        )
+
+        for user in queryset:
+            user_ac = user.get_ac_problems()
+            user_undone = user.get_undone_problems()
+            user_submitted = user.get_submitted_problems()
+            
             csv_writer.writerow(
                 [
-                    row['student_id'] if row['student_id'] != None else "N/A",
-                    row['username']
+                    user.username,
+                    user.student_id,
+                    user_submitted.count(),
+                    user_undone.count(),
+                    user_ac.count(),
+                    user.get_total_score()
                 ]
             )
         
-        response = HttpResponse(content_type="text/plain")
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={'Content-Disposition': f'attachment; filename="{time_now}_{total_problems}probs.csv"'}    
+        )
         response.write(writer.getvalue())
         return response
 

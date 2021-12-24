@@ -67,10 +67,31 @@ class User(AbstractUser):
     
     def get_total_score(self):
         "获得该用户提交的所有题目最大分数总和"
-        from submission.models import Submission, SubmissionResult
+        # from submission.models import Submission, SubmissionResult
         
-        scores = {}
-        for submission in self.get_submissions():
-            if submission.problem not in scores or submission.get_total_grade() > scores[submission.problem]:
-                scores[submission.problem] = submission.get_total_grade()
-        return sum(scores.values())
+        # scores = {}
+        # for submission in self.get_submissions():
+        #     if submission.problem not in scores or submission.get_total_grade() > scores[submission.problem]:
+        #         scores[submission.problem] = submission.get_total_grade()
+        # return sum(scores.values())
+
+        from problem.models import Problem
+        from submission.models import Submission, SubmissionResult
+        from django.db.models import Min, Sum
+        
+        # submission objects that are not succeed
+        failed_id = SubmissionResult.objects.exclude(possible_failure="NONE", status="DONE").values('submission_id')
+
+        # submission objects that shoule be successful, provided following intergrity requirements met 
+        # NOTE: in multiple-testcase ones, testcase-submissionresult relations are implicitly assumed
+        # So TODO: add integrity check for this
+        success_id = Submission.objects.exclude(id__in=failed_id).values('id')
+
+        # Submissions that are successful & has minimal id for one problem
+        # 'SELECT MIN(`submission_submission`.`id`) AS `id__min` FROM `submission_submission` WHERE (`submission_submission`.`id` IN (SELECT V0.`id` FROM `submission_submission` V0 WHERE NOT (V0.`id` IN (SELECT U0.`submission_id` FROM `submission_submissionresult` U0 WHERE NOT (U0.`possible_failure` = NONE AND U0.`status` = DONE)))) AND `submission_submission`.`user_id` = 1) GROUP BY `submission_submission`.`problem_id` ORDER BY NULL'
+        success_submission_id = Submission.objects.filter(id__in=success_id, user=self.id).values('problem').annotate(Min('id')).values("id__min")
+
+        # all grades aggregated for all submissions above
+        total_grades = SubmissionResult.objects.filter(submission_id__in=success_submission_id).aggregate(Sum('grade'))
+        
+        return total_grades['grade__sum']

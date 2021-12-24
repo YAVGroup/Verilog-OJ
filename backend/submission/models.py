@@ -48,6 +48,12 @@ class Submission(models.Model):
             if result.get_result() != 'Accepted':
                 return result.get_result() + ' at testcase #%d' % i
         return 'Accepted'
+    
+    def check_integrity(self):
+        """Check if it's sane; NEED TO MAKE SURE NO ONE'S SUBMITTING to get accurate result"""
+        result_count = SubmissionResult.objects.filter(submission=self).count()
+        testcase_count = self.problem.get_testcases().count()
+        return (result_count == testcase_count, result_count, testcase_count)
 
 class SubmissionResult(models.Model):
     id = models.AutoField(primary_key=True, help_text='提交结果ID')
