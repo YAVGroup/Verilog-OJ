@@ -287,6 +287,7 @@ export default {
     return {
       cmOptions: {
         tabSize: 4,
+        indentUnit: 4,
         mode: "verilog",
         theme: "base16-light",
         lineNumbers: true,
