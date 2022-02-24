@@ -97,6 +97,26 @@ export default new Router({
         ),
     },
 
+    // 讨论区
+    {
+      path: "/discussion/:problemid",
+      name: "discussion",
+      component: () =>
+        import(
+          /* webpackChunkName: "problem" */
+          "@/components/mainpage/discussion"
+        ),
+    },
+    {
+      path: "/topic/:topicid",
+      name: "topic",
+      component: () =>
+        import(
+          /* webpackChunkName: "problem" */
+          "@/components/mainpage/topic"
+        ),
+    },
+
     // 提交列表和提交细节
     {
       path: "/statue",
