@@ -214,7 +214,7 @@
                 :data="submissions"
                 style="width: 100%"
                 :row-class-name="tableRowClassName"
-                @row-click="rowClick"
+                @row-click="submissionClick"
                 v-loading="!loggedIn"
                 element-loading-text="登陆以查看本题提交记录"
                 element-loading-spinner="el-icon-info"
@@ -239,6 +239,53 @@
                     </el-tag>
                   </template> -->
                 </el-table-column>
+              </el-table>
+            </el-card>
+          </el-row>
+          <!--评论区-->
+          <el-row>
+            <el-card shadow="never">
+              <div
+                style="
+                  box-sizing: border-box;
+                  padding-bottom: 8px;
+                  display: inline-block;
+                "
+              >
+                <el-button @click="problemDiscuss" type="text">讨论区</el-button>
+              </div>
+              <el-button
+                size="mini"
+                @click="topicsRefresh"
+                style="float: right"
+                :disabled="!loggedIn"
+                >刷新</el-button
+              >
+              <el-table
+                :default-sort="{ prop: 'updatetime', order: 'descending' }"
+                :data="topics"
+                style="width: 100%"
+                :row-class-name="tableRowClassName"
+                @row-click="commentClick"
+                v-loading="!loggedIn"
+                element-loading-text="登陆以查看本题评论"
+                element-loading-spinner="el-icon-info"
+                size="mini"
+              >
+                <el-table-column
+                  prop="user_belong.username"
+                  label="用户"
+                  :width="60"
+                ></el-table-column>
+                <el-table-column
+                  prop="title"
+                  label="主题"
+                ></el-table-column>
+                <el-table-column
+                  prop="updatetime"
+                  label="最后更新时间"
+                  :width="100"
+                ></el-table-column>
               </el-table>
             </el-card>
           </el-row>
@@ -307,6 +354,7 @@ export default {
 
       code: "",
       submissions: [],
+      topics: [],
 
       waveform: "",
     };
@@ -357,7 +405,10 @@ export default {
         this.title = response.data.name;
         this.level = response.data.level;
 
-        if (this.loggedIn) this.submissionsRefresh();
+        if (this.loggedIn) {
+          this.submissionsRefresh();
+          this.topicsRefresh();
+        }
       })
       .catch((error) => {
         this.$message.error(
@@ -416,10 +467,17 @@ export default {
       return false;
     },
 
-    rowClick(row, col, e) {
+    submissionClick(row, col, e) {
       this.$router.push({
         name: "submission",
         params: { submissionid: row.id },
+      });
+    },
+
+    commentClick(row, col, e) {
+      this.$router.push({
+        name: "topic",
+        params: { topicid: row.id },
       });
     },
 
@@ -437,6 +495,23 @@ export default {
             );
           }
           this.submissions = response.data;
+        });
+    },
+
+    topicsRefresh() {
+      if (!this.loggedIn) {
+        this.$message.error("请登陆后查看评论！");
+        return;
+      }
+      this.$axios
+        .get("/topic/?problem=" + this.id)
+        .then((response) => {
+          for (var i = 0; i < response.data.length; i++) {
+            response.data[i].updatetime = moment(
+              response.data[i].update_time
+            ).format("YYYY-MM-DD");
+          }
+          this.topics = response.data;
         });
     },
 
@@ -486,6 +561,13 @@ export default {
             message: "已取消删除",
           });
         });
+    },
+
+    problemDiscuss: function () {
+      this.$router.push({
+        name: "discussion",
+        params: { problemid: this.id },
+      });
     },
 
     submit: function () {
