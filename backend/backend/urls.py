@@ -31,7 +31,8 @@ urlpatterns = [
             url('api/', include('file.urls')),
             url('api/', include('problem.urls')),
             url('api/', include('submission.urls')),
-            url('api/', include('news.urls'))
+            url('api/', include('news.urls')),
+            url('api/', include('discussion.urls'))
         ]
     ))
 ]
