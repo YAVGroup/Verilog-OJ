@@ -4,6 +4,9 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
+
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 from .models import Comment, Topic
@@ -34,6 +37,9 @@ class TopicViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
     """
     queryset = Topic.objects.all().order_by('-update_time')
     serializer_class = TopicSerializer
+    pagination_class = LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('id','creator', "problem")
 
 class CommentView(APIView):
     def post(self, request, *args):
