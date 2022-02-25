@@ -27,7 +27,6 @@
         <el-table
           :default-sort="{ prop: 'updatetime', order: 'descending' }"
           :data="tableData"
-          :row-style="ratingcolor"
           @row-click="rowClick"
           v-loading="loading"
         >
@@ -57,7 +56,7 @@
           </el-table-column>
           <el-table-column
             prop="comments.length"
-            label="回复数"
+            label="回复"
             :min-width="60"
           >
           </el-table-column>
@@ -185,7 +184,6 @@ export default {
       pagesize: 30,
       totalstatus: 10,
       contest: "0",
-      searchdialogVisible: false,
       loading: false,
       searchform: {
         user: "",
