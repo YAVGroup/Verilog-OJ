@@ -6,40 +6,84 @@
         <el-row class="topic-info">
           <el-button @click="topicCreator" type="text">{{ creator }}</el-button>
           : {{ updatetime }}
+          <el-button @click="discussForum" type="text"
+            >{{ problem }} 讨论区</el-button
+          >
         </el-row>
         <el-row>
           <markdownIt :mdSource="description"></markdownIt>
         </el-row>
+        <template v-for="(comment, i) in comments">
+          <div :key="comment.id" class="comment" :id="`comment_floor_${i + 1}`">
+            <el-row class="comment-info">
+              <el-button
+                @click="commentReplyer(comment.user_belong.id)"
+                type="text"
+                >{{ comment.user_belong.username }}</el-button
+              >
+              : {{ comment.update_time }} #{{ i + 1 }}
+            </el-row>
+            <el-row v-if="comment.parent_floor"
+              ><el-link
+                :href="`#comment_floor_${comment.parent_floor}`"
+                type="primary"
+                >回复 #{{ comment.parent_floor }}</el-link
+              >
+            </el-row>
+            <el-row>
+              <markdownIt :mdSource="comment.text"></markdownIt>
+            </el-row>
+          </div>
+        </template>
+        <el-card shadow="never" style="margin-top: 20px">
+          <!--提交界面-->
+          <el-row :gutter="15">
+            <i style="padding: 5px 10px" class="el-icon-edit"></i>
+            <div style="display: inline-block; font-size: 20px">
+              评论编辑 (支持 markdown)
+            </div>
+
+            <div v-if="!loggedIn" style="display: inline-block; float: right">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="登陆以进行提交"
+                placement="top"
+              >
+              </el-tooltip>
+            </div>
+            <div style="display: inline-block; float: right" v-else>
+              <el-button
+                type="success"
+                size="medium"
+                @click="submitComment"
+                style="font-weight: bold; margin-right: 10px; float: right"
+                >提交</el-button
+              >
+              <el-button
+                type="danger"
+                size="medium"
+                @click="code = ''"
+                style="font-weight: bold; margin-right: 10px; float: right"
+                >清空</el-button
+              >
+              <el-checkbox v-model="is_reply">回复楼层</el-checkbox>
+              <el-input-number
+                v-model="reply_to_floor"
+                :min="1"
+                label="回复楼层"
+              ></el-input-number>
+            </div>
+          </el-row>
+
+          <!--代码编辑-->
+          <el-row>
+            <codemirror v-model="code" :options="cmOptions"></codemirror>
+          </el-row>
+        </el-card>
       </el-col>
     </el-row>
-    <template v-for="(comment, i) in comments">
-      <el-row :key="comment.id" type="flex" justify="center">
-        <el-col
-          class="comment"
-          :xs="24"
-          :sm="20"
-          :md="16"
-          :lg="12"
-          :xl="12"
-          :id="`comment_floor_${i + 1}`"
-        >
-          <el-row class="comment-info">
-            <el-button
-              @click="commentReplyer(comment.user_belong.id)"
-              type="text"
-              >{{ comment.user_belong.username }}</el-button
-            >
-            : {{ comment.update_time }} #{{ i + 1 }}
-          </el-row>
-          <el-row v-if="comment.parent_floor"
-            >回复 #{{ comment.parent_floor }}
-          </el-row>
-          <el-row>
-            <markdownIt :mdSource="comment.text"></markdownIt>
-          </el-row>
-        </el-col>
-      </el-row>
-    </template>
+
     <el-row> &nbsp; </el-row>
   </div>
 </template>
@@ -51,7 +95,8 @@
 }
 
 .main-topic,
-.comment {
+.comment,
+.add-comment {
   margin-top: 15px;
   padding: 20px;
   border-radius: 4px;
@@ -74,12 +119,18 @@
 import moment from "moment";
 import { mapState } from "vuex";
 
+import { codemirror } from "vue-codemirror";
+require("codemirror/lib/codemirror.css");
+require("codemirror/theme/base16-light.css");
+require("codemirror/mode/markdown/markdown");
+
 import markdownIt from "@/components/utils/markdownIt";
 
 export default {
   name: "topic",
   components: {
     markdownIt,
+    codemirror,
   },
   methods: {
     getTopic() {
@@ -87,6 +138,8 @@ export default {
       this.$axios.get(url).then((response) => {
         this.creator = response.data.user_belong.username;
         this.creator_id = response.data.user_belong.id;
+        this.problem = response.data.problem_belong.name;
+        this.problem_id = response.data.problem_belong.id;
         this.title = response.data.title;
         this.description = response.data.description;
         this.createtime = moment(response.data.create_time).format(
@@ -112,6 +165,13 @@ export default {
       });
     },
 
+    discussForum: function () {
+      this.$router.push({
+        name: "discussion",
+        params: { problemid: this.problem_id },
+      });
+    },
+
     getComments() {
       let url = "/comment/?topic=" + this.id;
       this.$axios.get(url).then((response) => {
@@ -129,10 +189,55 @@ export default {
         this.comments = response.data;
       });
     },
+    submitComment: function () {
+      if (!this.loggedIn) {
+        this.$message.error("请先登录！");
+        return;
+      }
+
+      if (!this.code) {
+        this.$message.error("请输入代码！");
+        return;
+      }
+
+      this.$confirm("确定提交吗？", "提交", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "提交中...",
+          });
+
+          if (this.is_reply) {
+            return this.$axios.post("/addcomment", {
+              topic: this.id,
+              text: this.code,
+              parent: this.comments[this.reply_to_floor - 1].id,
+            });
+          }
+          return this.$axios.post("/addcomment", {
+            topic: this.id,
+            text: this.code,
+          });
+        })
+        .then((response) => {
+          this.getComments();
+        })
+        .catch((error) => {
+          this.$message.error(
+            "提交失败：" + JSON.stringify(error.response.data)
+          );
+        });
+    },
   },
   data() {
     return {
       id: null,
+      problem: "",
+      problem_id: "",
       creator: "",
       title: "",
       description: "",
@@ -141,6 +246,18 @@ export default {
       isadmin: false,
 
       comments: [],
+      reply_to_floor: 1,
+      is_reply: false,
+
+      cmOptions: {
+        tabSize: 4,
+        mode: "markdown",
+        theme: "base16-light",
+        lineNumbers: true,
+        viewportMargin: Infinity,
+        lineWrapping: true,
+      },
+      code: "",
     };
   },
   computed: {
