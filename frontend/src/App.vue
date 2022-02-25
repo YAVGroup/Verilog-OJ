@@ -6,12 +6,17 @@
       v-bind:router="true"
       id="nav"
     >
-      <el-menu-item index="/" id="title">{{ school }}</el-menu-item>
       <el-menu-item index="/">
-        <i class="el-icon-star-off"></i>Home</el-menu-item
+        <i class="el-icon-house"></i>Home</el-menu-item
+      >
+      <el-menu-item index="/learn/">
+        <i class="el-icon-collection"></i>Learn</el-menu-item
       >
       <el-menu-item index="/problempage/1">
         <i class="el-icon-menu"></i>Problem</el-menu-item
+      >
+      <el-menu-item index="/discuss/">
+        <i class="el-icon-chat-dot-square"></i>Discuss</el-menu-item
       >
       <el-menu-item index="/statue">
         <i class="el-icon-tickets"></i>Status</el-menu-item
