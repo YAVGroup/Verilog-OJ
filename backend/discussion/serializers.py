@@ -14,6 +14,8 @@ class TopicSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CommentSerializer(serializers.ModelSerializer):
+    user_belong = UserPublicListSerializer(source='replyer', read_only=True)
+
     class Meta:
         model = Comment
         
