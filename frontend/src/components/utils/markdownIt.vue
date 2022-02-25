@@ -37,21 +37,11 @@ export default {
     mdSource: String
   },
   data() {
-    return {
-      renderedHTML: "",
-      isError: false,
-    };
+    return {};
   },
-  watch: {
-    mdSource: function () {
-      this.text = this.mdSource;
-      try {
-        this.renderedHTML = md.render(this.text);
-        this.isError = false;
-      } catch (e) {
-        console.warn(e);
-        this.isError = true;
-      }
+  computed: {
+    renderedHTML: function () {
+      return md.render(this.mdSource)
     },
   },
 };
