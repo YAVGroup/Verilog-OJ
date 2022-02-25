@@ -275,7 +275,7 @@
                 <el-table-column
                   prop="user_belong.username"
                   label="用户"
-                  :width="60"
+                  :width="80"
                 ></el-table-column>
                 <el-table-column
                   prop="title"
@@ -283,7 +283,7 @@
                 ></el-table-column>
                 <el-table-column
                   prop="updatetime"
-                  label="最后更新时间"
+                  label="最后活跃时间"
                   :width="100"
                 ></el-table-column>
               </el-table>
@@ -506,10 +506,19 @@ export default {
       this.$axios
         .get("/topic/?problem=" + this.id)
         .then((response) => {
-          for (var i = 0; i < response.data.length; i++) {
-            response.data[i].updatetime = moment(
+          for (let i = 0; i < response.data.length; i++) {
+            let update_time = moment(
               response.data[i].update_time
             ).format("YYYY-MM-DD");
+            for (const comment of response.data[i].comments) {
+              const comment_update_time = moment(
+                comment.update_time
+              ).format("YYYY-MM-DD");
+              if (moment(update_time).isBefore(comment_update_time)) {
+                update_time = comment_update_time
+              }
+            }
+            response.data[i].updatetime = update_time;
           }
           this.topics = response.data;
         });

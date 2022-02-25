@@ -39,7 +39,7 @@
           <el-table-column
             prop="title"
             label="主题"
-            :min-width="240"
+            :min-width="150"
           >
           </el-table-column>
           <el-table-column
@@ -55,25 +55,15 @@
               </font>
             </template>
           </el-table-column>
-          <!-- <el-table-column prop="result" label="状态" :min-width="240">
-            <template slot-scope="scope">
-              <el-tag
-                size="medium"
-                :type="statuetype(scope.row.result)"
-                disable-transitions
-                hit
-              >
-                {{ scope.row.result }}
-                <i
-                  class="el-icon-loading"
-                  v-show="statuejudge(scope.row.result)"
-                ></i>
-              </el-tag>
-            </template>
-          </el-table-column> -->
+          <el-table-column
+            prop="comments.length"
+            label="回复数"
+            :min-width="60"
+          >
+          </el-table-column>
           <el-table-column
             prop="updatetime"
-            label="最后更新时间"
+            label="最后活跃时间"
             :min-width="180"
           ></el-table-column>
         </el-table>
@@ -166,10 +156,19 @@ export default {
         "&offset=" +
         (this.currentpage - 1) * this.pagesize;
       this.$axios.get(url).then((response) => {
-        for (var i = 0; i < response.data.results.length; i++) {
-          response.data.results[i].updatetime = moment(
+        for (let i = 0; i < response.data.results.length; i++) {
+          let update_time = moment(
             response.data.results[i].update_time
           ).format("YYYY-MM-DD HH:mm:ss");
+          for (const comment of response.data.results[i].comments) {
+            const comment_update_time = moment(
+              comment.update_time
+            ).format("YYYY-MM-DD HH:mm:ss");
+            if (moment(update_time).isBefore(comment_update_time)) {
+              update_time = comment_update_time
+            }
+          }
+          response.data.results[i].updatetime = update_time;
         }
         this.tableData = response.data.results;
         this.totalstatus = response.data.count;
