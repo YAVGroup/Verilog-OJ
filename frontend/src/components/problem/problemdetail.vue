@@ -354,7 +354,7 @@ export default {
 
       code: "",
       submissions: [],
-      topics: [],
+      topics: [{title: "点击查看"}],
 
       waveform: "",
     };
@@ -407,7 +407,6 @@ export default {
 
         if (this.loggedIn) {
           this.submissionsRefresh();
-          this.topicsRefresh();
         }
       })
       .catch((error) => {
@@ -475,6 +474,10 @@ export default {
     },
 
     commentClick(row, col, e) {
+      if (row.title == "点击查看") {
+        this.topicsRefresh();
+        return;
+      }
       this.$router.push({
         name: "topic",
         params: { topicid: row.id },

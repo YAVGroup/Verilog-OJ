@@ -62,7 +62,7 @@ class CommentViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
     """
     Topic view
     """
-    queryset = Comment.objects.all().order_by('-update_time')
+    queryset = Comment.objects.all().order_by('update_time')
     serializer_class = CommentSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('id','replyer', "topic")
