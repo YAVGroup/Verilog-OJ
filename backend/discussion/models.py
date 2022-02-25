@@ -21,7 +21,7 @@ class Topic(models.Model):
     description = models.TextField(help_text='讨论内容描述（文字）')
 
     create_time = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
-    update_time = models.DateTimeField(default=datetime.now, verbose_name=u'修改时间')
+    update_time = models.DateTimeField(auto_now_add=True, verbose_name=u'修改时间')
 
     def __str__(self):
         return self.title
@@ -51,7 +51,7 @@ class Comment(models.Model):
     likes_count = models.PositiveIntegerField(default=0,verbose_name=u'点赞数')
 
     create_time = models.DateTimeField(verbose_name=u'创建时间',auto_now_add=True)
-    update_time = models.DateTimeField(verbose_name=u'修改时间', default=datetime.now)
+    update_time = models.DateTimeField(verbose_name=u'修改时间', auto_now_add=True)
 
     def __str__(self):
         return self.topic.title
