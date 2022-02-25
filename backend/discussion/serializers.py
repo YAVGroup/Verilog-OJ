@@ -6,6 +6,7 @@ from user.serializers import UserPublicListSerializer
 class TopicSerializer(serializers.ModelSerializer):
     problem_belong = ProblemListSerializer(source='problem', read_only=True)
     user_belong = UserPublicListSerializer(source='creator', read_only=True)
+    comments = serializers.ListField(source='get_comments', read_only=True)
 
     class Meta:
         model = Topic
