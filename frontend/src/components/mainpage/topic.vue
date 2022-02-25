@@ -1,0 +1,128 @@
+<template>
+  <div>
+    <el-row 
+      type="flex"
+      justify="center"
+    >
+      <el-col class="main-topic" :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
+        <el-row class="main-title">{{ title }}</el-row>
+        <el-row class="topic-info">
+            <el-button @click="topicCreator" type="text">{{ creator }}</el-button>
+            : {{ updatetime }}
+        </el-row>
+        <el-row>
+          <markdownIt :mdSource="description"></markdownIt>
+        </el-row>
+      </el-col>
+    </el-row>
+    <el-row> &nbsp; </el-row>
+  </div>
+</template>
+
+<style scope>
+.el-tag {
+  text-align: center;
+  font-weight: bold;
+}
+
+.main-topic {
+  margin-top: 15px;
+  padding: 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
+}
+
+.main-title {
+  font-size: 20px;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+}
+
+.topic-info {
+    font-size: .8em;
+}
+
+</style>
+
+<script>
+import moment from "moment";
+import { mapState } from "vuex";
+
+import markdownIt from "@/components/utils/markdownIt";
+
+export default {
+  name: "topic",
+  components: {
+    markdownIt,
+  },
+  methods: {
+    rowClick(row, col, e) {
+      if (col.label == "题目") {
+        if (this.contest != "0") return;
+        this.$router.push({
+          name: "problemdetail",
+          params: { problemid: row.problem_belong.id },
+        });
+        return;
+      }
+      if (col.label == "用户") {
+        this.$router.push({
+          name: "user",
+          params: { userid: row.user_belong.id },
+        });
+        return;
+      }
+      this.$router.push({
+        name: "topic",
+        params: { topicid: row.id },
+      });
+    },
+
+    getTopic() {
+      let url = "/topic/" + this.id;
+      this.$axios.get(url).then((response) => {
+        console.log(response)
+        this.creator = response.data.user_belong.username
+        this.creator_id = response.data.user_belong.id
+        this.title = response.data.title
+        this.description = response.data.description
+        this.createtime = moment(response.data.create_time).format("YYYY-MM-DD HH:mm:ss")
+        this.updatetime = moment(response.data.update_time).format("YYYY-MM-DD HH:mm:ss")
+      });
+    },
+
+    topicCreator: function () {
+      this.$router.push({
+        name: "user",
+        params: { userid: this.creator_id },
+      });
+    },
+
+    getComments() {
+      let url = "/comment/?topic=" + this.id;
+      this.$axios.get(url).then((response) => {
+        console.log(response)
+      });
+    },
+  },
+  data() {
+    return {
+      id: null,
+      creator: null,
+      title: null,
+      description: null,
+      createtime: null,
+      updatetime: null,
+      isadmin: false,
+    };
+  },
+  computed: {
+    ...mapState(["loggedIn", "userID", "username", "isSuperUser"]),
+  },
+  created() {
+    this.id = this.$route.params.topicid;
+    this.getTopic();
+    this.getComments();
+  },
+};
+</script>
