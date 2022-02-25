@@ -30,7 +30,9 @@
                       size="medium"
                       icon="el-icon-edit"
                       @click="problemEdit"
-                      :disabled="!(loggedIn && (userID == owner || isSuperUser))"
+                      :disabled="
+                        !(loggedIn && (userID == owner || isSuperUser))
+                      "
                     ></el-button>
                     <el-button
                       plain
@@ -38,7 +40,9 @@
                       size="medium"
                       icon="el-icon-delete"
                       @click="problemDelete"
-                      :disabled="!(loggedIn && (userID == owner || isSuperUser))"
+                      :disabled="
+                        !(loggedIn && (userID == owner || isSuperUser))
+                      "
                     ></el-button>
                   </el-button-group>
                 </div>
@@ -252,7 +256,9 @@
                   display: inline-block;
                 "
               >
-                <el-button @click="problemDiscuss" type="text">讨论区</el-button>
+                <el-button @click="problemDiscuss" type="text"
+                  >讨论区</el-button
+                >
               </div>
               <el-button
                 size="mini"
@@ -277,14 +283,12 @@
                   label="用户"
                   :width="80"
                 ></el-table-column>
-                <el-table-column
-                  prop="title"
-                  label="主题"
-                ></el-table-column>
+                <el-table-column prop="title" label="主题"></el-table-column>
                 <el-table-column
                   prop="updatetime"
-                  label="最后活跃时间"
+                  label="活跃时间"
                   :width="100"
+                  :formatter="time_formatter"
                 ></el-table-column>
               </el-table>
             </el-card>
@@ -354,7 +358,7 @@ export default {
 
       code: "",
       submissions: [],
-      topics: [{title: "点击查看"}],
+      topics: [{ title: "点击查看" }],
 
       waveform: "",
     };
@@ -506,25 +510,30 @@ export default {
         this.$message.error("请登陆后查看评论！");
         return;
       }
-      this.$axios
-        .get("/topic/?problem=" + this.id)
-        .then((response) => {
-          for (let i = 0; i < response.data.length; i++) {
-            let update_time = moment(
-              response.data[i].update_time
-            ).format("YYYY-MM-DD");
-            for (const comment of response.data[i].comments) {
-              const comment_update_time = moment(
-                comment.update_time
-              ).format("YYYY-MM-DD");
-              if (moment(update_time).isBefore(comment_update_time)) {
-                update_time = comment_update_time
-              }
+      this.$axios.get("/topic/?problem=" + this.id).then((response) => {
+        for (let i = 0; i < response.data.length; i++) {
+          let update_time = moment(response.data[i].update_time).format(
+            "YYYY-MM-DD HH:mm:ss"
+          );
+          for (const comment of response.data[i].comments) {
+            const comment_update_time = moment(comment.update_time).format(
+              "YYYY-MM-DD HH:mm:ss"
+            );
+
+            if (moment(update_time).isBefore(comment_update_time)) {
+              update_time = comment_update_time;
             }
-            response.data[i].updatetime = update_time;
           }
-          this.topics = response.data;
-        });
+          response.data[i].updatetime = update_time;
+        }
+        this.topics = response.data;
+      });
+    },
+
+    time_formatter: function (row, col) {
+      if (row.updatetime) {
+        return prettyDate(row.updatetime);
+      }
     },
 
     problemEdit: function () {

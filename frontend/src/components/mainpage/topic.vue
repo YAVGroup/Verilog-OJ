@@ -1,9 +1,6 @@
 <template>
   <div>
-    <el-row 
-      type="flex"
-      justify="center"
-    >
+    <el-row type="flex" justify="center">
       <el-col class="main-topic" :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
         <el-row class="main-title">{{ title }}</el-row>
         <el-row class="topic-info">
@@ -15,18 +12,27 @@
         </el-row>
       </el-col>
     </el-row>
-    <template
-      v-for="(comment, i) in comments"
-    >
-      <el-row
-        :key="comment.id"
-        type="flex"
-        justify="center"
-      >
-        <el-col class="comment" :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
+    <template v-for="(comment, i) in comments">
+      <el-row :key="comment.id" type="flex" justify="center">
+        <el-col
+          class="comment"
+          :xs="24"
+          :sm="20"
+          :md="16"
+          :lg="12"
+          :xl="12"
+          :id="`comment_floor_${i + 1}`"
+        >
           <el-row class="comment-info">
-            <el-button @click="commentReplyer(comment.user_belong.id)" type="text">{{ comment.user_belong.username }}</el-button>
-            : {{ comment.update_time }} #{{ i+1 }}
+            <el-button
+              @click="commentReplyer(comment.user_belong.id)"
+              type="text"
+              >{{ comment.user_belong.username }}</el-button
+            >
+            : {{ comment.update_time }} #{{ i + 1 }}
+          </el-row>
+          <el-row v-if="comment.parent_floor"
+            >回复 #{{ comment.parent_floor }}
           </el-row>
           <el-row>
             <markdownIt :mdSource="comment.text"></markdownIt>
@@ -44,11 +50,12 @@
   font-weight: bold;
 }
 
-.main-topic, .comment {
+.main-topic,
+.comment {
   margin-top: 15px;
   padding: 20px;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
 
 .main-title {
@@ -57,10 +64,10 @@
     "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
 }
 
-.topic-info, .comment-info {
-    font-size: .8em;
+.topic-info,
+.comment-info {
+  font-size: 0.8em;
 }
-
 </style>
 
 <script>
@@ -75,37 +82,19 @@ export default {
     markdownIt,
   },
   methods: {
-    rowClick(row, col, e) {
-      if (col.label == "题目") {
-        if (this.contest != "0") return;
-        this.$router.push({
-          name: "problemdetail",
-          params: { problemid: row.problem_belong.id },
-        });
-        return;
-      }
-      if (col.label == "用户") {
-        this.$router.push({
-          name: "user",
-          params: { userid: row.user_belong.id },
-        });
-        return;
-      }
-      this.$router.push({
-        name: "topic",
-        params: { topicid: row.id },
-      });
-    },
-
     getTopic() {
       let url = "/topic/" + this.id;
       this.$axios.get(url).then((response) => {
-        this.creator = response.data.user_belong.username
-        this.creator_id = response.data.user_belong.id
-        this.title = response.data.title
-        this.description = response.data.description
-        this.createtime = moment(response.data.create_time).format("YYYY-MM-DD HH:mm:ss")
-        this.updatetime = moment(response.data.update_time).format("YYYY-MM-DD HH:mm:ss")
+        this.creator = response.data.user_belong.username;
+        this.creator_id = response.data.user_belong.id;
+        this.title = response.data.title;
+        this.description = response.data.description;
+        this.createtime = moment(response.data.create_time).format(
+          "YYYY-MM-DD HH:mm:ss"
+        );
+        this.updatetime = moment(response.data.update_time).format(
+          "YYYY-MM-DD HH:mm:ss"
+        );
       });
     },
 
@@ -116,7 +105,7 @@ export default {
       });
     },
 
-    commentReplyer: function(user_id) {
+    commentReplyer: function (user_id) {
       this.$router.push({
         name: "user",
         params: { userid: user_id },
@@ -126,11 +115,18 @@ export default {
     getComments() {
       let url = "/comment/?topic=" + this.id;
       this.$axios.get(url).then((response) => {
-        
+        const comment_ids = [];
         for (let i = 0; i < response.data.length; i++) {
-            response.data[i].update_time = moment(response.data[i].update_time).format("YYYY-MM-DD HH:mm:ss")
+          response.data[i].update_time = moment(
+            response.data[i].update_time
+          ).format("YYYY-MM-DD HH:mm:ss");
+          comment_ids[response.data[i].id] = i + 1; // 这个 id 对应的本 topic 的楼层号
+          if (response.data[i].parent) {
+            response.data[i].parent_floor =
+              comment_ids[response.data[i].parent];
+          }
         }
-        this.comments = response.data
+        this.comments = response.data;
       });
     },
   },
