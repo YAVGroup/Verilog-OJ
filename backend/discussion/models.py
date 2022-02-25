@@ -27,7 +27,7 @@ class Topic(models.Model):
         return comment_ids
 
     create_time = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
-    update_time = models.DateTimeField(auto_now_add=True, verbose_name=u'修改时间')
+    update_time = models.DateTimeField(auto_now=True, verbose_name=u'修改时间')
 
     def __str__(self):
         return self.title
@@ -56,8 +56,8 @@ class Comment(models.Model):
         help_text='父评论')
     likes_count = models.PositiveIntegerField(default=0,verbose_name=u'点赞数')
 
-    create_time = models.DateTimeField(verbose_name=u'创建时间',auto_now_add=True)
-    update_time = models.DateTimeField(verbose_name=u'修改时间', auto_now_add=True)
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    update_time = models.DateTimeField(verbose_name=u'修改时间', auto_now=True)
 
     def __str__(self):
         return self.topic.title
