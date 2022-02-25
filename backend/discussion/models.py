@@ -20,6 +20,12 @@ class Topic(models.Model):
     title = models.CharField(max_length=50,help_text='讨论标题')
     description = models.TextField(help_text='讨论内容描述（文字）')
 
+    def get_comments(self):
+        "获取所有该 topic 的评论（返回时间，用于排序）"
+        comment_ids = Comment.objects.filter(topic=self).values('update_time')
+
+        return comment_ids
+
     create_time = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
     update_time = models.DateTimeField(auto_now_add=True, verbose_name=u'修改时间')
 
