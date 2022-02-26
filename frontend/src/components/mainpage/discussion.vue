@@ -16,7 +16,7 @@
         <el-button
           style="margin-left: 15px"
           plain
-          @click="resetsearch"
+          @click="resetStatus"
           size="mini"
           >刷新</el-button
         >
@@ -151,7 +151,6 @@ export default {
   methods: {
     rowClick(row, col, e) {
       if (col.label == "题目") {
-        if (this.contest != "0") return;
         this.$router.push({
           name: "problemdetail",
           params: { problemid: row.problem_belong.id },
@@ -171,24 +170,17 @@ export default {
       });
     },
 
-    resetsearch() {
+    resetStatus() {
       this.currentpage = 1;
-      this.searchform.problem = "";
-      this.searchform.language = "";
-      this.searchform.result = "";
       this.getstatusdata();
     },
 
     handleSizeChange(val) {
-      this.contest = this.$route.params.contestID;
-      if (!this.contest) this.contest = "0";
       this.pagesize = val;
       this.getstatusdata();
     },
 
     handleCurrentChange(val) {
-      this.contest = this.$route.params.contestID;
-      if (!this.contest) this.contest = "0";
       this.currentpage = val;
       this.getstatusdata();
     },
@@ -251,7 +243,8 @@ export default {
           });
         })
         .then((response) => {
-          this.resetsearch();
+          this.resetStatus();
+          this.code = "";
         })
         .catch((error) => {
           this.$message.error(
@@ -263,19 +256,11 @@ export default {
   data() {
     return {
       problemid: null,
-      isadmin: false,
       tableData: [],
       currentpage: 1,
       pagesize: 30,
       totalstatus: 10,
-      contest: "0",
       loading: false,
-      searchform: {
-        user: "",
-        result: "",
-        problem: "",
-        language: "",
-      },
 
       topictitle: "",
       cmOptions: {

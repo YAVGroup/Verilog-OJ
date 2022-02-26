@@ -103,6 +103,19 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
 
+.main-topic p,
+h1,
+h2,
+h3,
+h4,
+h5 {
+  line-height: 2em;
+}
+
+.main-topic code {
+  line-height: 1.5em;
+}
+
 .main-title {
   font-size: 20px;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
@@ -225,6 +238,7 @@ export default {
         })
         .then((response) => {
           this.getComments();
+          this.code = "";
         })
         .catch((error) => {
           this.$message.error(
@@ -243,7 +257,6 @@ export default {
       description: "",
       createtime: "",
       updatetime: "",
-      isadmin: false,
 
       comments: [],
       reply_to_floor: 1,

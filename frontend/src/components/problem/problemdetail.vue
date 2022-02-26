@@ -256,16 +256,15 @@
                   display: inline-block;
                 "
               >
-                <el-button @click="problemDiscuss" type="text"
-                  >讨论区</el-button
-                >
+                讨论区
               </div>
               <el-button
                 size="mini"
-                @click="topicsRefresh"
-                style="float: right"
+                @click="problemDiscuss"
+                style="float: right; margin: 0 5px 5px 0"
+                type="text"
                 :disabled="!loggedIn"
-                >刷新</el-button
+                >进入讨论版</el-button
               >
               <el-table
                 :default-sort="{ prop: 'updatetime', order: 'descending' }"
