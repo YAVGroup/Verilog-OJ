@@ -13,6 +13,8 @@
         <el-row>
           <markdownIt :mdSource="description"></markdownIt>
         </el-row>
+
+        <!-- 渲染每一条评论 -->
         <template v-for="(comment, i) in comments">
           <div :key="comment.id" class="comment" :id="`comment_floor_${i + 1}`">
             <el-row class="comment-info">
@@ -22,14 +24,26 @@
                 >{{ comment.user_belong.username }}</el-button
               >
               : {{ comment.update_time }} #{{ i + 1 }}
+              <el-button type="text" class="reply-to" @click="replyTo(i)"
+                >点击回复</el-button
+              >
             </el-row>
+
+            <!-- 这条评论有父评论 -->
             <el-row v-if="comment.parent_floor"
-              ><el-link
-                :href="`#comment_floor_${comment.parent_floor}`"
-                type="primary"
+              ><el-link @click="goAnchor(comment.parent_floor)" type="primary"
                 >回复 #{{ comment.parent_floor }}</el-link
               >
             </el-row>
+            <el-row v-if="comment.parent_floor" class="quote-comment">
+              <markdownIt
+                :mdSource="
+                  comments[comment.parent_floor - 1].text.substr(0, 200)
+                "
+              ></markdownIt>
+            </el-row>
+
+            <!-- 评论内容 -->
             <el-row>
               <markdownIt :mdSource="comment.text"></markdownIt>
             </el-row>
@@ -39,7 +53,10 @@
           <!--提交界面-->
           <el-row :gutter="15">
             <i style="padding: 5px 10px" class="el-icon-edit"></i>
-            <div style="display: inline-block; font-size: 20px">
+            <div
+              id="comment-edit"
+              style="display: inline-block; font-size: 20px"
+            >
               评论编辑 (支持 markdown)
             </div>
 
@@ -126,6 +143,18 @@ h5 {
 .comment-info {
   font-size: 0.8em;
 }
+
+.quote-comment {
+  color: #646464;
+  margin: 10px 0;
+  padding: 0 10px 0 15px;
+  border-left: 3px solid #ccc;
+}
+
+.reply-to {
+  color: #ef2f11;
+  float: right;
+}
 </style>
 
 <script>
@@ -202,6 +231,22 @@ export default {
         this.comments = response.data;
       });
     },
+
+    replyTo(i) {
+      this.reply_to_floor = i + 1;
+      this.is_reply = true;
+      document.querySelector("#comment-edit").scrollIntoView({
+        behavior: "smooth",
+      });
+    },
+
+    goAnchor(id) {
+      const selector = `#comment_floor_${id}`;
+      document.querySelector(selector).scrollIntoView({
+        behavior: "smooth",
+      });
+    },
+
     submitComment: function () {
       if (!this.loggedIn) {
         this.$message.error("请先登录！");
