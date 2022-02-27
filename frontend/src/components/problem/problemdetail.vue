@@ -709,6 +709,10 @@ export default {
   /* word-break: break-all; */
   white-space: pre-line;
 }
+.problem-descriptions >>> * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
 .el-row {
   margin-bottom: 20px;
 }

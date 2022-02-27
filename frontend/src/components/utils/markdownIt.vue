@@ -55,8 +55,4 @@ export default {
   margin-block-end: 8px;
   margin-block-start: 8px;
 }
-.markdown-default >>> * {
-  margin-top: 0;
-  margin-bottom: 0;
-}
 </style>

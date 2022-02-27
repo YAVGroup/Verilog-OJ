@@ -4,8 +4,11 @@
       <el-col class="main-topic" :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
         <el-row class="main-title">{{ title }}</el-row>
         <el-row class="topic-info">
-          <el-button @click="topicCreator" type="text">{{ creator }}</el-button>
-          : {{ updatetime }}
+          <userhyperlink
+            style="display: inline"
+            :userID="creator_id"
+          ></userhyperlink
+          >:
           <el-button @click="discussForum" type="text"
             >{{ problem }} 讨论区</el-button
           >
@@ -38,7 +41,7 @@
             <el-row v-if="comment.parent_floor" class="quote-comment">
               <markdownIt
                 :mdSource="
-                  comments[comment.parent_floor - 1].text.substr(0, 200)
+                  commentCutter(comments[comment.parent_floor - 1].text)
                 "
               ></markdownIt>
             </el-row>
@@ -120,13 +123,10 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
 
-.main-topic p,
-h1,
-h2,
-h3,
-h4,
-h5 {
-  line-height: 2em;
+.main-topic pre {
+  border-left: 6px solid #606266;
+  padding-left: 24px;
+  margin: 12px 0;
 }
 
 .main-topic code {
@@ -152,7 +152,7 @@ h5 {
 }
 
 .reply-to {
-  color: #ef2f11;
+  color: #909399;
   float: right;
 }
 </style>
@@ -167,18 +167,19 @@ require("codemirror/theme/base16-light.css");
 require("codemirror/mode/markdown/markdown");
 
 import markdownIt from "@/components/utils/markdownIt";
+import userhyperlink from "@/components/utils/userhyperlink";
 
 export default {
   name: "topic",
   components: {
     markdownIt,
+    userhyperlink,
     codemirror,
   },
   methods: {
     getTopic() {
       let url = "/topic/" + this.id;
       this.$axios.get(url).then((response) => {
-        this.creator = response.data.user_belong.username;
         this.creator_id = response.data.user_belong.id;
         this.problem = response.data.problem_belong.name;
         this.problem_id = response.data.problem_belong.id;
@@ -190,13 +191,6 @@ export default {
         this.updatetime = moment(response.data.update_time).format(
           "YYYY-MM-DD HH:mm:ss"
         );
-      });
-    },
-
-    topicCreator: function () {
-      this.$router.push({
-        name: "user",
-        params: { userid: this.creator_id },
       });
     },
 
@@ -230,6 +224,14 @@ export default {
         }
         this.comments = response.data;
       });
+    },
+
+    commentCutter(s) {
+      // 如果长度大于 200，则取前 200 字符，并添加省略号
+      if (s.length > 200) {
+        s = s.substr(0, 200) + " ......";
+      }
+      return s;
     },
 
     replyTo(i) {
@@ -297,7 +299,7 @@ export default {
       id: null,
       problem: "",
       problem_id: "",
-      creator: "",
+      creator_id: "",
       title: "",
       description: "",
       createtime: "",
