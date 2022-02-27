@@ -1,29 +1,16 @@
 <template>
   <div>
-    <el-row>
-      <el-col
-        :xs="{ span: 12, push: 0 }"
-        :sm="{ span: 12, push: 0 }"
-        :md="{ span: 12, push: 0 }"
-        :lg="{ span: 12, push: 3 }"
-        :xl="{ span: 12, push: 6 }"
-        style="cursor: pointer; color: #409eff"
-      >
-        <b @click="toProblemdetail">{{ problem }}</b>
-      </el-col>
-      <el-col
-        :xs="{ span: 12, pull: 0 }"
-        :sm="{ span: 12, pull: 0 }"
-        :md="{ span: 12, pull: 0 }"
-        :lg="{ span: 12, pull: 3 }"
-        :xl="{ span: 12, pull: 6 }"
-        style="text-align: right"
-      >
-        <el-button plain @click="resetStatus" size="mini">刷新</el-button>
-      </el-col>
-    </el-row>
     <el-row type="flex" justify="center">
       <el-col :xs="24" :sm="24" :md="24" :lg="18" :xl="12">
+        <el-row style="margin-top: 15px">
+          <b @click="toProblemdetail" style="cursor: pointer; color: #409eff">{{
+            problem
+          }}</b>
+          <el-button plain @click="resetStatus" style="float: right" size="mini"
+            >刷新</el-button
+          ></el-row
+        >
+
         <el-table
           :default-sort="{ prop: 'updatetime', order: 'descending' }"
           :data="tableData"
@@ -48,6 +35,7 @@
             :min-width="120"
           ></el-table-column>
         </el-table>
+
         <!-- 发布帖子 -->
         <el-card shadow="never" style="margin-top: 20px">
           <!--提交界面-->
