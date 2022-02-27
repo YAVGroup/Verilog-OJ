@@ -4,14 +4,19 @@
       <el-col class="main-topic" :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
         <el-row class="main-title">{{ title }}</el-row>
         <el-row class="topic-info">
-          <userhyperlink
-            style="display: inline"
-            :userID="creator_id"
-          ></userhyperlink
-          >:
-          <el-button @click="discussForum" type="text"
-            >{{ problem }} 讨论区</el-button
-          >
+          <div>
+            <userhyperlink
+              style="display: inline"
+              :userID="creator_id"
+            ></userhyperlink
+            >:
+            <el-button @click="discussForum" type="text"
+              >{{ problem }} 讨论区</el-button
+            >
+          </div>
+
+          <div>创建时间 {{ createtime }}</div>
+          <div>更新时间 {{ updatetime }}</div>
         </el-row>
         <el-row>
           <markdownIt :mdSource="description"></markdownIt>
