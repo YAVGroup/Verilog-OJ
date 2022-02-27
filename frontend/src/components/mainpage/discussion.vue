@@ -64,7 +64,7 @@
           <el-row :gutter="15">
             <i style="padding: 5px 10px" class="el-icon-edit"></i>
             <div style="display: inline-block; font-size: 20px">
-              帖子编辑 (支持 markdown)
+              发帖 (支持 markdown)
             </div>
 
             <div v-if="!loggedIn" style="display: inline-block; float: right">
@@ -95,10 +95,16 @@
           </el-row>
 
           <!-- 标题编辑 -->
-          <el-row
-            >主题：
-            <el-input v-model="topictitle" placeholder="请输入标题"></el-input
-          ></el-row>
+          <el-row>
+            <el-col :span="2" type="flex" align="middle">主题：</el-col>
+            <el-col :span="22"
+              ><el-input
+                v-model="topictitle"
+                placeholder="请输入标题"
+                maxlength="50"
+              ></el-input
+            ></el-col>
+          </el-row>
 
           <!--内容编辑-->
           <el-row>
@@ -245,6 +251,11 @@ export default {
         .then((response) => {
           this.resetStatus();
           this.code = "";
+          this.topictitle = "";
+          this.$router.push({
+            name: "topic",
+            params: { topicid: response.data.id },
+          });
         })
         .catch((error) => {
           this.$message.error(
