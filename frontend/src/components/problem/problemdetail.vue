@@ -266,7 +266,9 @@
                 :disabled="!loggedIn"
                 >进入讨论版</el-button
               >
+              <!-- 主题表格 -->
               <el-table
+                v-if="topics_display"
                 :default-sort="{ prop: 'updatetime', order: 'descending' }"
                 :data="topics"
                 style="width: 100%"
@@ -290,6 +292,25 @@
                   :formatter="time_formatter"
                 ></el-table-column>
               </el-table>
+              <!-- 默认讨论区隐藏提示 -->
+              <el-row type="flex" justify="center" style="margin-bottom: 0">
+                <el-button
+                  v-if="topics_display"
+                  type="text"
+                  style="color: #909399"
+                  @click="topics_display = false"
+                  ><i class="el-icon-arrow-up"></i> 隐藏讨论</el-button
+                ><el-button
+                  v-else
+                  type="text"
+                  style="color: #909399"
+                  @click="
+                    topics_display = true;
+                    topicsRefresh();
+                  "
+                  ><i class="el-icon-arrow-down"></i> 显示讨论</el-button
+                ></el-row
+              >
             </el-card>
           </el-row>
         </el-col>
@@ -357,7 +378,8 @@ export default {
 
       code: "",
       submissions: [],
-      topics: [{ title: "点击查看" }],
+      topics: [],
+      topics_display: false,
 
       waveform: "",
     };
@@ -477,10 +499,6 @@ export default {
     },
 
     commentClick(row, col, e) {
-      if (row.title == "点击查看") {
-        this.topicsRefresh();
-        return;
-      }
       this.$router.push({
         name: "topic",
         params: { topicid: row.id },
