@@ -1,25 +1,25 @@
 <template>
   <div>
-    <el-row
-      type="flex"
-      justify="end"
-      align="middle"
-      style="text-align: right; margin-bottom: 5px; margin-top: 15px"
-    >
+    <el-row>
+      <el-col
+        :xs="{ span: 12, push: 0 }"
+        :sm="{ span: 7, push: 0 }"
+        :md="{ span: 6, push: 0 }"
+        :lg="{ span: 5, push: 3 }"
+        :xl="{ span: 3, push: 6 }"
+        style="cursor: pointer; color: #409eff"
+      >
+        <b @click="toProblemdetail">{{ problem }}</b>
+      </el-col>
       <el-col
         :xs="{ span: 12, pull: 0 }"
-        :sm="{ span: 7, pull: 0 }"
-        :md="{ span: 6, pull: 0 }"
-        :lg="{ span: 5, pull: 3 }"
-        :xl="{ span: 3, pull: 6 }"
+        :sm="{ span: 17, pull: 0 }"
+        :md="{ span: 18, pull: 0 }"
+        :lg="{ span: 19, pull: 3 }"
+        :xl="{ span: 21, pull: 6 }"
+        style="text-align: right"
       >
-        <el-button
-          style="margin-left: 15px"
-          plain
-          @click="resetStatus"
-          size="mini"
-          >刷新</el-button
-        >
+        <el-button plain @click="resetStatus" size="mini">刷新</el-button>
       </el-col>
     </el-row>
     <el-row type="flex" justify="center">
@@ -33,29 +33,19 @@
           <el-table-column
             prop="user_belong.username"
             label="用户"
-            :min-width="150"
+            :min-width="120"
           ></el-table-column>
+
           <el-table-column prop="title" label="主题" :min-width="150">
           </el-table-column>
-          <el-table-column
-            prop="problem_belong.name"
-            label="题目"
-            :min-width="240"
-          >
-            <template slot-scope="scope">
-              <font color="#409EFF">
-                <b style="cursor: pointer">{{
-                  scope.row.problem_belong.name
-                }}</b>
-              </font>
-            </template>
-          </el-table-column>
+
           <el-table-column prop="comments.length" label="回复" :min-width="60">
           </el-table-column>
+
           <el-table-column
             prop="updatetime"
             label="最后活跃时间"
-            :min-width="180"
+            :min-width="120"
           ></el-table-column>
         </el-table>
         <!-- 发布帖子 -->
@@ -155,14 +145,14 @@ export default {
     codemirror,
   },
   methods: {
+    toProblemdetail() {
+      this.$router.push({
+        name: "problemdetail",
+        params: { problemid: this.problemid },
+      });
+    },
+
     rowClick(row, col, e) {
-      if (col.label == "题目") {
-        this.$router.push({
-          name: "problemdetail",
-          params: { problemid: row.problem_belong.id },
-        });
-        return;
-      }
       if (col.label == "用户") {
         this.$router.push({
           name: "user",
@@ -193,6 +183,11 @@ export default {
 
     getstatusdata() {
       this.loading = true;
+
+      this.$axios.get("/problems/" + this.problemid).then((response) => {
+        this.problem = response.data.name;
+      });
+
       let url =
         "/topic/?problem=" +
         this.problemid +
@@ -200,6 +195,7 @@ export default {
         this.pagesize +
         "&offset=" +
         (this.currentpage - 1) * this.pagesize;
+
       this.$axios.get(url).then((response) => {
         for (let i = 0; i < response.data.results.length; i++) {
           let update_time = moment(response.data.results[i].update_time).format(
@@ -215,11 +211,13 @@ export default {
           }
           response.data.results[i].updatetime = update_time;
         }
+
         this.tableData = response.data.results;
         this.totalstatus = response.data.count;
         this.loading = false;
       });
     },
+
     submitTopic: function () {
       if (!this.loggedIn) {
         this.$message.error("请先登录！");
@@ -264,9 +262,11 @@ export default {
         });
     },
   },
+
   data() {
     return {
-      problemid: null,
+      problem: "",
+      problemid: "",
       tableData: [],
       currentpage: 1,
       pagesize: 30,
