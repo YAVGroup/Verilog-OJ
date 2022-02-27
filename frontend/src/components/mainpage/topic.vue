@@ -83,7 +83,7 @@
               <el-button
                 type="danger"
                 size="medium"
-                @click="code = ''"
+                @click="commentText = ''"
                 style="font-weight: bold; margin-right: 10px; float: right"
                 >清空</el-button
               >
@@ -96,9 +96,9 @@
             </div>
           </el-row>
 
-          <!--代码编辑-->
+          <!--评论编辑-->
           <el-row>
-            <codemirror v-model="code" :options="cmOptions"></codemirror>
+            <codemirror v-model="commentText" :options="cmOptions"></codemirror>
           </el-row>
         </el-card>
       </el-col>
@@ -255,8 +255,8 @@ export default {
         return;
       }
 
-      if (!this.code) {
-        this.$message.error("请输入代码！");
+      if (!this.commentText) {
+        this.$message.error("请输入评论！");
         return;
       }
 
@@ -274,18 +274,18 @@ export default {
           if (this.is_reply) {
             return this.$axios.post("/addcomment", {
               topic: this.id,
-              text: this.code,
+              text: this.commentText,
               parent: this.comments[this.reply_to_floor - 1].id,
             });
           }
           return this.$axios.post("/addcomment", {
             topic: this.id,
-            text: this.code,
+            text: this.commentText,
           });
         })
         .then((response) => {
           this.getComments();
-          this.code = "";
+          this.commentText = "";
         })
         .catch((error) => {
           this.$message.error(
@@ -317,7 +317,7 @@ export default {
         viewportMargin: Infinity,
         lineWrapping: true,
       },
-      code: "",
+      commentText: "",
     };
   },
   computed: {

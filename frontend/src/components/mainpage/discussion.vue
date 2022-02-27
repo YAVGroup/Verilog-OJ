@@ -3,20 +3,20 @@
     <el-row>
       <el-col
         :xs="{ span: 12, push: 0 }"
-        :sm="{ span: 7, push: 0 }"
-        :md="{ span: 6, push: 0 }"
-        :lg="{ span: 5, push: 3 }"
-        :xl="{ span: 3, push: 6 }"
+        :sm="{ span: 12, push: 0 }"
+        :md="{ span: 12, push: 0 }"
+        :lg="{ span: 12, push: 3 }"
+        :xl="{ span: 12, push: 6 }"
         style="cursor: pointer; color: #409eff"
       >
         <b @click="toProblemdetail">{{ problem }}</b>
       </el-col>
       <el-col
         :xs="{ span: 12, pull: 0 }"
-        :sm="{ span: 17, pull: 0 }"
-        :md="{ span: 18, pull: 0 }"
-        :lg="{ span: 19, pull: 3 }"
-        :xl="{ span: 21, pull: 6 }"
+        :sm="{ span: 12, pull: 0 }"
+        :md="{ span: 12, pull: 0 }"
+        :lg="{ span: 12, pull: 3 }"
+        :xl="{ span: 12, pull: 6 }"
         style="text-align: right"
       >
         <el-button plain @click="resetStatus" size="mini">刷新</el-button>
@@ -77,7 +77,7 @@
               <el-button
                 type="danger"
                 size="medium"
-                @click="code = ''"
+                @click="topicDescription = ''"
                 style="font-weight: bold; margin-right: 10px; float: right"
                 >清空</el-button
               >
@@ -89,7 +89,7 @@
             <el-col :span="2" type="flex" align="middle">主题：</el-col>
             <el-col :span="22"
               ><el-input
-                v-model="topictitle"
+                v-model="topicTitle"
                 placeholder="请输入标题"
                 maxlength="50"
               ></el-input
@@ -98,7 +98,10 @@
 
           <!--内容编辑-->
           <el-row>
-            <codemirror v-model="code" :options="cmOptions"></codemirror>
+            <codemirror
+              v-model="topicDescription"
+              :options="cmOptions"
+            ></codemirror>
           </el-row>
         </el-card>
       </el-col>
@@ -224,8 +227,13 @@ export default {
         return;
       }
 
-      if (!this.code) {
-        this.$message.error("请输入代码！");
+      if (!this.topicTitle) {
+        this.$message.error("请输入主题！");
+        return;
+      }
+
+      if (!this.topicDescription) {
+        this.$message.error("请输入正文！");
         return;
       }
 
@@ -242,14 +250,14 @@ export default {
 
           return this.$axios.post("/addtopic", {
             problem: this.problemid,
-            title: this.topictitle,
-            description: this.code,
+            title: this.topicTitle,
+            description: this.topicDescription,
           });
         })
         .then((response) => {
           this.resetStatus();
-          this.code = "";
-          this.topictitle = "";
+          this.topicDescription = "";
+          this.topicTitle = "";
           this.$router.push({
             name: "topic",
             params: { topicid: response.data.id },
@@ -273,7 +281,6 @@ export default {
       totalstatus: 10,
       loading: false,
 
-      topictitle: "",
       cmOptions: {
         tabSize: 4,
         mode: "markdown",
@@ -282,7 +289,8 @@ export default {
         viewportMargin: Infinity,
         lineWrapping: true,
       },
-      code: "",
+      topicTitle: "",
+      topicDescription: "",
     };
   },
   computed: {
