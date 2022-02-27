@@ -92,13 +92,13 @@
                 style="font-weight: bold; margin-right: 10px; float: right"
                 >清空</el-button
               >
-              <el-checkbox v-model="is_reply">回复楼层</el-checkbox>
-              <el-input-number
-                v-model="reply_to_floor"
-                :min="1"
-                label="回复楼层"
-              ></el-input-number>
             </div>
+          </el-row>
+
+          <!-- 提示是否处在回复楼层状态 -->
+          <el-row v-if="is_reply"
+            >正在回复： #{{ reply_to_floor }}
+            <el-button type="text" @click="is_reply = false">取消</el-button>
           </el-row>
 
           <!--评论编辑-->

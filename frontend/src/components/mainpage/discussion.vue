@@ -92,6 +92,7 @@
                 v-model="topicTitle"
                 placeholder="请输入标题"
                 maxlength="50"
+                show-word-limit
               ></el-input
             ></el-col>
           </el-row>
