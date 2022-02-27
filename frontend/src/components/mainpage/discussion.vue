@@ -97,12 +97,7 @@
           </el-row>
 
           <!--内容编辑-->
-          <el-row>
-            <codemirror
-              v-model="topicDescription"
-              :options="cmOptions"
-            ></codemirror>
-          </el-row>
+          <markdowneditor v-model="topicDescription"></markdowneditor>
         </el-card>
       </el-col>
     </el-row>
@@ -137,15 +132,12 @@
 import moment from "moment";
 import { mapState } from "vuex";
 
-import { codemirror } from "vue-codemirror";
-require("codemirror/lib/codemirror.css");
-require("codemirror/theme/base16-light.css");
-require("codemirror/mode/markdown/markdown");
+import markdowneditor from "@/components/utils/markdowneditor";
 
 export default {
   name: "discussion",
   components: {
-    codemirror,
+    markdowneditor,
   },
   methods: {
     toProblemdetail() {
@@ -281,14 +273,6 @@ export default {
       totalstatus: 10,
       loading: false,
 
-      cmOptions: {
-        tabSize: 4,
-        mode: "markdown",
-        theme: "base16-light",
-        lineNumbers: true,
-        viewportMargin: Infinity,
-        lineWrapping: true,
-      },
       topicTitle: "",
       topicDescription: "",
     };

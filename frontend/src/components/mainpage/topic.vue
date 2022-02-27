@@ -97,9 +97,7 @@
           </el-row>
 
           <!--评论编辑-->
-          <el-row>
-            <codemirror v-model="commentText" :options="cmOptions"></codemirror>
-          </el-row>
+          <markdowneditor v-model="commentText"></markdowneditor>
         </el-card>
       </el-col>
     </el-row>
@@ -161,20 +159,16 @@
 import moment from "moment";
 import { mapState } from "vuex";
 
-import { codemirror } from "vue-codemirror";
-require("codemirror/lib/codemirror.css");
-require("codemirror/theme/base16-light.css");
-require("codemirror/mode/markdown/markdown");
-
 import markdownIt from "@/components/utils/markdownIt";
+import markdowneditor from "@/components/utils/markdowneditor";
 import userhyperlink from "@/components/utils/userhyperlink";
 
 export default {
   name: "topic",
   components: {
     markdownIt,
+    markdowneditor,
     userhyperlink,
-    codemirror,
   },
   methods: {
     getTopic() {
@@ -309,14 +303,6 @@ export default {
       reply_to_floor: 1,
       is_reply: false,
 
-      cmOptions: {
-        tabSize: 4,
-        mode: "markdown",
-        theme: "base16-light",
-        lineNumbers: true,
-        viewportMargin: Infinity,
-        lineWrapping: true,
-      },
       commentText: "",
     };
   },
