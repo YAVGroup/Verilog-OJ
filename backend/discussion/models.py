@@ -52,7 +52,7 @@ class Comment(models.Model):
         default=None,
         blank=True,
         null=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         help_text='父评论')
     likes_count = models.PositiveIntegerField(default=0,verbose_name=u'点赞数')
 
