@@ -7,9 +7,13 @@ export function prettyDate(time) {
     diff = (new Date().getTime() - date.getTime()) / 1000,
     day_diff = Math.floor(diff / 86400);
 
-  // return date for anything greater than a day
-  if (isNaN(day_diff) || day_diff < 0 || day_diff > 0)
-    return date.getDate() + " " + date.toDateString().split(" ")[1];
+  // return date for anything greater than a week
+  if (isNaN(day_diff) || day_diff < 0 || day_diff > 7) {
+    const pad = (n) => (n.toString().length < 2 ? "0" + n : n);
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+      date.getDate()
+    )}`;
+  }
 
   return (
     (day_diff == 0 &&

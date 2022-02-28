@@ -547,11 +547,7 @@ export default {
       });
     },
 
-    time_formatter: function (row, col) {
-      if (row.updatetime) {
-        return prettyDate(row.updatetime);
-      }
-    },
+    time_formatter: (row) => prettyDate(row.updatetime),
 
     problemEdit: function () {
       this.$router.push({
