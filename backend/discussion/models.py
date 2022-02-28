@@ -46,7 +46,6 @@ class Comment(models.Model):
     )
 
     text = models.TextField(help_text='评论')
-    is_removed = models.BooleanField(default=False)
     parent = models.ForeignKey(
         'self',
         default=None,
