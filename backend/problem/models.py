@@ -85,3 +85,12 @@ class TestCase(models.Model):
         return "TestCase #{} (Problem #{}, {})".format(
             self.id, self.problem.id, self.problem.name
             )
+
+class ProblemBook(models.Model):
+    id = models.AutoField(primary_key=True, help_text='ProblemBook ID')
+    name = models.CharField(max_length=30, help_text='ProblemBook name')
+    # description_short
+    # description
+    # related_problems
+
+    

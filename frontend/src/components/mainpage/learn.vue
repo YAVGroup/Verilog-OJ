@@ -11,20 +11,12 @@
             <el-card shadow="never">
             <el-row>
                 <h3 style="display: inline-block; margin: 3px 0px">
-                欢迎您向 Verilog OJ 贡献题目！
+                题目页
                 </h3>
             </el-row>
             <el-row>
                 <div>
-                Verilog OJ
-                测试期间需要大家的反馈和配合。我们为新手上路的各位准备了常用的模板，帮助大家完成简单题目的创建。
-                </div>
-                <div>
-                更多信息您可以查看
-                <a
-                    href="https://github.com/YAVGroup/Verilog-OJ/blob/master/doc/operation/Problem_add_HOWTO.md"
-                    >Verilog OJ 出题指南</a
-                >。
+                本页面采取书籍形式进行题库中题目的组织，同时附有说明性文字介绍，以期为您的数字电路设计学习过程提供一些方便。
                 </div>
             </el-row>
             </el-card>
