@@ -37,21 +37,11 @@ export default {
     mdSource: String
   },
   data() {
-    return {
-      renderedHTML: "",
-      isError: false,
-    };
+    return {};
   },
-  watch: {
-    mdSource: function () {
-      this.text = this.mdSource;
-      try {
-        this.renderedHTML = md.render(this.text);
-        this.isError = false;
-      } catch (e) {
-        console.warn(e);
-        this.isError = true;
-      }
+  computed: {
+    renderedHTML: function () {
+      return md.render(this.mdSource)
     },
   },
 };
@@ -64,9 +54,5 @@ export default {
   margin-bottom: 8px;
   margin-block-end: 8px;
   margin-block-start: 8px;
-}
-.markdown-default >>> * {
-  margin-top: 0;
-  margin-bottom: 0;
 }
 </style>

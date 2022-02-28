@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'submission',
     'judge',
     'news',
+    'discussion',
 ]
 
 # CORS白名单设置

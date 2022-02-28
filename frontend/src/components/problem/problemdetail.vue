@@ -30,7 +30,9 @@
                       size="medium"
                       icon="el-icon-edit"
                       @click="problemEdit"
-                      :disabled="!(loggedIn && (userID == owner || isSuperUser))"
+                      :disabled="
+                        !(loggedIn && (userID == owner || isSuperUser))
+                      "
                     ></el-button>
                     <el-button
                       plain
@@ -38,7 +40,9 @@
                       size="medium"
                       icon="el-icon-delete"
                       @click="problemDelete"
-                      :disabled="!(loggedIn && (userID == owner || isSuperUser))"
+                      :disabled="
+                        !(loggedIn && (userID == owner || isSuperUser))
+                      "
                     ></el-button>
                   </el-button-group>
                 </div>
@@ -214,7 +218,7 @@
                 :data="submissions"
                 style="width: 100%"
                 :row-class-name="tableRowClassName"
-                @row-click="rowClick"
+                @row-click="submissionClick"
                 v-loading="!loggedIn"
                 element-loading-text="登陆以查看本题提交记录"
                 element-loading-spinner="el-icon-info"
@@ -240,6 +244,73 @@
                   </template> -->
                 </el-table-column>
               </el-table>
+            </el-card>
+          </el-row>
+          <!--评论区-->
+          <el-row>
+            <el-card shadow="never">
+              <div
+                style="
+                  box-sizing: border-box;
+                  padding-bottom: 8px;
+                  display: inline-block;
+                "
+              >
+                讨论区
+              </div>
+              <el-button
+                size="mini"
+                @click="problemDiscuss"
+                style="float: right; margin: 0 5px 5px 0"
+                type="text"
+                :disabled="!loggedIn"
+                >进入讨论版</el-button
+              >
+              <!-- 主题表格 -->
+              <el-table
+                v-if="topics_display"
+                :default-sort="{ prop: 'updatetime', order: 'descending' }"
+                :data="topics"
+                style="width: 100%"
+                :row-class-name="tableRowClassName"
+                @row-click="commentClick"
+                v-loading="!loggedIn"
+                element-loading-text="登陆以查看本题评论"
+                element-loading-spinner="el-icon-info"
+                size="mini"
+              >
+                <el-table-column
+                  prop="user_belong.username"
+                  label="用户"
+                  :width="80"
+                ></el-table-column>
+                <el-table-column prop="title" label="主题"></el-table-column>
+                <el-table-column
+                  prop="updatetime"
+                  label="活跃时间"
+                  :width="100"
+                  :formatter="time_formatter"
+                ></el-table-column>
+              </el-table>
+              <!-- 默认讨论区隐藏提示 -->
+              <el-row type="flex" justify="center" style="margin-bottom: 0">
+                <el-button
+                  v-if="topics_display"
+                  type="text"
+                  style="color: #909399"
+                  @click="topics_display = false"
+                  ><i class="el-icon-arrow-up"></i> 隐藏讨论</el-button
+                ><el-button
+                  v-else
+                  type="text"
+                  style="color: #909399"
+                  @click="
+                    topics_display = true;
+                    topicsRefresh();
+                  "
+                  ><i class="el-icon-arrow-down"></i> 显示讨论</el-button
+                ></el-row
+              >
             </el-card>
           </el-row>
         </el-col>
@@ -307,6 +378,8 @@ export default {
 
       code: "",
       submissions: [],
+      topics: [],
+      topics_display: false,
 
       waveform: "",
     };
@@ -357,7 +430,9 @@ export default {
         this.title = response.data.name;
         this.level = response.data.level;
 
-        if (this.loggedIn) this.submissionsRefresh();
+        if (this.loggedIn) {
+          this.submissionsRefresh();
+        }
       })
       .catch((error) => {
         this.$message.error(
@@ -416,10 +491,17 @@ export default {
       return false;
     },
 
-    rowClick(row, col, e) {
+    submissionClick(row, col, e) {
       this.$router.push({
         name: "submission",
         params: { submissionid: row.id },
+      });
+    },
+
+    commentClick(row, col, e) {
+      this.$router.push({
+        name: "topic",
+        params: { topicid: row.id },
       });
     },
 
@@ -439,6 +521,33 @@ export default {
           this.submissions = response.data;
         });
     },
+
+    topicsRefresh() {
+      if (!this.loggedIn) {
+        this.$message.error("请登陆后查看评论！");
+        return;
+      }
+      this.$axios.get("/topic/?problem=" + this.id).then((response) => {
+        for (let i = 0; i < response.data.length; i++) {
+          let update_time = moment(response.data[i].update_time).format(
+            "YYYY-MM-DD HH:mm:ss"
+          );
+          for (const comment of response.data[i].comments) {
+            const comment_update_time = moment(comment.update_time).format(
+              "YYYY-MM-DD HH:mm:ss"
+            );
+
+            if (moment(update_time).isBefore(comment_update_time)) {
+              update_time = comment_update_time;
+            }
+          }
+          response.data[i].updatetime = update_time;
+        }
+        this.topics = response.data;
+      });
+    },
+
+    time_formatter: (row) => prettyDate(row.updatetime),
 
     problemEdit: function () {
       this.$router.push({
@@ -486,6 +595,13 @@ export default {
             message: "已取消删除",
           });
         });
+    },
+
+    problemDiscuss: function () {
+      this.$router.push({
+        name: "discussion",
+        params: { problemid: this.id },
+      });
     },
 
     submit: function () {
@@ -588,6 +704,10 @@ export default {
   margin-right: 50px;
   /* word-break: break-all; */
   white-space: pre-line;
+}
+.problem-descriptions >>> * {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 .el-row {
   margin-bottom: 20px;
