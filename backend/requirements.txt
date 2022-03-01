@@ -18,7 +18,7 @@ djangorestframework==3.12.4
 idna==3.2
 itypes==1.2.0
 Jinja2==3.0.1
-kombu==5.1.0
+kombu==5.2.3
 MarkupSafe==2.0.1
 ply==3.11
 prompt-toolkit==3.0.19
