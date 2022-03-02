@@ -232,7 +232,7 @@
                 <el-table-column
                   prop="pretty_time"
                   label="日期"
-                  :width="60"
+                  :width="90"
                 ></el-table-column>
 
                 <el-table-column prop="result" label="状态">

@@ -3,7 +3,7 @@
  * @param {String} time - the JSON formatted time string
  */
 export function prettyDate(time) {
-  let date = new Date((time || "").replace(/-/g, "/").replace(/[TZ]/g, " ")),
+  let date = new Date((time || "").replace(/[TZ]/g, " ")),
     diff = (new Date().getTime() - date.getTime()) / 1000,
     day_diff = Math.floor(diff / 86400);
 
