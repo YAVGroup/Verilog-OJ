@@ -37,41 +37,13 @@
         </el-table>
 
         <!-- 发布帖子 -->
-        <el-card shadow="never" style="margin-top: 20px">
-          <!--提交界面-->
-          <el-row :gutter="15">
-            <i style="padding: 5px 10px" class="el-icon-edit"></i>
-            <div style="display: inline-block; font-size: 20px">
-              发帖 (支持 markdown)
-            </div>
-
-            <div v-if="!loggedIn" style="display: inline-block; float: right">
-              <el-tooltip
-                class="item"
-                effect="dark"
-                content="登陆以进行提交"
-                placement="top"
-              >
-              </el-tooltip>
-            </div>
-            <div style="display: inline-block; float: right" v-else>
-              <el-button
-                type="success"
-                size="medium"
-                @click="submitTopic"
-                style="font-weight: bold; margin-right: 10px; float: right"
-                >提交</el-button
-              >
-              <el-button
-                type="danger"
-                size="medium"
-                @click="topicDescription = ''"
-                style="font-weight: bold; margin-right: 10px; float: right"
-                >清空</el-button
-              >
-            </div>
-          </el-row>
-
+        <submitcard
+          style="margin-top: 20px"
+          title="发帖 (支持 markdown)"
+          :loggedIn="loggedIn"
+          @submit="submitTopic"
+          @clear="(topicDescription = ''), (topicTitle = '')"
+        >
           <!-- 标题编辑 -->
           <el-row>
             <el-col :span="2" type="flex" align="middle">主题：</el-col>
@@ -84,10 +56,9 @@
               ></el-input
             ></el-col>
           </el-row>
-
-          <!--内容编辑-->
-          <markdowneditor v-model="topicDescription"></markdowneditor>
-        </el-card>
+          <!-- 帖子内容编辑 -->
+          <markdowneditor v-model="topicDescription"></markdowneditor
+        ></submitcard>
       </el-col>
     </el-row>
 
@@ -122,11 +93,13 @@ import moment from "moment";
 import { mapState } from "vuex";
 
 import markdowneditor from "@/components/utils/markdowneditor";
+import submitcard from "@/components/utils/submitcard";
 
 export default {
   name: "discussion",
   components: {
     markdowneditor,
+    submitcard,
   },
   methods: {
     toProblemdetail() {

@@ -99,72 +99,15 @@
           </el-row>
 
           <el-row>
-            <el-card shadow="never">
-              <!--提交界面-->
-              <el-row :gutter="15">
-                <i style="padding: 5px 10px" class="el-icon-edit"></i>
-                <div style="display: inline-block; font-size: 20px">
-                  代码编辑
-                </div>
-
-                <div
-                  v-if="!loggedIn"
-                  style="display: inline-block; float: right"
-                >
-                  <el-tooltip
-                    class="item"
-                    effect="dark"
-                    content="登陆以进行提交"
-                    placement="top"
-                  >
-                    <!-- https://github.com/ElemeFE/element/issues/8557 -->
-                    <div
-                      style="
-                        font-weight: bold;
-                        margin-right: 10px;
-                        float: right;
-                      "
-                    >
-                      <el-button
-                        type="success"
-                        size="medium"
-                        @click="submit"
-                        disabled
-                        >提交</el-button
-                      >
-                    </div>
-                  </el-tooltip>
-                  <el-button
-                    type="danger"
-                    size="medium"
-                    @click="code = ''"
-                    style="font-weight: bold; margin-right: 10px; float: right"
-                    >清空</el-button
-                  >
-                </div>
-                <div style="display: inline-block; float: right" v-else>
-                  <el-button
-                    type="success"
-                    size="medium"
-                    @click="submit"
-                    style="font-weight: bold; margin-right: 10px; float: right"
-                    >提交</el-button
-                  >
-                  <el-button
-                    type="danger"
-                    size="medium"
-                    @click="code = ''"
-                    style="font-weight: bold; margin-right: 10px; float: right"
-                    >清空</el-button
-                  >
-                </div>
-              </el-row>
-
-              <!--代码编辑-->
-              <el-row>
-                <codemirror v-model="code" :options="cmOptions"></codemirror>
-              </el-row>
-            </el-card>
+            <!--提交界面-->
+            <submitcard
+              title="代码编辑"
+              :loggedIn="loggedIn"
+              @submit="submit"
+              @clear="code = ''"
+            >
+              <codemirror v-model="code" :options="cmOptions"></codemirror
+            ></submitcard>
           </el-row>
         </el-col>
         <!--侧栏-->
@@ -335,6 +278,7 @@ require("codemirror/theme/base16-dark.css");
 
 require("codemirror/mode/verilog/verilog");
 
+import submitcard from "@/components/utils/submitcard";
 import wavedrom from "@/components/utils/wavedrom";
 import markdownIt from "@/components/utils/markdownIt";
 import userhyperlink from "@/components/utils/userhyperlink";
@@ -346,6 +290,7 @@ import { prettyDate } from "@/utils/timeUtil";
 export default {
   name: "problemdetail",
   components: {
+    submitcard,
     codemirror,
     // statusmini,
     // prostatistice,

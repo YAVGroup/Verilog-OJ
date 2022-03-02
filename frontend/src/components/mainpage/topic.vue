@@ -57,44 +57,13 @@
             </el-row>
           </div>
         </template>
-        <el-card shadow="never" style="margin-top: 20px">
-          <!--提交界面-->
-          <el-row :gutter="15">
-            <i style="padding: 5px 10px" class="el-icon-edit"></i>
-            <div
-              id="comment-edit"
-              style="display: inline-block; font-size: 20px"
-            >
-              评论编辑 (支持 markdown)
-            </div>
-
-            <div v-if="!loggedIn" style="display: inline-block; float: right">
-              <el-tooltip
-                class="item"
-                effect="dark"
-                content="登陆以进行提交"
-                placement="top"
-              >
-              </el-tooltip>
-            </div>
-            <div style="display: inline-block; float: right" v-else>
-              <el-button
-                type="success"
-                size="medium"
-                @click="submitComment"
-                style="font-weight: bold; margin-right: 10px; float: right"
-                >提交</el-button
-              >
-              <el-button
-                type="danger"
-                size="medium"
-                @click="commentText = ''"
-                style="font-weight: bold; margin-right: 10px; float: right"
-                >清空</el-button
-              >
-            </div>
-          </el-row>
-
+        <submitcard
+          style="margin-top: 20px"
+          title="评论编辑 (支持 markdown)"
+          :loggedIn="loggedIn"
+          @submit="submitComment"
+          @clear="commentText = ''"
+        >
           <!-- 提示是否处在回复楼层状态 -->
           <el-row v-if="is_reply"
             >正在回复： #{{ reply_to_floor }}
@@ -103,7 +72,7 @@
 
           <!--评论编辑-->
           <markdowneditor v-model="commentText"></markdowneditor>
-        </el-card>
+        </submitcard>
       </el-col>
     </el-row>
 
@@ -167,6 +136,7 @@ import { mapState } from "vuex";
 import markdownIt from "@/components/utils/markdownIt";
 import markdowneditor from "@/components/utils/markdowneditor";
 import userhyperlink from "@/components/utils/userhyperlink";
+import submitcard from "@/components/utils/submitcard";
 
 export default {
   name: "topic",
@@ -174,6 +144,7 @@ export default {
     markdownIt,
     markdowneditor,
     userhyperlink,
+    submitcard,
   },
   methods: {
     getTopic() {
@@ -285,6 +256,7 @@ export default {
         .then((response) => {
           this.getComments();
           this.commentText = "";
+          this.is_reply = false;
         })
         .catch((error) => {
           this.$message.error(
