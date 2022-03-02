@@ -16,6 +16,7 @@ Verilog OJ 是面向数字电路学习和实践的在线评测平台。
 下文以 Ubuntu 20.04.1 LTS 为例进行说明。
 
 需要的依赖：
+
 - Python 3
   - ~~请注意，PyPI 上目前没有 Python 3.8 预编译的 Pandas 软件包，您可能需要安装 Cython, g++ 等再进行 pip install 操作，否则可能出现错误。~~ (Bumped Pandas to 1.1.4)
 - NodeJS & NPM (需要选择支持 package-lock.json 功能的 NPM 版本，过旧的版本请不要使用)
@@ -26,19 +27,29 @@ Verilog OJ 是面向数字电路学习和实践的在线评测平台。
 > 目前判题脚本中 pyDigitalWaveTools 的版本还没有迁移，请参考 [Judger 中的说明](judger/test/README.md) 部署 libreliu 魔改的 pyDigitalWaveTools 版本。
 
 大致过程：
+
 ```bash
 # Update repo to latest
 sudo apt update && sudo apt upgrade
 
 # Install essential software
-sudo apt install build-essential rabbitmq-server yosys nodejs npm python3-virtualenv 
+sudo apt install build-essential rabbitmq-server yosys nodejs npm python3-virtualenv
 sudo systemctl start rabbitmq-server
 
 git clone https://github.com/lluckydog/Verilog-OJ
+
 cd Verilog-OJ
+
+# 以下采用 venv 虚拟环境，以确保 python 包的版本不会和主环境冲突
+# 也可以采用 anaconda 等达成这一目的
+# 请确保知道这一部分的含义
 virtualenv venv
 . venv/bin/activate
-pip install -r requirements.txt
+
+cd backend
+
+# 安装 python 依赖
+python -m pip install -r requirements.txt
 
 cd frontend
 # 建议先把 npm 源切换为淘宝源，此处略
@@ -54,6 +65,7 @@ cd ../backend
 VERILOG_OJ_DEV=TRUE python manage.py migrate
 
 # 此处创建您测试环境的超级用户的用户名和密码
+# 在后台管理界面也会用到，请妥善保管
 VERILOG_OJ_DEV=TRUE python manage.py createsuperuser
 ```
 
@@ -64,6 +76,16 @@ VERILOG_OJ_DEV=TRUE python manage.py createsuperuser
 ```bash
 cd frontend
 npm run serve
+```
+
+会弹出 Webpack 的分析界面（端口 8888），这并不是我们的前端界面
+
+前端界面通过 `http://localhost:8080/` 访问
+
+每次运行后端和判题服务器前，先确保自己处在之前创建的虚拟环境内，以 venv 为例，如果不在：
+
+```bash
+source venv/bin/activate
 ```
 
 ### 运行后端
@@ -82,6 +104,14 @@ cd backend
 # (use systemctl enable to start on system boot)
 VERILOG_OJ_DEV=TRUE celery -A judge worker -l INFO
 ```
+
+### 题目导入
+
+以上步骤进行完毕后，可以导入题目，进行开发环境的部署测试、
+
+在后端运行的前提下，打开 http://127.0.0.1:8000/oj/admin-django/problem/problem/import_yaml
+
+逐个复制粘贴仓库目录下 assets 内的资源文件内容，提交，即可在前端看到题目
 
 ## 生产环境部署指南
 
