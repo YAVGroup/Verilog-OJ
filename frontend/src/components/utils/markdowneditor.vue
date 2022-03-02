@@ -11,7 +11,7 @@
     <el-row style="text-align: right; margin-top: 10px">
       <el-button type="primary" @click="isPreview = !isPreview">预览</el-button>
     </el-row>
-    <el-card v-if="isPreview && value.length"
+    <el-card v-if="isPreview"
       ><markdownIt :mdSource="value"></markdownIt
     ></el-card>
   </div>
@@ -33,6 +33,12 @@ export default {
       isPreview: false,
     };
   },
-  computed: {},
+  watch: {
+    value(code) {
+      if (code === "") {
+        this.isPreview = false;
+      }
+    },
+  },
 };
 </script>
