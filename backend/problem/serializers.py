@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Problem, TestCase
+from .models import Problem, ProblemBook, TestCase
 
 # TODO: 题目的创建者第一次设置后就不能更改了
 
@@ -35,3 +35,8 @@ class ProblemSerializer(serializers.ModelSerializer):
         model = Problem
         fields = '__all__'
         # read_only_fields = ('creater',)
+
+class ProblemBookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProblemBook
+        fields = '__all__'

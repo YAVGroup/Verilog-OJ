@@ -88,9 +88,15 @@ class TestCase(models.Model):
 
 class ProblemBook(models.Model):
     id = models.AutoField(primary_key=True, help_text='ProblemBook ID')
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        help_text='创建者',
+        default=DEFAULT_USER_ID
+    )
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
+    update_time = models.DateTimeField(auto_now=True, verbose_name=u'修改时间')
+    sequence_id = models.IntegerField(default=0, help_text='Sequence in book page')
     name = models.CharField(max_length=30, help_text='ProblemBook name')
-    # description_short
-    # description
-    # related_problems
-
-    
+    description_short = models.TextField(blank=True)
+    content = models.TextField(blank=True)

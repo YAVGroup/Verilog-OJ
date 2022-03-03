@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Problem, TestCase
+from .models import Problem, ProblemBook, TestCase
 from file.models import File
 from django.urls import path
 from django.template.response import TemplateResponse
@@ -280,3 +280,4 @@ class TestCaseAdmin(admin.ModelAdmin):
 
 admin.site.register(Problem, ProblemAdmin)
 admin.site.register(TestCase, TestCaseAdmin)
+admin.site.register(ProblemBook)

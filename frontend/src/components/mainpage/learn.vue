@@ -23,9 +23,17 @@
         </el-row>
 
         <el-row>
-          <div style="white-space: pre-wrap">
-            111
-          </div>
+          <el-card shadow="never" v-if="books.length == 0">目前尚无可学习的题目集。</el-card>
+
+          <el-col
+            :span="6"
+            v-for="book in books"
+            :key="book.id">
+            <el-card
+              shadow="never"
+              >{{ book.name }}</el-card>
+          </el-col>
+          
         </el-row>
       </el-col>
     </el-row>
@@ -37,16 +45,16 @@ export default {
   name: "learn",
   data() {
     return {
-      news: [],
+      books: [],
     };
   },
   methods: {
     
   },
   created() {
-    // this.$axios.get("/news/").then((response) => {
-    //   this.news = response.data;
-    // });
+    this.$axios.get("/problem-books/").then((response) => {
+      this.books = response.data;
+    });
   },
 };
 </script>

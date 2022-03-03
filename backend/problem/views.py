@@ -2,9 +2,11 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin
 
-from .models import Problem, TestCase
-from .serializers import ProblemSerializer, TestCaseSerializer, ProblemAdvancedListSerializer
+from .models import Problem, TestCase, ProblemBook
+from .serializers import ProblemSerializer, TestCaseSerializer, ProblemAdvancedListSerializer, ProblemBookSerializer
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -70,3 +72,10 @@ class TestCaseViewSet(ModelViewSet):
     permission_classes = (permissions.GetOnlyPermission,)
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('id','problem','type')
+
+class ProblemBookViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
+    queryset = ProblemBook.objects.all()
+    serializer_class = ProblemBookSerializer
+    pagination_class = LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('id', 'owner', 'sequence_id')
