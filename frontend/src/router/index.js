@@ -30,6 +30,17 @@ export default new Router({
         import( /* webpackChunkName: "main" */ "@/components/main"),
     },
 
+    // Learn
+    {
+      path: "/learn/",
+      name: "learn",
+      component: () =>
+        import(
+          /* webpackChunkName: "learn" */
+          "@/components/mainpage/learn"
+        ),
+    },
+
     // News
     {
       path: "/newsdetail/:newsid",
