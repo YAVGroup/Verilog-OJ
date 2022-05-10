@@ -104,7 +104,7 @@
               title="代码编辑"
               :loggedIn="loggedIn"
               @submit="submit"
-              @clear="code = ''"
+              @clear="code = template_code"
             >
               <codemirror v-model="code" :options="cmOptions"></codemirror
             ></submitcard>
@@ -322,12 +322,18 @@ export default {
       id: null,
 
       code: "",
+      template_code: "",
       submissions: [],
       topics: [],
       topics_display: false,
 
       waveform: "",
     };
+  },
+  watch: {
+    code: function (code) {
+      localStorage.setItem("code" + this.id, code);
+    },
   },
   created() {
     this.id = this.$route.params.problemid;
@@ -347,12 +353,17 @@ export default {
           response.data.create_time
         ).format("YYYY-MM-DD HH:mm:ss");
 
-        this.code = "";
         if (response.data.template_code_file != null) {
           this.$axios
             .get("/files/" + response.data.template_code_file + "/")
             .then((response) => {
-              this.code = response.data;
+              this.template_code = response.data;
+              const local_code = localStorage.getItem("code" + this.id);
+              if (local_code != null) {
+                this.code = local_code;
+              } else {
+                this.code = this.template_code;
+              }
             });
         }
 
