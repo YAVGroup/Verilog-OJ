@@ -33,7 +33,7 @@ Verilog OJ 是面向数字电路学习和实践的在线评测平台。
 sudo apt update && sudo apt upgrade
 
 # Install essential software
-sudo apt install build-essential rabbitmq-server yosys nodejs npm python3-virtualenv
+sudo apt install build-essential rabbitmq-server yosys nodejs npm python3-virtualenv iverilog
 sudo systemctl start rabbitmq-server
 
 git clone https://github.com/lluckydog/Verilog-OJ
