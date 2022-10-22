@@ -41,6 +41,16 @@ export default new Router({
         ),
     },
 
+    {
+      path: "/learn/:bookid",
+      name: "learndetail",
+      component: () =>
+        import(
+          /* webpackChunkName: "learn" */
+          "@/components/mainpage/learndetail"
+        ),
+    },
+
     // News
     {
       path: "/newsdetail/:newsid",

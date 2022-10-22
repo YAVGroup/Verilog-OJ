@@ -8,27 +8,27 @@
       </el-col>
       <el-col :xs="24" :sm="20" :md="16" :lg="16" :xl="16">
         <!-- 筛选器 TODO -->
-        <!-- <el-row>
+        <el-row>
             <el-card shadow="never">
             <el-row>
                 <h3 style="display: inline-block; margin: 3px 0px">
-                题目页
+                专题学习
                 </h3>
             </el-row>
             <el-row>
                 <div>
-                本页面采取书籍形式进行题库中题目的组织，同时附有说明性文字介绍，以期为您的数字电路设计学习过程提供一些方便。
+                本页面采取专题形式进行题库中题目的组织，同时附有说明性文字介绍，以期为您的数字电路设计学习过程提供一些方便。
                 </div>
             </el-row>
             </el-card>
-        </el-row> -->
+        </el-row>
 
         <el-row>
           <el-card shadow="never" v-if="books.length == 0">目前尚无可学习的题目集。</el-card>
 
           <el-row v-for="rowIndex in Math.ceil(books.length / 3)" :key="rowIndex">
             <el-col :span="7" v-for="(book, index) in books.slice((rowIndex - 1) * 3, rowIndex * 3)" :key="book.id" :offset="index > 0 ? 1 : 0">
-              <el-card :body-style="{ padding: '0px' }" style="margin-bottom: 20px;">
+              <el-card shadow="never" :body-style="{ padding: '0px' }" style="margin-bottom: 20px;">
                 <div style="padding: 14px;">
                     <el-popover
                       placement="bottom"
@@ -36,7 +36,7 @@
                       width="200"
                       trigger="hover"
                       :content="book.description_short.length > 0 ? book.description_short : '暂无简介'">
-                      <el-button type="text" style="font-size: 16px;" slot="reference">{{ book.name }}</el-button>
+                      <el-button type="text" style="font-size: 16px;" slot="reference" @click="jumpToBook(book.id)">{{ book.name }}</el-button>
                     </el-popover>
                 </div>
               </el-card>
@@ -58,7 +58,12 @@ export default {
     };
   },
   methods: {
-    
+    jumpToBook: function (bookID) {
+      this.$router.push({
+        name: "learndetail",
+        params: { bookid: bookID },
+      });
+    },
   },
   created() {
     this.$axios.get("/problem-books/").then((response) => {
