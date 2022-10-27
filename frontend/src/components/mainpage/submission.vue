@@ -8,8 +8,13 @@
       </el-col>
       <el-col :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
         <el-row class="main-title">
-          <i class="el-icon-info"></i>
-          提交结果
+          <el-col>
+            <i class="el-icon-info"></i>
+            提交结果
+          </el-col>
+          <el-button type="primary" plain @click="tryAgain"
+            ><i class="el-icon-d-arrow-right"></i> 继续尝试</el-button
+          >
         </el-row>
         <el-row>
           <el-card shadow="never">
@@ -127,6 +132,12 @@
   font-size: 20px;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  display: flex;
+  align-items: center;
+}
+
+.main-title .el-button {
+  font-size: 16px;
 }
 
 .left-aligned {
@@ -192,6 +203,7 @@ export default {
           this.submit_time = new Date(response.data.submit_time);
           console.log(this.submit_time.toISOString());
           this.subm_userid = response.data.user;
+          this.problem_id = response.data.problem_belong.id;
 
           let passed = 0;
           for (let i = 0; i < this.results.length; i++) {
@@ -234,6 +246,12 @@ export default {
         return type;
       }
     },
+    tryAgain() {
+      this.$router.push({
+        name: "problemdetail",
+        params: { problemid: this.problem_id },
+      });
+    },
   },
   data() {
     return {
@@ -258,6 +276,7 @@ export default {
       submit_time: new Date(),
       related_testcases: [],
       subm_userid: "",
+      problem_id: 0,
 
       autoRefresh: false,
     };

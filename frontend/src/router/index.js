@@ -13,7 +13,7 @@ Router.prototype.push = function push(location, onResolve, onReject) {
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: "history",
 
   // Ref: https://cli.vuejs.org/guide/mode-and-env.html#using-env-variables-in-client-side-code
@@ -190,3 +190,14 @@ export default new Router({
     //   }
   ],
 });
+
+router.afterEach((to, from) => {
+  if (to.name == "submission" && from.name == "problemdetail") {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+});
+
+export default router;
