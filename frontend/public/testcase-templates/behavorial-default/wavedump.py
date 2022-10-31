@@ -182,20 +182,22 @@ class VcdConverter:
     def parseValue(self, val_str):
         """ Note: b111xx1 -> x """
         if val_str[0] == "b":
+            if val_str.find("z") != -1:
+                return "z"
             if val_str.find("x") != -1:
                 return "x"
             return int(val_str[1:], base=2)
         elif len(val_str) == 1:
-            if val_str[0] == "x":
-                return "x"
+            if val_str[0] in ["x", "z"]:
+                return val_str[0]
             else:
                 return int(val_str, base=2)
         else:
             raise VcdSignalValueParseError("Unknown value type")
 
     def toBinRepr(self, val, width):
-        if val == 'x':
-            return 'x' * width
+        if val in ['x', 'z']:
+            return val * width
 
         striped = bin(val)[2:]
         assert(width >= len(striped))
