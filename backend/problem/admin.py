@@ -80,6 +80,14 @@ class ProblemAdmin(admin.ModelAdmin):
                         read_file_into_info(f_inst)
                     )
 
+            templ_fs = prob_inst.template_code_files.all()
+            if len(templ_fs) > 0:
+                prob["template_code_files"] = []
+                for templ_f in templ_fs:
+                    prob["template_code_files"].append(
+                        read_file_into_info(templ_f)
+                    )
+
             if prob_inst.template_code_file is not None:
                 prob["template_code_file"] = read_file_into_info(
                     prob_inst.template_code_file)
@@ -167,6 +175,7 @@ class ProblemAdmin(admin.ModelAdmin):
                 problem_info['app_data'] = read_optional('app_data')
 
                 problem_info['template_code_file'] = read_file_info(read_optional('template_code_file'))
+                problem_info['template_code_files'] = read_optionals('template_code_files', read_file_info)
                 problem_info['description_files'] = read_optionals('description_files', read_file_info)
                 problem_info['judge_files'] = read_optionals('judge_files', read_file_info)
                 problem_info['testcases'] = read_optionals('testcases', read_testcase)
@@ -218,6 +227,11 @@ class ProblemAdmin(admin.ModelAdmin):
                 if prob['template_code_file'] is not None:
                     file_inst = save_file_to_db(prob['template_code_file'])
                     prob_inst.template_code_file = file_inst
+                
+                if prob['template_code_files'] is not None:
+                    for finfo in prob['template_code_files']:
+                        file_inst = save_file_to_db(finfo)
+                        prob_inst.template_code_files.add(file_inst)
                 
                 if prob['description_files'] is not None:
                     for finfo in prob['description_files']:

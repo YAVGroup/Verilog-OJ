@@ -24,10 +24,10 @@ class Problem(models.Model):
     description_input = models.TextField(help_text='输入描述（文字）')
     description_output = models.TextField(help_text='输出描述（文字）')
     description_files = models.ManyToManyField(File, help_text='描述文件', related_name='description', blank=True)
-    
-    template_code_file = models.ForeignKey(
-        File, on_delete=models.SET_NULL, null=True, blank=True,
-        help_text='模板代码文件', related_name="template_code"
+
+    template_code_files = models.ManyToManyField(
+        File, blank=True,
+        help_text='模板代码文件', related_name="template_codes"
     )
     app_data = models.TextField(help_text='样例用到的波形图', blank=True)
     judge_files = models.ManyToManyField(File, help_text='评测所用文件', related_name='judge', blank=True)

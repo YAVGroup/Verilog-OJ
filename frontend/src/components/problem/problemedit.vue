@@ -775,7 +775,7 @@ export default {
                 this.judgeWorkspaceTemplates[templateName].url +
                 "/" +
                 this.judgeWorkspaceTemplates[templateName].content
-                  .template_code_file,
+                  .template_code_files[0],
               baseURL: process.env.BASE_URL,
             }).then((response) => {
               let fileInst = this.judgeWorkspaceAddFile(
@@ -784,7 +784,7 @@ export default {
               fileInst.fileName =
                 this.judgeWorkspaceTemplates[
                   templateName
-                ].content.template_code_file;
+                ].content.template_code_files[0];
               fileInst.content = response.data;
             }),
             // judge_files
@@ -1134,7 +1134,7 @@ export default {
           });
 
           let judgeFiles = problem.judge_files;
-          let templateCodeFile = problem.template_code_file;
+          let templateCodeFile = problem.template_code_files[0];
 
           let problemPromises = [
             // template_code_file

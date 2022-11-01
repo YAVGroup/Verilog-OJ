@@ -353,11 +353,12 @@ export default {
           response.data.create_time
         ).format("YYYY-MM-DD HH:mm:ss");
 
-        if (response.data.template_code_file != null) {
+        if (response.data.template_code_files != null) {
           this.$axios
-            .get("/files/" + response.data.template_code_file + "/")
+            .get("/files/" + response.data.template_code_files[0] + "/")
             .then((response) => {
               this.template_code = response.data;
+            //   this.$message(this.template_code);
               const local_code = localStorage.getItem("code" + this.id);
               if (local_code != null) {
                 this.code = local_code;
