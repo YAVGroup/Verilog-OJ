@@ -561,11 +561,11 @@ problems:
     - name: main.sh
       content: |-
         #!/bin/bash
-        iverilog ./testcase/testbench.v ./problem/mux_ref.v -o ref_run
+        iverilog ./testcase/testbench.v ./problem/*.v -o ref_run
         vvp ref_run
         mv out.vcd out_ref.vcd
 
-        iverilog ./testcase/testbench.v ./submit/code.v -o mux_run
+        iverilog ./testcase/testbench.v ./submit/*.v -o mux_run
 
         if [ $? -ne 0 ]; then
           echo "CE" > possible_error.txt
