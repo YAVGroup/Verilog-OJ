@@ -98,16 +98,42 @@
         </el-row>
         <el-row v-else>
           <!-- 代码显示 -->
-          <el-alert title="Code：" type="info" :closable="false">
+          <el-alert type="info" :closable="false">
+            <el-button plain>
+              <i class="el-icon-refresh-left"></i>
+              <div>撤销</div>
+            </el-button>
+            <el-button plain>
+              <i class="el-icon-refresh-right"></i>
+              <div>重做</div>
+            </el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button plain>
+              <i class="el-icon-scissors"></i>
+              <div>剪切</div>
+            </el-button>
             <el-button
-              size="mini"
+              plain
               v-clipboard:copy="code"
               v-clipboard:success="onCopy"
               v-clipboard:error="onError"
-              >Copy</el-button
-            >
-            <el-button size="mini" @click="downloadFile(submissionid, code)"
-              >Download</el-button
+              ><i class="el-icon-document-copy"></i>
+              <div>复制</div>
+            </el-button>
+            <el-button plain>
+              <i class="el-icon-data-board"></i>
+              <div>粘贴</div>
+            </el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button plain>
+              <i class="el-icon-document"></i>
+              <div>全选</div>
+            </el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button plain @click="downloadFile(submissionid, code)"
+              ><i class="el-icon-download"></i>
+              <div>下载</div>
+            </el-button
             >
           </el-alert>
 
@@ -146,6 +172,28 @@
 
 .right-aligned {
   text-align: right;
+}
+
+.el-alert .el-button {
+  padding: 6px 12px;
+}
+
+.el-alert .el-button i {
+  font-size: 22px;
+}
+
+.el-alert .el-button div {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.el-alert {
+  padding: 6px;
+}
+
+.el-alert .el-divider {
+  height: 32px;
+  vertical-align: baseline;
 }
 </style>
 
