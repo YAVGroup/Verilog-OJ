@@ -1,6 +1,5 @@
 <template>
   <div>
-    <el-row> &nbsp; </el-row>
     <el-row :gutter="15">
       <el-col :xs="0" :sm="1" :md="2" :lg="2" :xl="4" class="placeholder">
         <!-- placeholder only -->
@@ -106,8 +105,78 @@
               @submit="submit"
               @clear="code = template_code"
             >
-              <codemirror v-model="code" :options="cmOptions"></codemirror
-            ></submitcard>
+              <el-row>
+                <el-col class="filelist" :span="6">
+                  <div>文件列表</div>
+                  <div>
+                    <el-button plain type="primary">
+                      <i class="el-icon-document-add"></i>
+                      <div>新建</div>
+                    </el-button>
+                    <el-button plain type="primary">
+                      <i class="el-icon-document-copy"></i>
+                      <div>复制</div>
+                    </el-button>
+                    <el-button plain type="primary">
+                      <i class="el-icon-document-remove"></i>
+                      <div>重命名</div>
+                    </el-button>
+                    <el-button plain type="danger">
+                      <i class="el-icon-document-delete"></i>
+                      <div>删除</div>
+                    </el-button>
+                  </div>
+                  <div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div class="active">code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                    <div>code.v</div>
+                    <div>code2.v</div>
+                  </div>
+                </el-col>
+                <el-col :span="18" class="editor">
+                  <div>code.v</div>
+                  <codemirror v-model="code" :options="cmOptions"></codemirror>
+                </el-col>
+              </el-row>
+            </submitcard>
           </el-row>
         </el-col>
         <!--侧栏-->
@@ -262,11 +331,6 @@
   </div>
 </template>
 
-<style scope>
-.CodeMirror {
-  height: 500px;
-}
-</style>
 <script>
 import moment from "moment";
 import { codemirror } from "vue-codemirror";
@@ -673,5 +737,87 @@ export default {
   display: inline-block;
   height: auto;
   max-width: 75%;
+}
+
+.el-card__body > .el-row:nth-child(2) {
+  margin: 0;
+}
+
+.filelist {
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #cbced5;
+  box-sizing: border-box;
+  border-right: none;
+}
+
+.filelist > div:first-child {
+  height: 36px;
+  box-sizing: border-box;
+  text-align: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #cbced5;
+}
+
+.filelist > div:nth-child(2) {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 4px;
+  border-bottom: 1px solid #cbced5;
+}
+
+.filelist > div:nth-child(2) > button {
+  padding: 4px;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.filelist > div:nth-child(2) > button div {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.filelist > div:nth-child(3) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 4px 10px;
+  overflow-y: scroll;
+}
+
+.filelist > div:nth-child(3) > div {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 2px solid white;
+  user-select: none;
+}
+
+.filelist > div:nth-child(3) > div:hover {
+  background-color: #d9ecff;
+}
+
+.filelist > div:nth-child(3) > .active {
+  border: 2px solid #8cc5ff;
+}
+
+.editor > div:first-child {
+  height: 36px;
+  line-height: 24px;
+  text-align: center;
+  padding: 6px 0;
+  border: 1px solid #cbced5;
+  border-bottom: none;
+  box-sizing: border-box;
+}
+</style>
+
+<style>
+.CodeMirror {
+  height: 464px;
+  border: 1px solid #cbced5;
+  box-sizing: border-box;
 }
 </style>
