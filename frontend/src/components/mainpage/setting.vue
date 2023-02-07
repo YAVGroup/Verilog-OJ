@@ -6,7 +6,7 @@
           <div style="text-align: center; margin: 5px">昵称</div>
         </el-col>
         <el-col :span="12">
-          <el-input v-model="form.name" autocomplete="off"></el-input>
+          <el-input v-model="form.username" autocomplete="off"></el-input>
         </el-col>
       </el-row>
       <el-row :gutter="10">
@@ -106,17 +106,16 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "setting",
   data() {
     return {
-      username: "",
-      name: "",
       form: {
-        username: "",
         password: "",
         confirm: "",
-        name: "",
+        username: "",
         des: "",
         school: "",
         course: "",
@@ -126,17 +125,16 @@ export default {
         qq: "",
         email: "",
       },
-      userid: -1,
     };
   },
   methods: {
     updateClick() {
-      if (!this.username) {
+      if (!this.userID) {
         this.$message.error("非法访问！");
         return;
       }
       if (
-        !this.form.name ||
+        !this.form.username ||
         !this.form.school ||
         !this.form.course ||
         !this.form.classes ||
@@ -153,7 +151,7 @@ export default {
         return;
       }
 
-      if (this.form.name.length < 2) {
+      if (this.form.username.length < 2) {
         this.$message.error("昵称太短！");
         return;
       }
@@ -183,44 +181,45 @@ export default {
       ).then(() => {
         // TODO: fix this
         //this.form.password = this.form.password;
-        this.$axios
-          .put("/changeone/", this.form)
-
-          .then(
-            (response) => {
-              this.$message({
-                message: "更新成功！",
-                type: "success",
-              });
-              sessionStorage.setItem("name", this.form.name);
-              this.$router.push({
-                name: "user",
-                query: { username: this.form.username },
-              });
-            },
-            (response) => {
-              this.$message.error("更新失败（" + response + "）");
-            }
-          );
+        this.$axios.put(`/users/${this.userID}/`, this.form).then(
+          (response) => {
+            this.$message({
+              message: "更新成功！",
+              type: "success",
+            });
+            this.$parent.showHome();
+          },
+          (response) => {
+            this.$message.error("更新失败（" + response + "）");
+          }
+        );
       });
     },
+    async updateUserInfo() {
+      if (this.userID) {
+        const resp_data = (await this.$axios.get(`/users/${this.userID}`)).data;
+        this.form.username = resp_data.username;
+        this.form.des = resp_data.des || "这个人很懒，什么都没有没有留下。";
+        this.form.school = resp_data.school;
+        this.form.course = resp_data.course;
+        this.form.classes = resp_data.classes;
+        this.form.number = resp_data.number;
+        this.form.realname = resp_data.realname;
+        this.form.qq = resp_data.qq;
+        this.form.email = resp_data.email;
+      }
+    },
   },
-  created() {
-    this.username = this.$route.params.username;
-    this.form.username = this.username;
-    if (this.username) {
-      this.$axios.get("/user/?username=" + this.username).then((response) => {
-        this.form.name = response.data[0].name;
-        this.form.school = response.data[0].school;
-        this.form.course = response.data[0].course;
-        this.form.classes = response.data[0].classes;
-        this.form.number = response.data[0].number;
-        this.form.realname = response.data[0].realname;
-        this.form.qq = response.data[0].qq;
-        this.form.email = response.data[0].email;
-        this.userid = this.username;
-      });
-    }
+  computed: {
+    ...mapState(["loggedIn", "userID", "username", "isSuperUser"]),
+  },
+  watch: {
+    userID: function () {
+      this.updateUserInfo();
+    },
+  },
+  created: async function () {
+    await this.updateUserInfo();
   },
 };
 </script>
