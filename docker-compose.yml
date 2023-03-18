@@ -3,6 +3,7 @@ version: "3.7"
 services:
   # public port 80, the only port exposed
   web:
+    restart: always
     build:
       context: ./frontend
       dockerfile: Dockerfile.nginx
@@ -15,6 +16,7 @@ services:
   
   # api address on 0.0.0.0:8000
   backend:
+    restart: always
     build:
       context: ./backend
       dockerfile: Dockerfile.django
@@ -50,6 +52,7 @@ services:
   # - Useful command: `show variables like 'character%';` in mysql
   # ref: https://stackoverflow.com/questions/45729326/how-to-change-the-default-character-set-of-mysql-using-docker-compose
   db:
+    restart: always
     # 5.7 raises InnoDB limit, so VARCHAR(255) is possible
     # - So no need to alter Django stuff, probably
     # - http://mysql.rjweb.org/doc.php/limits#767_limit_in_innodb_indexes
@@ -66,6 +69,7 @@ services:
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
 
   mqserver:
+    restart: always
     image: "rabbitmq:3.8-management"
 
     environment:
@@ -73,6 +77,7 @@ services:
       RABBITMQ_DEFAULT_PASS: ${rabbitmq_password}
 
   judgeworker:
+    restart: always
     build:
       context: ./backend
       dockerfile: Dockerfile.judger
