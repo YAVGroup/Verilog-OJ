@@ -119,23 +119,64 @@ problems:
 
         class VcdComparator:
 
-            def compare_signals(self, ref, ud):
-                # compare width
-                if ref['type']['width'] != ud['type']['width']:
-                    raise VcdSignalComparationError("Signal {} have different width between ref ({}) and ud ({})".format(
-                        ref['name'], ref['type']['width'], ud['type']['width']))
+          def compare_signals(self, ref, ud):
+              # compare width
+              if ref['type']['width'] != ud['type']['width']:
+                  raise VcdSignalComparationError("Signal {} have different width between ref ({}) and ud ({})".format(
+                      ref['name'], ref['type']['width'], ud['type']['width']))
 
-                # No need to compare sigType (reg/wire.. anything else?)
+              # No need to compare sigType (reg/wire.. anything else?)
 
-                # signal comparation
-                # TODO: support for different types ('b0' with 'b000' or 'd0' or something...)
-                
-                # Since value change dump theoretically only generates data when changes
-                # so direct diffing should work
-                for i, val in enumerate(ref['data']):
-                    if ud['data'][i] != val:
-                        raise VcdSignalComparationError("Signal {} have difference on time {} (ref={}, ud={})".format(
-                            ref['name'], val[0], val, ud['data'][i]))
+              # signal comparation
+              # TODO: support for different types ('b0' with 'b000' or 'd0' or something...)
+              
+              # Since value change dump theoretically only generates data when changes
+              # so direct diffing should work
+              index_ref = 0
+              index_ud = 0
+              time1 = 0
+              time2 = 0
+              val1 = ref['data'][0][1]
+              val2 = ud['data'][0][1]
+
+              while (index_ref+1) <= len(ref['data']) and (index_ud+1) <= len(ud['data']):
+                  time1 = ref['data'][index_ref][0]
+                  time2 = ud['data'][index_ud][0]
+                  if time1 < time2:
+                      val1 = ref['data'][index_ref][1]
+                  elif time1 > time2:
+                      val2 = ud['data'][index_ud][1]
+                  else:
+                      val1 = ref['data'][index_ref][1]
+                      val2 = ud['data'][index_ud][1]
+
+                  if val1 != val2:
+                      raise VcdSignalComparationError("Signal {} have difference on time {} (ref={}, ud={})".format(
+                          ref['name'], time1, ref['data'][index_ref], ud['data'][index_ud]))
+
+                  if time1 < time2:
+                      index_ref += 1
+                  elif time1 == time2:
+                      index_ref += 1
+                      index_ud += 1
+                  else:
+                      index_ud += 1
+
+              while (index_ref+1) <= len(ref['data']):
+                  time1 = ref['data'][index_ref][0]
+                  val1= ref['data'][index_ref][1]
+                  if val1 != val2:
+                      raise VcdSignalComparationError("Signal {} have difference on time {} (ref={}, ud={})".format(
+                          ref['name'], time1, ref['data'][index_ref], ud['data'][index_ud]))
+                  index_ref += 1
+                  
+              while (index_ud+1) <= len(ud['data']):
+                  time2 = ud['data'][index_ud][0]
+                  val2 = ud['data'][index_ud][1]
+                  if val1 != val2:
+                      raise VcdSignalComparationError("Signal {} have difference on time {} (ref={}, ud={})".format(
+                          ref['name'], time2, ref['data'][index_ref], ud['data'][index_ud]))
+                  index_ud += 1
 
             def dump_hierarchy(self, data_obj):
                 # TODO: only dump names
