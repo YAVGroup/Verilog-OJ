@@ -95,7 +95,7 @@ class VcdComparator:
         val1 = ref['data'][0][1]
         val2 = ud['data'][0][1]
 
-        while (index_ref+1) <= len(ref['data']) or (index_ud+1) <= len(ud['data']):
+        while (index_ref+1) <= len(ref['data']) and (index_ud+1) <= len(ud['data']):
             time1 = ref['data'][index_ref][0]
             time2 = ud['data'][index_ud][0]
             if time1 < time2:
@@ -118,9 +118,23 @@ class VcdComparator:
             else:
                 index_ud += 1
 
-        if time1 != time2:
-            raise VcdSignalComparationError("Signal {} have difference on time {} (ref={}, ud={})".format(
-                ref['name'], time1, ref['data'][index_ref], ud['data'][index_ud]))  
+        while (index_ref+1) <= len(ref['data']):
+            time1 = ref['data'][index_ref][0]
+            val1= ref['data'][index_ref][1]
+            if val1 != val2:
+                raise VcdSignalComparationError("Signal {} have difference on time {} (ref={}, ud={})".format(
+                    ref['name'], time1, ref['data'][index_ref], ud['data'][index_ud]))
+            index_ref += 1
+            
+        while (index_ud+1) <= len(ud['data']):
+            time2 = ud['data'][index_ud][0]
+            val2 = ud['data'][index_ud][1]
+            if val1 != val2:
+                raise VcdSignalComparationError("Signal {} have difference on time {} (ref={}, ud={})".format(
+                    ref['name'], time2, ref['data'][index_ref], ud['data'][index_ud]))
+            index_ud += 1
+         
+
 
     def dump_hierarchy(self, data_obj):
         # TODO: only dump names
@@ -154,7 +168,11 @@ class VcdComparator:
         try:
             # compare all signals
             for i in range(0, len(self.signals_ref)):
-                self.compare_signals(self.signals_ref[i], self.signals_ut[i])
+                if len(self.signals_ref[i]) == len(self.signals_ut[i]):
+                    self.compare_signals(self.signals_ref[i], self.signals_ut[i])
+                else:
+                    raise VcdSignalComparationError("Signal {} have different hierarchy depth between ref ({}) and ud ({})".format(
+                        self.signals_ref[i]['name'], len(self.signals_ref[i]), len(self.signals_ut[i])))
             return (True, "No error")
         except VcdSignalComparationError as e:
             return (False, "{}".format(e))
@@ -182,22 +200,20 @@ class VcdConverter:
     def parseValue(self, val_str):
         """ Note: b111xx1 -> x """
         if val_str[0] == "b":
-            if val_str.find("z") != -1:
-                return "z"
             if val_str.find("x") != -1:
                 return "x"
             return int(val_str[1:], base=2)
         elif len(val_str) == 1:
-            if val_str[0] in ["x", "z"]:
-                return val_str[0]
+            if val_str[0] == "x":
+                return "x"
             else:
                 return int(val_str, base=2)
         else:
             raise VcdSignalValueParseError("Unknown value type")
 
     def toBinRepr(self, val, width):
-        if val in ['x', 'z']:
-            return val * width
+        if val == 'x':
+            return 'x' * width
 
         striped = bin(val)[2:]
         assert(width >= len(striped))
