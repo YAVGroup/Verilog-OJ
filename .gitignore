@@ -1,5 +1,7 @@
 **/__pycache__
+lib/
 venv/
+venv_new/
 
 # Editor directories and files
 .idea

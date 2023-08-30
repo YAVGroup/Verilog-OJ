@@ -134,7 +134,6 @@ export default {
       if (command == "setting") {
         this.$router.push({
           name: "setting",
-          params: { username: this.username },
         });
       }
       // if (command == "submittion") {

@@ -25,8 +25,9 @@ services:
         USE_APK_MIRROR: "yes"
         USE_MYSQL: "yes"
     environment:
+      VERILOG_OJ_DEV: "TRUE"
       VERILOG_OJ_HOST_STATIC: "yes"
-      #VERILOG_OJ_PROD_DEBUG: "yes"
+      # VERILOG_OJ_PROD_DEBUG: "yes"
       VERILOG_OJ_JUDGER_SECRET: ${judger_secret}
       VERILOG_OJ_SECRET_KEY: ${secret_key}
       VERILOG_OJ_USE_MYSQL: "yes"
