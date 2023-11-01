@@ -42,6 +42,10 @@ class ProblemViewSet(ModelViewSet):
     search_fields = ('name', 'level', 'tags')
     pagination_class = LimitOffsetPagination
     #serializer_class = ProblemSerializer
+    def get_object(self):
+        obj = super().get_object()
+        obj.viewed()
+        return obj
 
     def get_serializer_class(self):
         """

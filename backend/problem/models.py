@@ -24,6 +24,7 @@ class Problem(models.Model):
     description_input = models.TextField(help_text='输入描述（文字）')
     description_output = models.TextField(help_text='输出描述（文字）')
     description_files = models.ManyToManyField(File, help_text='描述文件', related_name='description', blank=True)
+    views = models.PositiveIntegerField(help_text='浏览量', default=0)
     
     template_code_file = models.ForeignKey(
         File, on_delete=models.SET_NULL, null=True, blank=True,
@@ -32,6 +33,10 @@ class Problem(models.Model):
     app_data = models.TextField(help_text='样例用到的波形图', blank=True)
     judge_files = models.ManyToManyField(File, help_text='评测所用文件', related_name='judge', blank=True)
     
+    def viewed(self):
+        self.views += 1
+        self.save(update_fields=['views'])
+
     def get_testcases(self):
         "获得该题目所有测试点"
         return TestCase.objects.filter(problem=self)
