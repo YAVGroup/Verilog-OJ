@@ -24,5 +24,8 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
                 return False
         elif obj.name == "code_ref.v":
             return False
-        else:
+        # Temporary restrictions
+        elif obj.name.endswith('.v') or obj.name.endswith('.sh') or obj.name.endswith('.py'):
             return True
+        else:
+            return False
