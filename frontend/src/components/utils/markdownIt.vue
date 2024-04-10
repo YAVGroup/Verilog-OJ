@@ -5,7 +5,12 @@
 </template>
 
 <script>
-var md = require('markdown-it')({
+
+// See: https://www.npmjs.com/package/markdown-it-for-inline
+// Also, play with https://markdown-it.github.io/ for token stream examples
+let mdTokIterator = require('markdown-it-for-inline');
+
+let md = require('markdown-it')({
   html:         false,        // Enable HTML tags in source
   xhtmlOut:     false,        // Use '/' to close single tags (<br />).
                               // This is only for full CommonMark compatibility.
@@ -31,13 +36,51 @@ var md = require('markdown-it')({
   highlight: function (/*str, lang*/) { return ''; }
 });
 
+
 export default {
   name: "markdownIt",
   props: {
-    mdSource: String
+    mdSource: String,
+    enableProblemRewrite: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {};
+  },
+  methods: {
+    isNumeric(val) {
+      return /^\d+$/.test(val);
+    }
+  },
+  created() {
+    if (this.enableProblemRewrite) {
+      // Rewrite Rule 1: [OJ-QUESTION-ONELINE](79)
+      //  or of the form [OJ-QUESTION-ONELINE](problem-name-url)
+      //  (problem-name-url must contain non-digit characters)
+      md.use(
+        mdTokIterator,
+        'oneline_question_replace',
+        'link_open',
+        function (tokens, idx) {
+          // Make sure link contains only text
+          if ((tokens[idx + 2].type !== 'link_close') ||
+            (tokens[idx + 1].type !== 'text')) {
+            return;
+          }
+          
+          if (tokens[idx + 1].content == 'OJ-QUESTION-ONELINE') {
+            let problemRef = tokens[idx].attrs[1];
+            // if (isNumeric(problemRef)) {
+            //   let problemID = Number(problemRef);
+
+            // } else {
+              
+            // }
+          }
+      });
+    }
   },
   computed: {
     renderedHTML: function () {
