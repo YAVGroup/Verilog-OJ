@@ -20,6 +20,7 @@
     "js-cookie": "^2.2.1",
     "luxon": "^1.28.0",
     "markdown-it": "^12.2.0",
+    "markdown-it-for-inline": "^0.1.1",
     "moment": "^2.29.1",
     "vue": "^2.6.14",
     "vue-clipboard2": "^0.3.1",
