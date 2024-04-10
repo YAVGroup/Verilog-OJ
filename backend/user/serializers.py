@@ -16,9 +16,16 @@ class UserSerializer(serializers.ModelSerializer):
     total_score = serializers.IntegerField(source='get_total_score', read_only=True)
     undone_problems = serializers.ListField(source='get_undone_problems', read_only=True)
 
+
+    # WARN: Serializer fields that are set without read-only can be updated on call to create/update.
+    #       and some priviledge escalations can occur.
+    # To avoid, use https://www.django-rest-framework.org/api-guide/serializers/#specifying-read-only-fields
+    # to set explicitly
     class Meta:
         model = User
-        exclude = ['is_staff', 'is_active', 'groups', 'user_permissions'] # 这些字段现在暂时用不上
+        exclude = ['is_staff', 'is_active', 'groups', 'user_permissions'] # 这些字段现在暂时用不上，且暴露会给出 create/update 方法
+        read_only_fields = ['is_superuser', 'is_mail_authenticated', 'student_id', 'date_joined', 'last_login']
+
 
 # 仅给出用户对外界公开的信息
 class UserPublicSerializer(serializers.ModelSerializer):
@@ -34,6 +41,7 @@ class UserPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ['password', 'is_staff', 'is_active', 'is_mail_authenticated', 'groups', 'user_permissions']
+        read_only_fields = ['is_superuser', 'is_mail_authenticated', 'student_id', 'date_joined', 'last_login']
 
 class UserPublicListSerializer(serializers.ModelSerializer):
     class Meta:
