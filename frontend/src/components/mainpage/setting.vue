@@ -1,258 +1,145 @@
 <template>
-  <el-card shadow="always" id="card">
-    <el-form :model="form">
-      <el-row :gutter="10">
-        <el-col :span="3">
-          <div style="text-align: center; margin: 5px">昵称</div>
-        </el-col>
-        <el-col :span="12">
-          <el-input v-model="form.name" autocomplete="off"></el-input>
-        </el-col>
-      </el-row>
-      <el-row :gutter="10">
-        <el-col :span="3">
-          <div style="text-align: center; margin: 5px">介绍</div>
-        </el-col>
-        <el-col :span="12">
-          <el-input v-model="form.des" autocomplete="off"></el-input>
-        </el-col>
-      </el-row>
-      <el-row :gutter="10">
-        <el-col :span="3">
-          <div style="text-align: center; margin: 5px">
-            新密码（不更改，请输入上次密码）
-          </div>
-        </el-col>
-        <el-col :span="12">
-          <el-input
-            type="password"
-            v-model="form.password"
-            autocomplete="off"
-          ></el-input>
-        </el-col>
-      </el-row>
-      <el-row :gutter="10">
-        <el-col :span="3">
-          <div style="text-align: center; margin: 5px">确认密码</div>
-        </el-col>
-        <el-col :span="12">
-          <el-input
-            type="password"
-            v-model="form.confirm"
-            autocomplete="off"
-          ></el-input>
-        </el-col>
-      </el-row>
-      <el-row :gutter="10">
-        <el-col :span="3">
-          <div style="text-align: center; margin: 5px">学校</div>
-        </el-col>
-        <el-col :span="12">
-          <el-input v-model="form.school" autocomplete="off"></el-input>
-        </el-col>
-      </el-row>
-      <el-row :gutter="10">
-        <el-col :span="3">
-          <div style="text-align: center; margin: 5px">专业</div>
-        </el-col>
-        <el-col :span="12">
-          <el-input v-model="form.course" autocomplete="off"></el-input>
-        </el-col>
-      </el-row>
-      <el-row :gutter="10">
-        <el-col :span="3">
-          <div style="text-align: center; margin: 5px">班级</div>
-        </el-col>
-        <el-col :span="12">
-          <el-input v-model="form.classes" autocomplete="off"></el-input>
-        </el-col>
-      </el-row>
-      <el-row :gutter="10">
-        <el-col :span="3">
-          <div style="text-align: center; margin: 5px">学号</div>
-        </el-col>
-        <el-col :span="12">
-          <el-input v-model="form.number" autocomplete="off"></el-input>
-        </el-col>
-      </el-row>
-      <el-row :gutter="10">
-        <el-col :span="3">
-          <div style="text-align: center; margin: 5px">真实姓名</div>
-        </el-col>
-        <el-col :span="12">
-          <el-input v-model="form.realname" autocomplete="off"></el-input>
-        </el-col>
-      </el-row>
-      <el-row :gutter="10">
-        <el-col :span="3">
-          <div style="text-align: center; margin: 5px">QQ</div>
-        </el-col>
-        <el-col :span="12">
-          <el-input v-model="form.qq" autocomplete="off"></el-input>
-        </el-col>
-      </el-row>
-      <el-row :gutter="10">
-        <el-col :span="3">
-          <div style="text-align: center; margin: 5px">Email</div>
-        </el-col>
-        <el-col :span="12">
-          <el-input v-model="form.email" autocomplete="off"></el-input>
-        </el-col>
-      </el-row>
-    </el-form>
+  <div>
+    <el-row> &nbsp; </el-row>
+    <el-row>
+      <el-col :xs="0" :sm="2" :md="4" :lg="6" :xl="6" class="placeholder">
+        <!-- placeholder only -->
+        &nbsp;
+      </el-col>
+      <el-col :xs="24" :sm="20" :md="16" :lg="12" :xl="12">
+        <el-row>
+          <el-col>
+            <i class="el-icon-info"></i>
+              用户账户设置
+          </el-col>
+        </el-row>
+        <el-card shadow="none" id="card"
+                v-loading="!loggedIn"
+                element-loading-text="登陆以修改用户账户信息"
+                element-loading-spinner="el-icon-info">
+          <el-form :model="form">
+            <el-row :gutter="10">
+              <el-col :span="3">
+                <div style="text-align: center; margin: 5px">用户名</div>
+              </el-col>
+              <el-col :span="12">
+                <el-input v-model="form.username" autocomplete="off"></el-input>
+              </el-col>
+            </el-row>
+            <el-row :gutter="10">
+              <p>为了增强用户账户的安全性，请设置安全的密码。</p>
+              <p>密码应该满足如下的要求：</p>
+              <ul :key="index" v-for="(item, index) in passwordRequirements">
+                <li>{{ item }}</li>
+              </ul>
+            </el-row>
+            <el-row :gutter="10">
+              <el-col :span="3">
+                <div style="text-align: center; margin: 5px">
+                  新密码
+                </div>
+              </el-col>
+              <el-col :span="12">
+                <el-input
+                  type="password"
+                  v-model="form.password"
+                  placeholder="请输入新密码"
+                  autocomplete="off"
+                ></el-input>
+              </el-col>
+            </el-row>
+            <el-row :gutter="10">
+              <el-col :span="3">
+                <div style="text-align: center; margin: 5px">确认密码</div>
+              </el-col>
+              <el-col :span="12">
+                <el-input
+                  type="password"
+                  v-model="form.confirmPassword"
+                  placeholder="请输入确认密码"
+                  autocomplete="off"
+                ></el-input>
+              </el-col>
+            </el-row>
+          </el-form>
 
-    <el-button type="primary" @click="updateClick">更新</el-button>
-  </el-card>
+          <el-button type="primary" @click="updateClick">更新</el-button>
+        </el-card>
+      </el-col>
+    </el-row>
+
+  </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "setting",
   data() {
     return {
-      username: "",
-      name: "",
+      passwordRequirements: [],
       form: {
         username: "",
         password: "",
-        confirm: "",
-        name: "",
-        des: "",
-        school: "",
-        course: "",
-        classes: "",
-        number: "",
-        realname: "",
-        qq: "",
-        email: "",
+        confirmPassword: "",
       },
-      userid: -1,
     };
   },
   methods: {
     updateClick() {
-      if (!this.username) {
-        this.$message.error("非法访问！");
+      if (!this.form.username) {
+        this.$message.error("请输入新的用户名");
         return;
       }
-      if (
-        !this.form.name ||
-        !this.form.school ||
-        !this.form.course ||
-        !this.form.classes ||
-        !this.form.number ||
-        !this.form.realname ||
-        !this.form.qq ||
-        !this.form.email
-      ) {
-        this.$message.error("字段不能为空！");
-        return;
-      }
-      if (this.form.password != this.form.confirm) {
-        this.$message.error("两次密码不一致！");
+      
+      if (this.form.password != this.form.confirmPassword) {
+        this.$message.error("您输入的密码和确认密码不一致，请重新输入");
         return;
       }
 
-      if (this.form.name.length < 2) {
-        this.$message.error("昵称太短！");
-        return;
-      }
-
-      if (!this.form.password) {
-        this.$message.error("请输入密码");
-        return;
-      }
-
-      if (this.form.password.length < 6) {
-        this.$message.error("密码太短！");
-        return;
-      }
-
-      if (this.form.des.length <= 0) {
-        this.form.des = "这个人很懒，什么都没有没有留下。";
-      }
-
-      this.$confirm(
-        "确定更新吗?",
-        "如果你在参与一场比赛，请勿更新你的【昵称】，会影响排行榜计算，后果自负！",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-        }
-      ).then(() => {
-        // TODO: fix this
-        //this.form.password = this.form.password;
-        this.$axios
-          .put("/changeone/", this.form)
-
-          .then(
-            (response) => {
-              this.$message({
-                message: "更新成功！",
-                type: "success",
-              });
-              sessionStorage.setItem("name", this.form.name);
-              this.$router.push({
-                name: "user",
-                query: { username: this.form.username },
-              });
-            },
-            (response) => {
-              this.$message.error("更新失败（" + response + "）");
-            }
+      this.$axios
+        .post("/user/password-strength-validation/", {password: this.form.password})
+        .then((response) => {
+          // Validation successful
+          this.$axios.patch("/users/" + this.$store.state.userID + "/", {
+            "username": this.form.username,
+            "password": this.form.password
+          }).then((response) => {
+            this.$message({
+              message: "修改成功！",
+              type: "success",
+            });
+            this.$store.dispatch("refreshLogInStatus");
+          }).catch((error) => {
+            this.$message.error(
+              "修改失败：\n" + JSON.stringify(error.response.data)
+            );
+            this.$store.dispatch("refreshLogInStatus");
+          });
+        })
+        .catch((error) => {
+          this.$message.error(
+            "密码强度校验失败：\n" + error.response.data.errors.join("\n")
           );
-      });
+        });
     },
   },
   created() {
-    this.username = this.$route.params.username;
-    this.form.username = this.username;
-    if (this.username) {
-      this.$axios.get("/user/?username=" + this.username).then((response) => {
-        this.form.name = response.data[0].name;
-        this.form.school = response.data[0].school;
-        this.form.course = response.data[0].course;
-        this.form.classes = response.data[0].classes;
-        this.form.number = response.data[0].number;
-        this.form.realname = response.data[0].realname;
-        this.form.qq = response.data[0].qq;
-        this.form.email = response.data[0].email;
-        this.userid = this.username;
-      });
-    }
+    this.form.username = this.$store.state.username;
+    this.$axios.get("/user/password-strength-validation/").then((response) => {
+      this.passwordRequirements = response.data.password_requirements;
+    })
   },
+  computed: mapState(
+    ["loggedIn"]
+  ),
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#card {
-  margin: 200px;
-  padding: 200px;
-}
-.el-table .warning-row {
-  background: #fff9f9;
-}
-
-.el-table .success-row {
-  background: #e6ffdf;
-}
-
-.el-table .info-row {
-  background: #fffff7;
-}
-
-.el-table .judging-row {
-  background: #f7ffff;
-}
-
-.el-table .danger-row {
-  background: #fff9f9;
-}
-
-.el-tag {
-  text-align: center;
-  font-weight: bold;
+.el-row {
+  margin-bottom: 20px;
 }
 </style>

@@ -42,6 +42,7 @@ const store = new Vuex.Store({
     userID: 0,
     username: "",
     isSuperUser: false,
+    isPasswordStrong: false
   },
   mutations: {
     logIn(state, payload) {
@@ -49,13 +50,19 @@ const store = new Vuex.Store({
       state.userID = payload.userID;
       state.username = payload.username;
       state.isSuperUser = payload.isSuperUser;
+      state.isPasswordStrong = payload.isPasswordStrong;
     },
     logOut(state) {
       state.loggedIn = false;
       state.userID = 0;
       state.username = "";
       state.isSuperUser = false;
+      state.isPasswordStrong = false;
     },
+    // Will be called when password vulnerability have fixed
+    markPasswordStrong(state) {
+      state.isPasswordStrong = true;
+    }
   },
   actions: {
     /**
@@ -76,8 +83,26 @@ const store = new Vuex.Store({
             userID: response.data.id,
             username: response.data.username,
             isSuperUser: response.data.is_superuser,
+            isPasswordStrong: response.data.is_password_strong
           });
-          this.dialogLoginVisible = false;
+        })
+        .catch((error) => {
+          payload.fail_cb(error);
+        });
+    },
+    /**
+     * Log out the system.
+     * @param {*} context
+     * @param {*} payload - contains { username, password, success_cb, fail_cb }
+     */
+    logOut(context, payload) {
+      axios
+        .get("/user/logout/")
+        .then((response) => {
+          payload.success_cb(response);
+          context.commit({
+            type: "logOut",
+          });
         })
         .catch((error) => {
           payload.fail_cb(error);
@@ -100,6 +125,7 @@ const store = new Vuex.Store({
             userID: response.data.userID,
             username: response.data.username,
             isSuperUser: response.data.isSuperUser,
+            isisPasswordStrong: response.data.isPasswordStrong
           });
         } else if (!response.data.isLoggedIn && this.state.loggedIn) {
           console.log("[ INFO ] Login state invalidated, do logOut");

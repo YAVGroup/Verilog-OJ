@@ -1,7 +1,9 @@
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.contrib.auth import login, logout
+from django.contrib.auth.password_validation import validate_password, password_validators_help_texts
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
@@ -10,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
 from rest_framework.compat import coreapi, coreschema
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.parsers import JSONParser
 from django.http import HttpResponseRedirect
 
 from cas_client import CASClient
@@ -80,14 +83,16 @@ class UserLoginStatusView(APIView):
                 'isLoggedIn': False,
                 'username': '',
                 'userID': 0,
-                'isSuperUser': False
+                'isSuperUser': False,
+                'isPasswordStrong': False
             })
         else:
             return Response({
                 'isLoggedIn': True,
                 'username': request.user.username,
                 'userID': request.user.id,
-                'isSuperUser': request.user.is_superuser
+                'isSuperUser': request.user.is_superuser,
+                'isPasswordStrong': request.user.is_password_strong
             })
 
 class UserLogoutView(APIView):
@@ -191,3 +196,22 @@ class UserSignupView(GenericAPIView):
         except Exception as e:
             return Response(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+
+class UserPasswordStrengthValidationView(APIView):
+    """
+    Check if the password is within policy
+    """
+    parser_classes = [JSONParser]
+
+    def post(self, request, *args, **kwargs):
+        password = request.data.get('password', '')
+        try:
+            validate_password(password)
+            return Response({'password_strength': 'Strong'}, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            return Response({'password_strength': 'Weak', 'errors': e.messages}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self, request, *args, **kwargs):
+        return Response({
+            'password_requirements': password_validators_help_texts()
+        }, status=status.HTTP_200_OK)
