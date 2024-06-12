@@ -1,0 +1,63 @@
+version: '3.7'
+services:
+  # Update this to the name of the service you want to work with in your docker-compose.yml file
+
+  backend:
+    # Uncomment if you want to override the service's Dockerfile to one in the .devcontainer 
+    # folder. Note that the path of the Dockerfile and context is relative to the *primary* 
+    # docker-compose.yml file (the first in the devcontainer.json "dockerComposeFile"
+    # array). The sample below assumes your primary file is in the root of your project.
+    #
+    build:
+      context: ./backend
+      dockerfile: ../.devcontainer/backend-container/Dockerfile.django.devContainer
+      args:
+        USE_PIP_MIRROR: "yes"
+        USE_APT_MIRROR: "yes"
+        USE_MYSQL: "yes"
+    environment:
+      VERILOG_OJ_PROD_DEBUG: "yes"
+      VERILOG_OJ_DEV_CONTAINER_USED: "yes"
+
+    volumes:
+      # Update this to wherever you want VS Code to mount the folder of your project
+      # This is relative to the root docker compose file.
+      # Cached means to mount it read only. Can only change from outside
+      - .:/workspaces:cached
+
+    # Uncomment the next four lines if you will use a ptrace-based debugger like C++, Go, and Rust.
+    # cap_add:
+    #   - SYS_PTRACE
+    # security_opt:
+    #   - seccomp:unconfined
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: ['/bin/sh', '-c', 'while sleep 1000; do :; done']
+
+  web:
+    # Uncomment if you want to override the service's Dockerfile to one in the .devcontainer 
+    # folder. Note that the path of the Dockerfile and context is relative to the *primary* 
+    # docker-compose.yml file (the first in the devcontainer.json "dockerComposeFile"
+    # array). The sample below assumes your primary file is in the root of your project.
+    #
+    build:
+      context: ./frontend
+      dockerfile: ../.devcontainer/web-container/Dockerfile.node.devContainer
+    environment:
+      VERILOG_OJ_DEV_CONTAINER_USED: "yes"
+
+    volumes:
+      # Update this to wherever you want VS Code to mount the folder of your project
+      # This is relative to the root docker compose file.
+      # Cached means to mount it read only. Can only change from outside
+      - .:/workspaces:cached
+
+    # Uncomment the next four lines if you will use a ptrace-based debugger like C++, Go, and Rust.
+    # cap_add:
+    #   - SYS_PTRACE
+    # security_opt:
+    #   - seccomp:unconfined
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: ['/bin/sh', '-c', 'while sleep 1000; do :; done']
+ 

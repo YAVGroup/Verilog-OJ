@@ -1,0 +1,9 @@
+FROM node:10.23
+
+# Create and setup workspace folder
+WORKDIR /workspaces
+
+EXPOSE 8080
+
+# Setup default user
+# USER node

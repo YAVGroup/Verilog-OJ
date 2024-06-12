@@ -1,0 +1,37 @@
+FROM ubuntu:20.04
+LABEL maintainer="libreliu@foxmail.com"
+
+WORKDIR /workspaces
+
+ARG USE_PIP_MIRROR=yes
+ARG USE_APT_MIRROR=yes
+ARG USE_MYSQL=yes
+
+RUN (test ${USE_PIP_MIRROR} = yes \
+    && \
+    (pip3 config set global.index-url https://mirrors.aliyun.com/pypi/simple/) \
+    || \
+    (echo "pip mirror config untouched.");) \
+    && (test ${USE_APT_MIRROR} = yes \
+    && \
+    (sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list) \
+    || \
+    (echo "apt mirror config untouched.");)
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    libmariadb-dev \
+    gcc \
+    g++ \
+    make \
+    libffi-dev \
+    libssl-dev \
+    git
+
+RUN (test ${USE_MYSQL} = yes \
+    && pip3 install mysqlclient==2.0.1 \
+    || echo "Skipped MySQL setup." \
+    ) \
+    && pip3 install gunicorn==20.0.4
+
