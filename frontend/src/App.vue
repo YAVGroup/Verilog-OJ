@@ -52,6 +52,8 @@
 
     <login ref="logindialog"></login>
 
+    <mandatoryPasswordChange :dialogVisible="loggedIn && !isPasswordStrong"></mandatoryPasswordChange>
+
     <el-backtop :bottom="50">
       <div
         style="
@@ -89,13 +91,16 @@ export default {
   components: {
     login: (resolve) => require(["@/login"], resolve),
     register: (resolve) => require(["@/register"], resolve),
+    mandatoryPasswordChange: (resolve) => require(["@/mandatoryPasswordChange"], resolve),
   },
   data() {
     return {
       school: "USTC",
     };
   },
-  computed: mapState(["loggedIn", "userID", "username", "isSuperUser"]),
+  computed: mapState(
+    ["loggedIn", "userID", "username", "isSuperUser", "isPasswordStrong"]
+  ),
   methods: {
     loginopen() {
       this.$refs.logindialog.open();
@@ -111,22 +116,22 @@ export default {
     },
     handleCommand(command) {
       if (command == "logout") {
-        this.$axios
-          .get("/user/logout/")
-          .then((response) => {
-            this.$store.commit({
-              type: "logOut",
-            });
+        this.$store.dispatch("logOut", {
+          // Note on JS newbie:
+          // () => {} don't provide their own this binding
+          // while function () {} provides
+          success_cb: () => {
             this.$message({
               message: "登出成功！",
               type: "success",
             });
-          })
-          .catch((error) => {
+          },
+          fail_cb: (error) => {
             this.$message.error(
               "服务器错误！" + "(" + JSON.stringify(error.response.data) + ")"
             );
-          });
+          },
+        });
       }
       if (command == "home") {
         this.showHome();

@@ -7,6 +7,12 @@ class User(AbstractUser):
         default=False,
         help_text='邮箱是否已经被验证（目前没用）'
     )
+    # Whether the password is strong enough
+    is_password_strong = models.BooleanField(
+        default=False,
+        help_text='Whether the password is strong enough'
+    )
+
     student_id = models.CharField(
         max_length=10, null=True, blank=True,
         help_text='学生ID，标记是否经过统一身份验证'
@@ -54,16 +60,16 @@ class User(AbstractUser):
         
         return undone_problems
 
-    def get_ac_submission(self):
-        "获得该用户AC的所有submission（仅id）"
-        from submission.models import Submission, SubmissionResult
-        ac_submission = set()
-        ac_problems = set()
-        for submission in self.get_submissions():
-            if submission.is_ac() and submission.problem.id not in ac_problems:
-                ac_submission.add(submission.id)
-                ac_problems.add(submission.problem.logic_id)
-        return ac_submission
+    # def get_ac_submission(self):
+    #     "获得该用户AC的所有submission（仅id）"
+    #     from submission.models import Submission, SubmissionResult
+    #     ac_submission = set()
+    #     ac_problems = set()
+    #     for submission in self.get_submissions():
+    #         if submission.is_ac() and submission.problem.id not in ac_problems:
+    #             ac_submission.add(submission.id)
+    #             ac_problems.add(submission.problem.logic_id)
+    #     return ac_submission
     
     def get_total_score(self):
         "获得该用户提交的所有题目最大分数总和"

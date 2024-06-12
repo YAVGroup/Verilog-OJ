@@ -9,7 +9,8 @@ module.exports = {
   devServer: {
     proxy: {
       "/oj/api": {
-        target: "http://localhost:8000/oj/api",
+        target: process.env.VERILOG_OJ_DEV_CONTAINER_USED == "yes" ? 
+                "http://backend:8000/oj/api" : "http://localhost:8000/oj/api",
         changeOrigin: true,
         pathRewrite: {
           "^/oj/api": "/",

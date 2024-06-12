@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import User
 from django.http import HttpResponse
 import io, csv
@@ -6,7 +7,7 @@ from submission.models import Submission, SubmissionResult
 from problem.models import Problem
 from django.utils import timezone
 
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(BaseUserAdmin):
     list_display = ('username','student_id', 'problems_done', 'ac_problems_count','total_score')
     actions = ['export_csv']
     
