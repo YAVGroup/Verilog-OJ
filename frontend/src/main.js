@@ -125,7 +125,7 @@ const store = new Vuex.Store({
             userID: response.data.userID,
             username: response.data.username,
             isSuperUser: response.data.isSuperUser,
-            isisPasswordStrong: response.data.isPasswordStrong
+            isPasswordStrong: response.data.isPasswordStrong
           });
         } else if (!response.data.isLoggedIn && this.state.loggedIn) {
           console.log("[ INFO ] Login state invalidated, do logOut");
