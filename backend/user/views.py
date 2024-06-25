@@ -188,7 +188,6 @@ class UserSignupView(GenericAPIView):
         # 注册
         try:
             data = request.data.copy()
-            data['password'] = make_password(data['password'])
             serializer = UserSerializer(data=data)
             serializer.is_valid(True)
             serializer.save()
