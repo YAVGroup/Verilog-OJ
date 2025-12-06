@@ -69,7 +69,7 @@ class UserPublicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ['password', 'is_staff', 'is_active', 'is_mail_authenticated', 'groups', 'user_permissions', 'is_password_strong']
+        exclude = ['password', 'is_staff', 'is_active', 'is_mail_authenticated', 'groups', 'user_permissions', 'is_password_strong', 'email']
         read_only_fields = ['is_superuser', 'is_mail_authenticated', 'student_id', 'date_joined', 'last_login', 'id']
 
 class UserPublicListSerializer(serializers.ModelSerializer):

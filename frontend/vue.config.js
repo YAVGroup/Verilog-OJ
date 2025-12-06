@@ -2,7 +2,7 @@
 module.exports = {
   // In VLab environment, we use vlab.ustc.edu.cn/oj/... to access
   publicPath: process.env.NODE_ENV === "production" ? "/oj/" : "/",
-
+  productionSourceMap: false,
   assetsDir: "",
 
   // Used to forward API requests to Django

@@ -26,7 +26,7 @@ urlpatterns = [
     path(settings.WEBPATH_PREFIX, include(
         [
             path('admin-django/', admin.site.urls),
-            url('docs/', include_docs_urls(title="接口文档", authentication_classes=[], permission_classes=[])),
+            # url('docs/', include_docs_urls(title="接口文档", authentication_classes=[], permission_classes=[])),
             url('api/', include('user.urls')),
             url('api/', include('file.urls')),
             url('api/', include('problem.urls')),
