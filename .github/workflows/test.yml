@@ -10,7 +10,7 @@ on:
 jobs:
   frontend_test:
     name: Frontend Test
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
@@ -35,7 +35,7 @@ jobs:
       working-directory: ./frontend
   backend_test:
     name: Backend Test
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       VERILOG_OJ_DEV: "TRUE"
       VERILOG_OJ_JUDGER_SECRET: "SOMETHING"
