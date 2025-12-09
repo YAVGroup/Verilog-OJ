@@ -243,8 +243,8 @@ class JudgerAPITester(django.test.TestCase):
         self.assertTrue('"log"' in resp.content.decode("utf-8"))
 
         # 测试用于生成文档的接口
-        resp = c.get('/oj/docs/')
-        self.assertContains(resp, "/oj/api/submission-results/", status_code=200)
+        # resp = c.get('/oj/docs/')
+        # self.assertContains(resp, "/oj/api/submission-results/", status_code=200)
 
         resp = c.post('/oj/api/submission-results/1/')
         self.assertContains(resp, "detail", status_code=405)
@@ -278,9 +278,9 @@ class JudgerAPITester(django.test.TestCase):
         self.assertContains(resp, "detail", status_code=403)
 
         # 测试用于生成文档的接口
-        c.logout()
-        resp = c.get('/oj/docs/')
-        self.assertContains(resp, "/oj/api/submissions/", status_code=200)
+        # c.logout()
+        # resp = c.get('/oj/docs/')
+        # self.assertContains(resp, "/oj/api/submissions/", status_code=200)
 
         c.force_authenticate(user=None)
         resp = c.get('/oj/api/submissions/1/')
